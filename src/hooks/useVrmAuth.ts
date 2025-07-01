@@ -29,8 +29,13 @@ export const useVrmAuthQuery = <T = any>(
 
   const queryKey = ['auth', endpoint, method, params, data];
 
-  const queryResult = useQuery<VormiaAuthResponse<T>, VormiaError>({
+  const queryConfig = {
+    ...queryOptions,
     queryKey,
+  };
+
+  const queryResult = useQuery<VormiaAuthResponse<T>, VormiaError>({
+    ...queryConfig,
     queryFn: async (): Promise<VormiaAuthResponse<T>> => {
       try {
         let response: any;

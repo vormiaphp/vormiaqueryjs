@@ -6,6 +6,7 @@ export { useVrmMutation } from './hooks/useVrmMutation';
 export { createVormiaClient } from './client/createVormiaClient';
 
 // Types
+export type { VormiaError } from './client/utils/VormiaError';
 export type {
   VormiaConfig,
   VormiaQueryOptions,
@@ -16,5 +17,4 @@ export type {
   HttpMethod,
 } from './types';
 
-// Utils
-export { VormiaError } from './utils/VormiaError';
+// VormiaError is now exported from the types section above

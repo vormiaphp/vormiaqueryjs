@@ -1,8 +1,12 @@
 src/
-rollup.config.js
-.babelrc
 .gitignore
 *.log
 coverage/
 .nyc_output/
 .env*
+.vscode/
+*.local
+.DS_Store
+node_modules/
+*.tsbuildinfo
+dist/tsconfig.tsbuildinfo

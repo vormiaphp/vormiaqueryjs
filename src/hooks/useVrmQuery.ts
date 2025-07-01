@@ -26,8 +26,13 @@ export const useVrmQuery = <T = any>(
 
   const queryKey = [endpoint, method, params, data];
 
-  const queryResult = useQuery<VormiaResponse<T>, VormiaError>({
+  const queryConfig = {
+    ...queryOptions,
     queryKey,
+  };
+
+  const queryResult = useQuery<VormiaResponse<T>, VormiaError>({
+    ...queryConfig,
     queryFn: async (): Promise<VormiaResponse<T>> => {
       try {
         let response: any;

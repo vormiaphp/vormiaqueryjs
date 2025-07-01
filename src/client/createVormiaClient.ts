@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { VormiaConfig, VormiaError } from '../types';
-import { encryptData, decryptData } from '../utils/encryption';
+import { encryptData, decryptData } from './utils/encryption';
 
 export class VormiaClient {
   private axiosInstance: AxiosInstance;
