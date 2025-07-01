@@ -1,5 +1,4 @@
 // Main entry point
-export { VormiaQueryProvider } from './providers/VormiaQueryProvider.js';
 export { useVrmQuery } from './hooks/useVrmQuery.js';
 export { useVrmAuth } from './hooks/useVrmAuth.js';
 export { useVrmMutation } from './hooks/useVrmMutation.js';
