@@ -1,8 +1,8 @@
-import { VormiaConfig, VormiaError, VormiaRequestConfig, VormiaInstance } from '../types';
+import { VormiaConfig, VormiaError, VormiaRequestConfig, VormiaInstance, VormiaResponse } from '../types';
 import { encryptData } from './utils/encryption';
 
 // Helper function to convert headers to HeadersInit
-const toHeadersInit = (headers?: Record<string, string | string[] | undefined>): HeadersInit => {
+const toHeadersInit = (headers?: Record<string, string | string[] | undefined>): Record<string, string> => {
   const result: Record<string, string> = {};
   if (!headers) return result;
   
@@ -101,7 +101,7 @@ const createHttpClient = (baseConfig: VormiaRequestConfig): VormiaInstance => {
       }
     },
     defaults: {
-      headers: { ...baseConfig.headers }
+      headers: toHeadersInit(baseConfig.headers)
     }
   };
   

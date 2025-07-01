@@ -3,11 +3,13 @@ import react from '@vitejs/plugin-react';
 import dts from 'vite-plugin-dts';
 import { libInjectCss } from 'vite-plugin-lib-inject-css';
 import { resolve } from 'path';
+import { svelte } from '@sveltejs/vite-plugin-svelte';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
+    svelte(),
     libInjectCss(),
     dts({
       insertTypesEntry: true,
@@ -71,5 +73,14 @@ export default defineConfig({
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
+  },
+  test: {
+    environment: 'jsdom',
+    include: ['src/**/*.test.ts', 'src/**/*.test.js'],
+    globals: true,
+    setupFiles: [],
+    coverage: {
+      reporter: ['text', 'json', 'html'],
+    },
   },
 });
