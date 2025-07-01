@@ -384,3 +384,104 @@ npm test
 ## License
 
 MIT License. See [LICENSE](LICENSE) for details.
+
+---
+
+## Extra Usage Examples
+
+### 1. Encrypted Mutation (React)
+
+```jsx
+import { useVrmMutation } from "vormiaquery";
+
+function SendSecret() {
+  const mutation = useVrmMutation({
+    endpoint: "/secret",
+    method: "POST",
+    rsaEncrypt: true, // Enable RSA encryption
+  });
+
+  const handleSend = async () => {
+    await mutation.mutate({ message: "Top Secret" });
+  };
+
+  return <button onClick={handleSend}>Send Secret</button>;
+}
+```
+
+### 2. Decrypting an Encrypted Response (Node.js/SSR)
+
+```js
+import { VormiaClient } from "vormiaquery";
+
+const client = new VormiaClient({
+  baseURL: "https://api.example.com",
+  rsaEncrypt: true,
+  privateKey: process.env.VORMIA_PRIVATE_KEY,
+  publicKey: process.env.VORMIA_PUBLIC_KEY,
+});
+
+async function getEncryptedData() {
+  const response = await client.get("/secure-data");
+  // response.data is automatically decrypted
+  console.log(response.data);
+}
+```
+
+### 3. Using VormiaQuery with Custom Headers
+
+```js
+import { useVrmQuery } from "vormiaquery";
+
+const { data } = useVrmQuery({
+  endpoint: "/profile",
+  method: "GET",
+  headers: {
+    "X-Requested-With": "VormiaQuery",
+    "X-Custom-Token": "abc123",
+  },
+});
+```
+
+### 4. Error Handling for Validation Errors
+
+```js
+import { useVrmMutation } from "vormiaquery";
+
+function RegisterForm() {
+  const mutation = useVrmMutation({ endpoint: "/register", method: "POST" });
+
+  const handleRegister = async (formData) => {
+    try {
+      await mutation.mutateAsync(formData);
+    } catch (error) {
+      if (error.isValidationError()) {
+        // Show validation errors to the user
+        const errors = error.getValidationErrors();
+        alert(JSON.stringify(errors));
+      }
+    }
+  };
+
+  // ...form rendering
+}
+```
+
+### 5. VormiaQuery in a Next.js API Route (Node.js)
+
+```js
+// pages/api/proxy.js
+import { VormiaClient } from "vormiaquery";
+
+const client = new VormiaClient({
+  baseURL: "https://api.example.com",
+  rsaEncrypt: true,
+  privateKey: process.env.VORMIA_PRIVATE_KEY,
+  publicKey: process.env.VORMIA_PUBLIC_KEY,
+});
+
+export default async function handler(req, res) {
+  const apiRes = await client.get("/protected-data");
+  res.status(200).json(apiRes.data);
+}
+```
