@@ -1,7 +1,7 @@
 {
-  "name": "vormiaquery",
+  "name": "vormiaqueryjs",
   "version": "1.0.0",
-  "description": "A npm package for query management with VormiaPHP laravel Backend application",
+  "description": "Vormia Query Js - A npm package for query management with VormiaPHP laravel Backend application",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "exports": {
@@ -49,13 +49,13 @@
     "data-fetching",
     "api"
   ],
-  "homepage": "https://github.com/vormiaphp/vormiaquery#readme",
+  "homepage": "https://github.com/vormiaphp/vormiaqueryjs#readme",
   "bugs": {
-    "url": "https://github.com/vormiaphp/vormiaquery/issues"
+    "url": "https://github.com/vormiaphp/vormiaqueryjs/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vormiaphp/vormiaquery.git"
+    "url": "git+https://github.com/vormiaphp/vormiaqueryjs.git"
   },
   "license": "MIT",
   "author": "vormiateam",
