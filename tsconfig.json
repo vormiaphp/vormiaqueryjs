@@ -1,24 +1,21 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "useDefineForClassFields": true,
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
+    "target": "ES2015",
     "module": "ESNext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": false,
-    "jsx": "preserve",
-    "jsxImportSource": "solid-js",
-    "declaration": true,
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "sourceMap": true,
     "outDir": "./dist",
     "rootDir": "./src",
+    "strict": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
     "baseUrl": ".",
     "paths": {
       "svelte": ["./node_modules/svelte"],
@@ -26,7 +23,8 @@
       "vue": ["./node_modules/vue"],
       "@builder.io/qwik": ["./node_modules/@builder.io/qwik"]
     },
-    "types": ["node", "vite/client"]
+    "typeRoots": ["./node_modules/@types"],
+    "types": ["node"]
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.test.tsx"]

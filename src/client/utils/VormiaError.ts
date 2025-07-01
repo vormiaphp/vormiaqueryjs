@@ -1,15 +1,15 @@
-import { AxiosResponse } from 'axios';
+import { VormiaResponse } from '../../types';
 
 export class VormiaError extends Error {
   public status?: number;
-  public response?: AxiosResponse;
+  public response?: VormiaResponse<any>;
   public code?: string;
   public data?: any;
 
-  constructor(message: string, status?: number, response?: AxiosResponse, code?: string) {
+  constructor(message: string, status?: number, response?: VormiaResponse<any>, code?: string) {
     super(message);
     this.name = 'VormiaError';
-    this.status = status;
+    this.status = status || response?.status;
     this.response = response;
     this.code = code;
     this.data = response?.data;

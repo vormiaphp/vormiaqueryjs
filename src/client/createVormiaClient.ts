@@ -1,9 +1,115 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
-import { VormiaConfig, VormiaError } from '../types';
-import { encryptData, decryptData } from './utils/encryption';
+import { VormiaConfig, VormiaError, VormiaRequestConfig, VormiaInstance } from '../types';
+import { encryptData } from './utils/encryption';
+
+// Helper function to convert headers to HeadersInit
+const toHeadersInit = (headers?: Record<string, string | string[] | undefined>): HeadersInit => {
+  const result: Record<string, string> = {};
+  if (!headers) return result;
+  
+  Object.entries(headers).forEach(([key, value]) => {
+    if (Array.isArray(value)) {
+      result[key] = value.join(',');
+    } else if (value !== undefined) {
+      result[key] = value;
+    }
+  });
+  
+  return result;
+};
+
+// Create a simple HTTP client that matches our VormiaInstance interface
+const createHttpClient = (baseConfig: VormiaRequestConfig): VormiaInstance => {
+  const client: VormiaInstance = {
+    request: async <T = any>(config: VormiaRequestConfig): Promise<VormiaResponse<T>> => {
+      const fullUrl = config.url ? new URL(config.url, config.baseURL || baseConfig.baseURL).toString() : '';
+      const headers = toHeadersInit({
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        ...baseConfig.headers,
+        ...config.headers,
+      });
+
+      try {
+        const response = await fetch(fullUrl, {
+          method: config.method || 'GET',
+          headers,
+          body: config.data ? JSON.stringify(config.data) : undefined,
+          credentials: config.withCredentials || baseConfig.withCredentials ? 'include' : 'same-origin',
+        });
+
+        const responseData = await response.json().catch(() => ({}));
+        
+        if (!response.ok) {
+          throw new VormiaError(
+            responseData.message || 'Request failed',
+            response.status,
+            {
+              data: responseData,
+              status: response.status,
+              statusText: response.statusText,
+              headers: {},
+              config,
+              request: {},
+              success: false,
+              timestamp: new Date().toISOString(),
+            },
+            response.status.toString()
+          );
+        }
+
+        return {
+          data: responseData,
+          status: response.status,
+          statusText: response.statusText,
+          headers: {},
+          config,
+          request: {},
+          success: true,
+          timestamp: new Date().toISOString(),
+        };
+      } catch (error) {
+        if (error instanceof VormiaError) {
+          throw error;
+        }
+        throw new VormiaError(
+          error instanceof Error ? error.message : 'Request failed'
+        );
+      }
+    },
+    get: <T = any>(url: string, config?: VormiaRequestConfig) => 
+      client.request<T>({ ...config, method: 'GET', url }),
+    post: <T = any>(url: string, data?: any, config?: VormiaRequestConfig) => 
+      client.request<T>({ ...config, method: 'POST', url, data }),
+    put: <T = any>(url: string, data?: any, config?: VormiaRequestConfig) => 
+      client.request<T>({ ...config, method: 'PUT', url, data }),
+    patch: <T = any>(url: string, data?: any, config?: VormiaRequestConfig) => 
+      client.request<T>({ ...config, method: 'PATCH', url, data }),
+    delete: <T = any>(url: string, config?: VormiaRequestConfig) => 
+      client.request<T>({ ...config, method: 'DELETE', url }),
+    head: <T = any>(url: string, config?: VormiaRequestConfig) => 
+      client.request<T>({ ...config, method: 'HEAD', url }),
+    options: <T = any>(url: string, config?: VormiaRequestConfig) => 
+      client.request<T>({ ...config, method: 'OPTIONS', url }),
+    interceptors: {
+      request: {
+        use: () => 0,
+        eject: () => {}
+      },
+      response: {
+        use: () => 0,
+        eject: () => {}
+      }
+    },
+    defaults: {
+      headers: { ...baseConfig.headers }
+    }
+  };
+  
+  return client;
+};
 
 export class VormiaClient {
-  private axiosInstance: AxiosInstance;
+  private http: VormiaInstance;
   private config: VormiaConfig;
 
   constructor(config: VormiaConfig) {
@@ -14,71 +120,69 @@ export class VormiaClient {
       ...config,
     };
 
-    this.axiosInstance = axios.create({
+    this.http = createHttpClient({
       baseURL: this.config.baseURL,
       headers: {
         'Content-Type': 'application/json',
-        Accept: 'application/json',
+        'Accept': 'application/json',
         ...this.config.headers,
       },
       withCredentials: this.config.withCredentials,
       timeout: this.config.timeout,
     });
-
-    this.setupInterceptors();
   }
 
-  private setupInterceptors() {
-    // Request interceptor
-    this.axiosInstance.interceptors.request.use((config) => {
-      // Add auth token
-      const token = this.getAuthToken();
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+  // Simplified interceptor-like functionality
+  private async handleRequest<T>(config: VormiaRequestConfig): Promise<VormiaResponse<T>> {
+    // Add auth token to request
+    const token = this.getAuthToken();
+    const headers = {
+      ...config.headers,
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    };
+
+    try {
+      const response = await this.http.request<T>({ ...config, headers });
+      
+      // Handle 204 No Content
+      if (response.status === 204) {
+        return {
+          ...response,
+          data: { response: [], message: 'No content found' } as any,
+        };
+      }
+      
+      return response;
+    } catch (error: any) {
+      if (error.status === 401) {
+        this.handleUnauthorized();
       }
 
-      return config;
-    });
-
-    // Response interceptor
-    this.axiosInstance.interceptors.response.use(
-      (response) => {
-        // Handle 204 No Content
-        if (response.status === 204) {
-          return {
-            ...response,
-            data: { response: [], message: 'No content found' },
-          };
-        }
-
-        return response;
-      },
-      (error) => {
-        if (error.response?.status === 401) {
-          this.handleUnauthorized();
-        }
-
-        if (error.response?.status === 204) {
-          return Promise.resolve({
-            ...error.response,
-            data: { response: [], message: 'No content found' },
-          });
-        }
-
-        const vormiaError = new VormiaError(
-          error.message || 'Request failed',
-          error.response?.status,
-          error.response,
-          error.code
-        );
-
-        if (this.config.onError) {
-          this.config.onError(vormiaError);
-        }
-
-        return Promise.reject(vormiaError);
+      if (error.status === 204) {
+        return {
+          data: { response: [], message: 'No content found' } as any,
+          status: 204,
+          statusText: 'No Content',
+          headers: {},
+          config,
+          success: true,
+          timestamp: new Date().toISOString(),
+        };
       }
-    );
+
+      const vormiaError = new VormiaError(
+        error.message || 'Request failed',
+        error.status,
+        error.response,
+        error.code
+      );
+
+      if (this.config.onError) {
+        this.config.onError(vormiaError);
+      }
+
+      throw vormiaError;
+    }
   }
 
   private handleUnauthorized() {
@@ -105,35 +209,46 @@ export class VormiaClient {
     localStorage.removeItem(this.config.authTokenKey!);
   }
 
-  public async request<T = any>(config: AxiosRequestConfig & { encryptData?: boolean }): Promise<T> {
-    const { encryptData: shouldEncrypt, ...axiosConfig } = config;
+  public async request<T = any>(config: VormiaRequestConfig & { encryptData?: boolean }): Promise<VormiaResponse<T>> {
+    const { encryptData: shouldEncrypt, ...requestConfig } = config;
 
     // Encrypt data if needed
-    if (shouldEncrypt && axiosConfig.data && this.config.encryptionKey) {
-      axiosConfig.data = encryptData(axiosConfig.data, this.config.encryptionKey);
+    if (shouldEncrypt && requestConfig.data && this.config.encryptionKey) {
+      requestConfig.data = encryptData(requestConfig.data, this.config.encryptionKey);
     }
 
-    const response = await this.axiosInstance.request<T>(axiosConfig);
-    return response.data;
+    return this.handleRequest<T>(requestConfig);
   }
 
-  public async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  public async get<T = any>(url: string, config?: VormiaRequestConfig): Promise<VormiaResponse<T>> {
     return this.request<T>({ ...config, method: 'GET', url });
   }
 
-  public async post<T = any>(url: string, data?: any, config?: AxiosRequestConfig & { encryptData?: boolean }): Promise<T> {
+  public async post<T = any>(
+    url: string, 
+    data?: any, 
+    config?: VormiaRequestConfig & { encryptData?: boolean }
+  ): Promise<VormiaResponse<T>> {
     return this.request<T>({ ...config, method: 'POST', url, data });
   }
 
-  public async put<T = any>(url: string, data?: any, config?: AxiosRequestConfig & { encryptData?: boolean }): Promise<T> {
+  public async put<T = any>(
+    url: string, 
+    data?: any, 
+    config?: VormiaRequestConfig & { encryptData?: boolean }
+  ): Promise<VormiaResponse<T>> {
     return this.request<T>({ ...config, method: 'PUT', url, data });
   }
 
-  public async patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig & { encryptData?: boolean }): Promise<T> {
+  public async patch<T = any>(
+    url: string, 
+    data?: any, 
+    config?: VormiaRequestConfig & { encryptData?: boolean }
+  ): Promise<VormiaResponse<T>> {
     return this.request<T>({ ...config, method: 'PATCH', url, data });
   }
 
-  public async delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  public async delete<T = any>(url: string, config?: VormiaRequestConfig): Promise<VormiaResponse<T>> {
     return this.request<T>({ ...config, method: 'DELETE', url });
   }
 }

@@ -1,13 +1,20 @@
-import { useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query';
-import { VormiaQueryOptions, VormiaResponse, VormiaError } from '../types';
+import { useQuery, useQueryClient, UseQueryResult, UseQueryOptions } from '@tanstack/react-query';
+import { VormiaResponse, VormiaError } from '../types';
 import { getGlobalVormiaClient } from '../client/createVormiaClient';
+
+export interface VormiaQueryOptions<T = any> extends Omit<UseQueryOptions<VormiaResponse<T>, VormiaError>, 'queryKey' | 'queryFn'> {
+  endpoint: string;
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  params?: Record<string, any>;
+  data?: any;
+  headers?: Record<string, string>;
+  axiosConfig?: any;
+  transform?: (data: any) => T;
+}
 
 export const useVrmQuery = <T = any>(
   options: VormiaQueryOptions<T>
-): UseQueryResult<VormiaResponse<T>, VormiaError> & {
-  invalidate: () => Promise<void>;
-  refetch: () => Promise<UseQueryResult<VormiaResponse<T>, VormiaError>>;
-} => {
+) => {
   const queryClient = useQueryClient();
   const client = getGlobalVormiaClient();
 
@@ -19,8 +26,6 @@ export const useVrmQuery = <T = any>(
     headers,
     axiosConfig,
     transform,
-    onSuccess,
-    onError,
     ...queryOptions
   } = options;
 
@@ -31,9 +36,9 @@ export const useVrmQuery = <T = any>(
     queryKey,
   };
 
-  const queryResult = useQuery<VormiaResponse<T>, VormiaError>({
+  const queryResult = useQuery({
     ...queryConfig,
-    queryFn: async (): Promise<VormiaResponse<T>> => {
+    queryFn: async () => {
       try {
         let response: any;
 
@@ -64,13 +69,8 @@ export const useVrmQuery = <T = any>(
         }
 
         // Transform data if transform function is provided
-        if (transform && response.response) {
-          response.response = transform(response.response);
-        }
-
-        // Call onSuccess callback
-        if (onSuccess) {
-          onSuccess(response);
+        if (transform && response.data) {
+          response.data = transform(response.data);
         }
 
         return response;
@@ -79,10 +79,7 @@ export const useVrmQuery = <T = any>(
           error instanceof Error ? error.message : 'Unknown error occurred'
         );
 
-        // Call onError callback
-        if (onError) {
-          onError(vormiaError);
-        }
+        // Error will be handled by React Query's onError
 
         throw vormiaError;
       }
@@ -95,15 +92,11 @@ export const useVrmQuery = <T = any>(
     await queryClient.invalidateQueries({ queryKey });
   };
 
-  const refetch = async () => {
-    return queryResult.refetch();
-  };
-
   return {
     ...queryResult,
     invalidate,
-    refetch,
-  };
+    refetch: queryResult.refetch,
+  } as const;
 };
 
 // Hook for manually invalidating queries

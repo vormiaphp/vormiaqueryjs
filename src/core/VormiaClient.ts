@@ -1,39 +1,20 @@
-// @ts-ignore - Workaround for axios type issues
-import axios = require('axios');
-import type { VormiaConfig } from '../types';
+import axios from 'axios';
+import type { 
+  VormiaConfig,
+  VormiaRequestConfig,
+  VormiaResponse,
+  VormiaInstance
+} from '../types';
 
-// Define our own types to avoid direct axios dependency
-type AxiosRequestConfig = any;
-type AxiosResponse<T = any> = {
-  data: T;
-  status: number;
-  statusText: string;
-  headers: Record<string, string>;
-  config: AxiosRequestConfig;
-  request?: any;
+// Environment variable fallbacks
+const DEFAULT_CONFIG = {
+  VORMIA_API_URL: process.env.VORMIA_API_URL || '',
+  VORMIA_AUTH_TOKEN_KEY: process.env.VORMIA_AUTH_TOKEN_KEY || 'auth_token',
+  VORMIA_TIMEOUT: process.env.VORMIA_TIMEOUT ? parseInt(process.env.VORMIA_TIMEOUT, 10) : 30000,
+  VORMIA_WITH_CREDENTIALS: process.env.VORMIA_WITH_CREDENTIALS === 'true' || false
 };
 
-interface AxiosInstance {
-  request<T = any>(config: AxiosRequestConfig): Promise<AxiosResponse<T>>;
-  get<T = any>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>>;
-  delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>>;
-  head<T = any>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>>;
-  options<T = any>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>>;
-  post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>>;
-  put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>>;
-  patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>>;
-  interceptors: {
-    request: {
-      use: (onFulfilled?: any, onRejected?: any) => number;
-      eject: (id: number) => void;
-    };
-    response: {
-      use: (onFulfilled?: any, onRejected?: any) => number;
-      eject: (id: number) => void;
-    };
-  };
-  defaults: any;
-}
+// Use our custom Vormia types
 
 export class VormiaError extends Error {
   status?: number;
@@ -53,27 +34,36 @@ export class VormiaError extends Error {
 }
 
 export class VormiaClient {
-  private axiosInstance: AxiosInstance;
+  private axiosInstance: VormiaInstance;
   private config: VormiaConfig;
 
-  constructor(config: VormiaConfig) {
-    this.config = {
-      authTokenKey: 'auth_token',
-      withCredentials: false,
-      timeout: 30000,
-      ...config,
+  constructor(config: VormiaConfig = {}) {
+    // Start with default config from environment variables
+    const defaultConfig: VormiaConfig = {
+      baseURL: DEFAULT_CONFIG.VORMIA_API_URL || '',
+      authTokenKey: DEFAULT_CONFIG.VORMIA_AUTH_TOKEN_KEY,
+      withCredentials: DEFAULT_CONFIG.VORMIA_WITH_CREDENTIALS,
+      timeout: DEFAULT_CONFIG.VORMIA_TIMEOUT,
     };
 
-    // @ts-ignore - Type assertion to avoid axios type issues
+    // Merge with user-provided config (user config takes precedence)
+    this.config = { ...defaultConfig, ...config };
+
+    // Validate required configuration
+    if (!this.config.baseURL) {
+      console.warn('VormiaClient: No baseURL provided. Please set VORMIA_API_URL in your .env file or pass baseURL in the config.');
+    }
+
+      // Create axios instance with proper typing
     this.axiosInstance = axios.create({
       baseURL: this.config.baseURL,
+      timeout: this.config.timeout,
       headers: {
         'Content-Type': 'application/json',
         ...this.config.headers,
       },
-      timeout: this.config.timeout,
       withCredentials: this.config.withCredentials,
-    }) as unknown as AxiosInstance;
+    }) as unknown as VormiaInstance;
 
     this.setupInterceptors();
   }
@@ -81,79 +71,97 @@ export class VormiaClient {
   private setupInterceptors() {
     // Request interceptor
     this.axiosInstance.interceptors.request.use(
-      (config: AxiosRequestConfig) => {
-        // Add auth token if exists
-        const token = localStorage.getItem(this.config.authTokenKey!);
-        if (token) {
-          config.headers = config.headers || {};
-          config.headers.Authorization = `Bearer ${token}`;
+      (config: VormiaRequestConfig) => {
+        // Add auth token to request if it exists
+        if (typeof window !== 'undefined' && this.config.authTokenKey) {
+          const token = localStorage.getItem(this.config.authTokenKey);
+          if (token) {
+            config.headers = config.headers || {};
+            config.headers.Authorization = `Bearer ${token}`;
+          }
         }
         return config;
       },
       (error: any) => {
-        return Promise.reject(new VormiaError(error.message, error.response?.status));
+        return Promise.reject(error);
       }
     );
 
     // Response interceptor
     this.axiosInstance.interceptors.response.use(
-      (response: AxiosResponse) => response,
+      (response: VormiaResponse) => response,
       (error: any) => {
-        const status = error.response?.status;
-        const message = error.response?.data?.message || error.message;
-        return Promise.reject(new VormiaError(message, status));
+        if (error.response?.status === 401 && this.config.onUnauthorized) {
+          this.config.onUnauthorized();
+        }
+        return Promise.reject(new VormiaError(
+          error.response?.data?.message || error.message,
+          error.response?.status,
+          error.response,
+          error.code
+        ));
       }
     );
   }
 
   // Core HTTP methods
-  public async request<T = any>(config: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+  public async request<T = any>(config: VormiaRequestConfig): Promise<VormiaResponse<T>> {
     return this.axiosInstance.request<T>(config);
   }
 
-  public async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+  public async get<T = any>(url: string, config?: VormiaRequestConfig): Promise<VormiaResponse<T>> {
     return this.axiosInstance.get<T>(url, config);
   }
 
   public async post<T = any>(
-    url: string,
-    data?: any,
-    config?: AxiosRequestConfig
-  ): Promise<AxiosResponse<T>> {
+    url: string, 
+    data?: any, 
+    config?: VormiaRequestConfig
+  ): Promise<VormiaResponse<T>> {
     return this.axiosInstance.post<T>(url, data, config);
   }
 
   public async put<T = any>(
-    url: string,
-    data?: any,
-    config?: AxiosRequestConfig
-  ): Promise<AxiosResponse<T>> {
+    url: string, 
+    data?: any, 
+    config?: VormiaRequestConfig
+  ): Promise<VormiaResponse<T>> {
     return this.axiosInstance.put<T>(url, data, config);
   }
 
-  public async delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+  public async delete<T = any>(
+    url: string, 
+    config?: VormiaRequestConfig
+  ): Promise<VormiaResponse<T>> {
     return this.axiosInstance.delete<T>(url, config);
   }
 
   public async patch<T = any>(
-    url: string,
-    data?: any,
-    config?: AxiosRequestConfig
-  ): Promise<AxiosResponse<T>> {
+    url: string, 
+    data?: any, 
+    config?: VormiaRequestConfig
+  ): Promise<VormiaResponse<T>> {
     return this.axiosInstance.patch<T>(url, data, config);
   }
 
   // Auth methods
   public setAuthToken(token: string): void {
-    localStorage.setItem(this.config.authTokenKey!, token);
-  }
-
-  public getAuthToken(): string | null {
-    return localStorage.getItem(this.config.authTokenKey!);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(this.config.authTokenKey || 'auth_token', token);
+    }
   }
 
   public clearAuthToken(): void {
-    localStorage.removeItem(this.config.authTokenKey!);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(this.config.authTokenKey || 'auth_token');
+    }
+  }
+
+  public getAuthToken(): string | null {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(this.config.authTokenKey || 'auth_token');
+    }
+    return null;
   }
 }
 

@@ -1,14 +1,40 @@
-import { useQuery, useMutation, useQueryClient, UseQueryResult, UseMutationResult } from '@tanstack/react-query';
-import { VormiaAuthOptions, VormiaAuthResponse, VormiaError, VormiaMutationOptions } from '../types';
+import { 
+  useQuery, 
+  useMutation, 
+  useQueryClient, 
+  UseMutationOptions, 
+  UseQueryOptions, 
+  UseMutationResult 
+} from '@tanstack/react-query';
+import { VormiaError, VormiaAuthResponse } from '../types';
 import { getGlobalVormiaClient } from '../client/createVormiaClient';
+
+// Extended types for auth
+interface VormiaAuthOptions<T = any> extends Omit<UseQueryOptions<VormiaAuthResponse<T>, VormiaError>, 'queryKey' | 'queryFn'> {
+  endpoint: string;
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  params?: Record<string, any>;
+  data?: any;
+  headers?: Record<string, string>;
+  axiosConfig?: any;
+  transform?: (data: any) => T;
+  encryptData?: boolean;
+  storeToken?: boolean;
+}
+
+interface VormiaMutationOptions<T = any, V = any> extends Omit<UseMutationOptions<VormiaAuthResponse<T>, VormiaError, V>, 'mutationFn'> {
+  endpoint: string;
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  headers?: Record<string, string>;
+  axiosConfig?: any;
+  transform?: (data: any) => T;
+  encryptData?: boolean;
+}
 
 // Hook for authenticated queries with encryption
 export const useVrmAuthQuery = <T = any>(
   options: VormiaAuthOptions<T>
-): UseQueryResult<VormiaAuthResponse<T>, VormiaError> & {
-  invalidate: () => Promise<void>;
-  logout: () => void;
-} => {
+) => {
   const queryClient = useQueryClient();
   const client = getGlobalVormiaClient();
 
@@ -22,8 +48,6 @@ export const useVrmAuthQuery = <T = any>(
     transform,
     encryptData = false,
     storeToken = true,
-    onSuccess,
-    onError,
     ...queryOptions
   } = options;
 
@@ -34,9 +58,9 @@ export const useVrmAuthQuery = <T = any>(
     queryKey,
   };
 
-  const queryResult = useQuery<VormiaAuthResponse<T>, VormiaError>({
+  const queryResult = useQuery({
     ...queryConfig,
-    queryFn: async (): Promise<VormiaAuthResponse<T>> => {
+    queryFn: async () => {
       try {
         let response: any;
 
@@ -77,10 +101,7 @@ export const useVrmAuthQuery = <T = any>(
           response.response = transform(response.response);
         }
 
-        // Call onSuccess callback
-        if (onSuccess) {
-          onSuccess(response);
-        }
+        // Success is handled by React Query's onSuccess
 
         return response;
       } catch (error) {
@@ -88,10 +109,7 @@ export const useVrmAuthQuery = <T = any>(
           error instanceof Error ? error.message : 'Authentication failed'
         );
 
-        // Call onError callback
-        if (onError) {
-          onError(vormiaError);
-        }
+        // Error is handled by React Query's onError
 
         throw vormiaError;
       }
@@ -113,7 +131,7 @@ export const useVrmAuthQuery = <T = any>(
     ...queryResult,
     invalidate,
     logout,
-  };
+  } as const;
 };
 
 // Hook for authentication mutations (login, register, etc.)
@@ -145,8 +163,8 @@ export const useVrmAuth = <T = any, V = any>(
     ...mutationOptions
   } = options;
 
-  const mutation = useMutation<VormiaAuthResponse<T>, VormiaError, V>({
-    mutationFn: async (variables: V): Promise<VormiaAuthResponse<T>> => {
+  const mutation = useMutation({
+    mutationFn: async (variables: V) => {
       try {
         let response: any;
 
@@ -180,13 +198,7 @@ export const useVrmAuth = <T = any, V = any>(
           response.response = transform(response.response);
         }
 
-        // Call success callbacks
-        if (onLoginSuccess) {
-          onLoginSuccess(response);
-        }
-        if (onSuccess) {
-          onSuccess(response, variables, undefined);
-        }
+        // Success is handled by React Query's onSuccess
 
         return response;
       } catch (error) {
@@ -194,10 +206,7 @@ export const useVrmAuth = <T = any, V = any>(
           error instanceof Error ? error.message : 'Authentication failed'
         );
 
-        // Call onError callback
-        if (onError) {
-          onError(vormiaError, variables, undefined);
-        }
+        // Error is handled by React Query's onError
 
         throw vormiaError;
       }

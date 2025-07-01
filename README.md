@@ -30,6 +30,23 @@ npm install react @tanstack/react-query axios
 
 ## Quick Start
 
+## Environment Variables
+
+VormiaQuery supports configuration through environment variables. Simply create a `.env` file in your project root:
+
+```env
+VORMIA_API_URL=https://your-api.com/api/v1
+VORMIA_AUTH_TOKEN_KEY=auth_token
+VORMIA_TIMEOUT=30000
+VORMIA_WITH_CREDENTIALS=false
+```
+
+Copy the example configuration:
+
+```bash
+cp .env.example .env
+```
+
 ### 1. Setup the Provider
 
 Wrap your app with the `VormiaQueryProvider`:
@@ -42,9 +59,12 @@ function App() {
   return (
     <VormiaQueryProvider
       config={{
-        baseURL: "https://your-api.com/api/v1",
-        authTokenKey: "auth_token", // localStorage key for token
-        encryptionKey: "your-secret-key", // for data encryption
+        // Environment variables will be used as defaults
+        // These can be overridden here
+        baseURL: process.env.VORMIA_API_URL,
+        authTokenKey: process.env.VORMIA_AUTH_TOKEN_KEY,
+        withCredentials: process.env.VORMIA_WITH_CREDENTIALS === 'true',
+        timeout: process.env.VORMIA_TIMEOUT ? parseInt(process.env.VORMIA_TIMEOUT, 10) : 30000,
         onUnauthorized: () => {
           // Handle 401 errors
           window.location.href = "/login";

@@ -1,4 +1,5 @@
-import React, { createContext, useContext, ReactNode } from 'react';
+import * as React from 'react';
+import { createContext, useContext, ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { VormiaClient, createVormiaClient, setGlobalVormiaClient } from '../client/createVormiaClient';
 import { VormiaConfig } from '../types';
@@ -24,11 +25,11 @@ export const useVormiaContext = (): VormiaContextType => {
   return context;
 };
 
-export const VormiaQueryProvider: React.FC<VormiaQueryProviderProps> = ({
+export const VormiaQueryProvider = ({
   children,
   config,
   queryClient,
-}) => {
+}: VormiaQueryProviderProps) => {
   // Create default query client if not provided
   const defaultQueryClient = React.useMemo(() => {
     return queryClient || new QueryClient({
@@ -65,11 +66,18 @@ export const VormiaQueryProvider: React.FC<VormiaQueryProviderProps> = ({
     queryClient: defaultQueryClient,
   }), [vormiaClient, defaultQueryClient]);
 
-  return (
-    <VormiaContext.Provider value={contextValue}>
-      <QueryClientProvider client={defaultQueryClient}>
-        {children}
-      </QueryClientProvider>
-    </VormiaContext.Provider>
+  // Create a fragment to wrap the providers
+  return React.createElement(
+    React.Fragment,
+    null,
+    React.createElement(
+      VormiaContext.Provider,
+      { value: contextValue },
+      React.createElement(
+        QueryClientProvider,
+        { client: defaultQueryClient },
+        children
+      )
+    )
   );
 };
