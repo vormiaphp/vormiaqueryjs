@@ -99,48 +99,20 @@ This will create two files in your project directory:
 
 ---
 
-## 🛠️ Laravel Integration Example (Backend)
+## 🛠️ Laravel Integration (Backend)
 
-To use RSA encryption/decryption in your Laravel backend, use [phpseclib](https://github.com/phpseclib/phpseclib):
-
-### 1. Install phpseclib
+For Laravel backend integration with VormiaQueryJS, install the official Laravel package:
 
 ```bash
-composer require phpseclib/phpseclib
+composer require vormiaphp/vormiaqueryphp
 ```
 
-### 2. Example Controller Usage
+Follow the complete installation and usage instructions at:
 
-```php
-use phpseclib3\Crypt\RSA;
+- [GitHub Repository](https://github.com/vormiaphp/vormiaqueryphp)
+- [Packagist Package](https://packagist.org/packages/vormiaphp/vormiaqueryphp)
 
-public function handleRequest(Request $request)
-{
-    $privateKey = env('VORMIA_PRIVATE_KEY');
-    $publicKey = env('VORMIA_PUBLIC_KEY');
-
-    // Decrypt incoming data
-    if ($request->has('encrypted')) {
-        $rsa = RSA::loadPrivateKey($privateKey);
-        $decrypted = $rsa->decrypt(base64_decode($request->input('encrypted')));
-        $data = json_decode($decrypted, true);
-        // ... process $data ...
-    }
-
-    // Prepare response
-    $response = ['foo' => 'bar'];
-    if ($request->expectsEncryptedResponse) {
-        $rsa = RSA::loadPublicKey($publicKey);
-        $encrypted = base64_encode($rsa->encrypt(json_encode($response)));
-        return response()->json(['encrypted' => $encrypted]);
-    }
-
-    return response()->json($response);
-}
-```
-
-- Store your keys in `.env` as described above.
-- Never expose your private key in frontend/browser code.
+The Laravel package provides middleware, helpers, and complete integration for encrypted API communication with VormiaQueryJS.
 
 ---
 
