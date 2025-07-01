@@ -1,38 +1,62 @@
-# @vormiajs/vormia-query
+# VormiaQuery
 
-A React hooks library for seamless data fetching with TanStack Query and Axios, specifically designed for Laravel/VormiaPHP projects.
+A universal query and mutation library for seamless data fetching and state management, designed for use with React, Vue, Svelte, Solid, and Qwik. Built for modern JavaScript projects and Laravel/VormiaPHP backends.
 
 ## Features
 
 - 🚀 **Easy to use**: Simple API for GET, POST, PUT, DELETE operations
 - 🔒 **Built-in Authentication**: Token-based auth with automatic handling
 - 🔐 **Data Encryption**: Optional AES encryption for sensitive data
-- ⚡ **TanStack Query Integration**: Powerful caching, background updates, and more
-- 🎯 **TypeScript Support**: Full type safety out of the box
-- 🔄 **Laravel Compatible**: Designed for Laravel API responses
+- ⚡ **Framework Agnostic**: Works with React, Vue, Svelte, Solid, Qwik
 - 🛡️ **Error Handling**: Comprehensive error handling with custom error types
+- 🧪 **Tested with Vitest**: Modern, fast JavaScript testing
+- 🟩 **Pure JavaScript**: No TypeScript required
 
 ## Installation
 
 ```bash
-npm install @vormiajs/vormia-query
-# or
-yarn add @vormiajs/vormia-query
+npm install vormiaquery
 ```
 
 ### Peer Dependencies
 
-Make sure you have these installed:
+Install the peer dependencies for your framework:
+
+**React:**
 
 ```bash
-npm install react @tanstack/react-query axios
+npm install react react-dom @tanstack/react-query
+```
+
+**Vue:**
+
+```bash
+npm install vue @tanstack/vue-query
+```
+
+**Svelte:**
+
+```bash
+npm install svelte @tanstack/svelte-query
+```
+
+**Solid:**
+
+```bash
+npm install solid-js @tanstack/solid-query
+```
+
+**Qwik:**
+
+```bash
+npm install @builder.io/qwik
 ```
 
 ## Quick Start
 
-## Environment Variables
+### Environment Variables
 
-VormiaQuery supports configuration through environment variables. Simply create a `.env` file in your project root:
+VormiaQuery supports configuration through environment variables. Create a `.env` file in your project root:
 
 ```env
 VORMIA_API_URL=https://your-api.com/api/v1
@@ -41,77 +65,132 @@ VORMIA_TIMEOUT=30000
 VORMIA_WITH_CREDENTIALS=false
 ```
 
-Copy the example configuration:
+---
 
-```bash
-cp .env.example .env
-```
+## Usage Examples
 
-### 1. Setup the Provider
+### React
 
-Wrap your app with the `VormiaQueryProvider`:
-
-```tsx
+```jsx
 import React from "react";
-import { VormiaQueryProvider } from "@vormiajs/vormia-query";
+import { VormiaQueryProvider, useVrmQuery, useVrmMutation } from "vormiaquery";
 
 function App() {
   return (
-    <VormiaQueryProvider
-      config={{
-        // Environment variables will be used as defaults
-        // These can be overridden here
-        baseURL: process.env.VORMIA_API_URL,
-        authTokenKey: process.env.VORMIA_AUTH_TOKEN_KEY,
-        withCredentials: process.env.VORMIA_WITH_CREDENTIALS === 'true',
-        timeout: process.env.VORMIA_TIMEOUT ? parseInt(process.env.VORMIA_TIMEOUT, 10) : 30000,
-        onUnauthorized: () => {
-          // Handle 401 errors
-          window.location.href = "/login";
-        },
-      }}
-    >
-      <YourAppComponents />
+    <VormiaQueryProvider config={{ baseURL: "https://api.example.com" }}>
+      <CategoriesList />
     </VormiaQueryProvider>
   );
 }
-```
-
-### 2. Basic Data Fetching
-
-```tsx
-import { useVrmQuery } from "@vormiajs/vormia-query";
 
 function CategoriesList() {
   const { data, isLoading, error, refetch } = useVrmQuery({
-    endpoint: "/request/list-categories",
-    method: "POST",
-    queryKey: ["categories"],
+    endpoint: "/categories",
+    method: "GET",
   });
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
   return (
-    <div>
-      {data?.response?.map((category) => (
-        <div key={category.id}>{category.name}</div>
+    <ul>
+      {data?.response?.map((cat) => (
+        <li key={cat.id}>{cat.name}</li>
       ))}
-    </div>
+    </ul>
   );
 }
 ```
 
-### 3. Authentication
+### Vue
 
-```tsx
-import { useVrmAuth } from "@vormiajs/vormia-query";
+```js
+<script setup>
+import { useVormiaQuery } from 'vormiaquery/adapters/vue';
+
+const { data, error, isLoading, refetch } = useVormiaQuery({
+  endpoint: '/categories',
+  method: 'GET',
+});
+</script>
+
+<template>
+  <div v-if="isLoading">Loading...</div>
+  <div v-else-if="error">Error: {{ error.message }}</div>
+  <ul v-else>
+    <li v-for="cat in data?.response" :key="cat.id">{{ cat.name }}</li>
+  </ul>
+</template>
+```
+
+### Svelte
+
+```svelte
+<script>
+  import { createVormiaStore } from 'vormiaquery/adapters/svelte';
+  const store = createVormiaStore({ endpoint: '/categories', method: 'GET' });
+</script>
+
+{#if $store.loading}
+  <p>Loading...</p>
+{:else if $store.error}
+  <p>Error: {$store.error.message}</p>
+{:else}
+  <ul>
+    {#each $store as cat}
+      <li>{cat.name}</li>
+    {/each}
+  </ul>
+{/if}
+```
+
+### Solid
+
+```js
+import { createVormiaResource } from "vormiaquery/adapters/solid";
+
+const [categories] = createVormiaResource({
+  endpoint: "/categories",
+  method: "GET",
+});
+
+function CategoriesList() {
+  return (
+    <ul>
+      {categories()?.response?.map((cat) => (
+        <li>{cat.name}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+### Qwik
+
+```js
+import { useVormiaQuery } from "vormiaquery/adapters/qwik";
+
+export default function CategoriesList() {
+  const { data, isLoading, error } = useVormiaQuery({
+    endpoint: "/categories",
+    method: "GET",
+  });
+  // Render logic for Qwik
+}
+```
+
+---
+
+## Authentication Example (React)
+
+```jsx
+import { useVrmAuth } from "vormiaquery";
 
 function LoginForm() {
   const { login, isLoading, error, isAuthenticated } = useVrmAuth({
     endpoint: "/auth/login",
-    encryptData: true, // Encrypt login credentials
-    storeToken: true, // Automatically store token
+    encryptData: true,
+    storeToken: true,
     onLoginSuccess: (data) => {
       console.log("Login successful:", data.user);
     },
@@ -120,15 +199,12 @@ function LoginForm() {
   const handleLogin = async (credentials) => {
     try {
       await login(credentials);
-      // Redirect or update UI
     } catch (err) {
       console.error("Login failed:", err);
     }
   };
 
-  if (isAuthenticated) {
-    return <div>Welcome back!</div>;
-  }
+  if (isAuthenticated) return <div>Welcome back!</div>;
 
   return (
     <form
@@ -145,150 +221,33 @@ function LoginForm() {
 }
 ```
 
-### 4. Mutations (Create, Update, Delete)
+---
 
-```tsx
-import {
-  useVrmMutation,
-  useVrmCreate,
-  useVrmUpdate,
-  useVrmDelete,
-} from "@vormiajs/vormia-query";
+## Mutations Example (React)
 
-function CategoryManager() {
-  // Generic mutation
-  const createCategory = useVrmMutation({
-    endpoint: "/categories",
-    method: "POST",
-    onSuccess: (data) => {
-      console.log("Category created:", data);
-    },
-  });
+```jsx
+import { useVrmMutation } from "vormiaquery";
 
-  // Specialized hooks
-  const updateCategory = useVrmUpdate("/categories/{id}");
-  const deleteCategory = useVrmDelete("/categories/{id}");
+function AddCategory() {
+  const mutation = useVrmMutation({ endpoint: "/categories", method: "POST" });
 
-  const handleCreate = async (categoryData) => {
-    await createCategory.mutateAsync(categoryData);
+  const handleAdd = async () => {
+    await mutation.mutate({ name: "New Category" });
   };
 
-  return (
-    <div>
-      <button onClick={() => handleCreate({ name: "New Category" })}>
-        Create Category
-      </button>
-    </div>
-  );
+  return <button onClick={handleAdd}>Add Category</button>;
 }
 ```
 
-## API Reference
+---
 
-### VormiaQueryProvider
+## Error Handling
 
-The main provider component that sets up the Vormia client and TanStack Query.
-
-```tsx
-<VormiaQueryProvider
-  config={{
-    baseURL: string;                    // API base URL
-    headers?: Record<string, string>;   // Default headers
-    timeout?: number;                   // Request timeout (default: 30000ms)
-    withCredentials?: boolean;          // Include credentials (default: false)
-    authTokenKey?: string;              // localStorage key for auth token
-    encryptionKey?: string;             // Key for data encryption
-    onUnauthorized?: () => void;        // 401 error handler
-    onError?: (error: VormiaError) => void; // Global error handler
-  }}
-  queryClient={queryClient} // Optional: provide your own QueryClient
->
-```
-
-### useVrmQuery
-
-Hook for data fetching with caching.
-
-```tsx
-const result = useVrmQuery({
-  endpoint: string;                 // API endpoint
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'; // HTTP method
-  params?: Record<string, any>;     // Query parameters
-  data?: any;                       // Request body
-  headers?: Record<string, string>; // Additional headers
-  transform?: (data: any) => T;     // Transform response data
-  onSuccess?: (data) => void;       // Success callback
-  onError?: (error) => void;        // Error callback
-  // All TanStack Query options...
-});
-```
-
-### useVrmAuth
-
-Hook for authentication operations.
-
-```tsx
-const auth = useVrmAuth({
-  endpoint: string;                 // Auth endpoint
-  encryptData?: boolean;            // Encrypt request data (default: true)
-  storeToken?: boolean;             // Store token automatically (default: true)
-  onLoginSuccess?: (data) => void;  // Login success callback
-  // Other mutation options...
-});
-
-// Methods
-auth.login(credentials);     // Login function
-auth.logout();              // Logout and clear data
-auth.isAuthenticated;       // Authentication status
-```
-
-### useVrmMutation
-
-Hook for data mutations (create, update, delete).
-
-```tsx
-const mutation = useVrmMutation({
-  endpoint: string;                 // API endpoint
-  method?: 'POST' | 'PUT' | 'PATCH' | 'DELETE'; // HTTP method
-  encryptData?: boolean;            // Encrypt request data
-  transform?: (data: any) => T;     // Transform response data
-  onSuccess?: (data) => void;       // Success callback
-  onError?: (error) => void;        // Error callback
-  // All TanStack Query mutation options...
-});
-
-// Methods
-mutation.mutate(data);           // Execute mutation
-mutation.mutateAsync(data);      // Execute mutation (async)
-mutation.invalidateQueries();    // Invalidate related queries
-```
-
-### Specialized Mutation Hooks
-
-```tsx
-// Create
-const create = useVrmCreate("/endpoint", options);
-
-// Update
-const update = useVrmUpdate("/endpoint", options);
-
-// Patch
-const patch = useVrmPatch("/endpoint", options);
-
-// Delete
-const deleteItem = useVrmDelete("/endpoint", options);
-```
-
-### Error Handling
-
-The package includes a comprehensive `VormiaError` class:
-
-```tsx
+```js
 try {
   await mutation.mutateAsync(data);
 } catch (error) {
   if (error.isValidationError()) {
-    const validationErrors = error.getValidationErrors();
     // Handle validation errors
   } else if (error.isUnauthorized()) {
     // Handle auth errors
@@ -298,82 +257,28 @@ try {
 }
 ```
 
-## Laravel Integration
+---
 
-This package is designed to work seamlessly with Laravel APIs. It handles:
+## Testing
 
-- ✅ Standard Laravel JSON responses
-- ✅ Validation error responses (422)
-- ✅ Authentication with Sanctum/Passport
-- ✅ 204 No Content responses
-- ✅ Pagination metadata
+This project uses [Vitest](https://vitest.dev/) for all tests. Example:
 
-Example Laravel response format:
-
-```json
-{
-  "response": [...], // Your data
-  "message": "Success",
-  "meta": {
-    "total": 100,
-    "page": 1,
-    "perPage": 15
-  }
-}
+```bash
+npm test
 ```
 
-## Data Encryption
+- All tests are written in JavaScript.
+- No TypeScript or Jest is required.
 
-Enable encryption for sensitive data:
+---
 
-```tsx
-const { mutate } = useVrmMutation({
-  endpoint: "/sensitive-data",
-  encryptData: true, // Data will be AES encrypted
-});
+## API Reference
 
-// Or for auth
-const auth = useVrmAuth({
-  endpoint: "/login",
-  encryptData: true, // Credentials will be encrypted
-});
-```
+- See the source code and examples above for API usage for each framework.
+- All hooks and helpers are available under their respective framework adapter paths.
 
-## TypeScript Support
-
-Full TypeScript support with proper typing:
-
-```tsx
-interface User {
-  id: number;
-  name: string;
-  email: string;
-}
-
-interface LoginCredentials {
-  email: string;
-  password: string;
-}
-
-const { data } = useVrmQuery<User[]>({
-  endpoint: "/users",
-});
-
-const auth = useVrmAuth<User, LoginCredentials>({
-  endpoint: "/login",
-});
-```
+---
 
 ## License
 
 MIT License. See [LICENSE](LICENSE) for details.
-
-## Contributing
-
-Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details.
-
-## Support
-
-- 📖 [Documentation](https://github.com/vormiaphp/vormiaquery/wiki)
-- 🐛 [Issues](https://github.com/vormiaphp/vormiaquery/issues)
-- 💬 [Discussions](https://github.com/vormiaphp/vormiaquery/discussions)
