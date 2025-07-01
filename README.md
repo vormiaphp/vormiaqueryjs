@@ -1,6 +1,58 @@
 # VormiaQuery
 
-> **Note:** As of v1.0.2, VormiaQuery no longer prompts you to install peer dependencies after installation. Please refer to the instructions above and install the required dependencies for your framework manually. This change improves compatibility with bun, pnpm, and other package managers.
+A universal query and mutation library for seamless data fetching and state management, designed for use with React, Vue, Svelte, Solid, and Qwik. Built for modern JavaScript projects and Laravel/VormiaPHP backends.
+
+---
+
+## 🚀 Installation (JavaScript/Frontend)
+
+Install VormiaQueryJS using your favorite package manager:
+
+### **npm**
+
+```bash
+npm install vormiaqueryjs
+```
+
+### **bun**
+
+```bash
+bun add vormiaqueryjs
+```
+
+### **yarn**
+
+```bash
+yarn add vormiaqueryjs
+```
+
+### **pnpm**
+
+```bash
+pnpm add vormiaqueryjs
+```
+
+### **deno** (experimental, not fully supported)
+
+```ts
+import vormiaqueryjs from "npm:vormiaqueryjs";
+```
+
+> ⚠️ VormiaQueryJS is not fully Deno-compatible due to Node.js built-ins. Use with caution.
+
+---
+
+## 🚨 Required Peer Dependencies
+
+After installing `vormiaqueryjs`, you must also install the correct peer dependencies for your stack:
+
+- React: `npm install @tanstack/react-query axios @tanstack/eslint-plugin-query`
+- Vue: `npm install @tanstack/vue-query axios @tanstack/eslint-plugin-query`
+- Svelte: `npm install @tanstack/svelte-query axios @tanstack/eslint-plugin-query`
+- Solid: `npm install @tanstack/solid-query axios @tanstack/eslint-plugin-query`
+- Qwik: `npm install @builder.io/qwik axios @tanstack/eslint-plugin-query`
+
+> **Note:** VormiaQuery no longer prompts you to install peer dependencies after installation. Please refer to the instructions above and install the required dependencies for your framework manually. This change improves compatibility with bun, pnpm, and other package managers.
 
 ---
 
@@ -20,16 +72,6 @@ This will create two files in your project directory:
 
 - `vormia_public.pem` (public key)
 - `vormia_private.pem` (private key)
-
-> **🚨 Required Peer Dependencies**
->
-> After installing `vormiaquery`, you must also install the correct peer dependencies for your stack:
->
-> - React: `npm install @tanstack/react-query axios @tanstack/eslint-plugin-query`
-> - Vue: `npm install @tanstack/vue-query axios @tanstack/eslint-plugin-query`
-> - Svelte: `npm install @tanstack/svelte-query axios @tanstack/eslint-plugin-query`
-> - Solid: `npm install @tanstack/solid-query axios @tanstack/eslint-plugin-query`
-> - Qwik: `npm install @builder.io/qwik axios @tanstack/eslint-plugin-query`
 
 ### Key Storage Recommendations
 
@@ -57,7 +99,7 @@ This will create two files in your project directory:
 
 ---
 
-## Laravel Integration Example
+## 🛠️ Laravel Integration Example (Backend)
 
 To use RSA encryption/decryption in your Laravel backend, use [phpseclib](https://github.com/phpseclib/phpseclib):
 
@@ -101,8 +143,6 @@ public function handleRequest(Request $request)
 - Never expose your private key in frontend/browser code.
 
 ---
-
-A universal query and mutation library for seamless data fetching and state management, designed for use with React, Vue, Svelte, Solid, and Qwik. Built for modern JavaScript projects and Laravel/VormiaPHP backends.
 
 ## Features
 
@@ -175,7 +215,11 @@ VORMIA_WITH_CREDENTIALS=false
 
 ```jsx
 import React from "react";
-import { VormiaQueryProvider, useVrmQuery, useVrmMutation } from "vormiaquery";
+import {
+  VormiaQueryProvider,
+  useVrmQuery,
+  useVrmMutation,
+} from "vormiaqueryjs";
 
 function App() {
   return (
@@ -208,7 +252,7 @@ function CategoriesList() {
 
 ```js
 <script setup>
-import { useVormiaQuery } from 'vormiaquery/adapters/vue';
+import { useVormiaQuery } from 'vormiaqueryjs/adapters/vue';
 
 const { data, error, isLoading, refetch } = useVormiaQuery({
   endpoint: '/categories',
@@ -229,7 +273,7 @@ const { data, error, isLoading, refetch } = useVormiaQuery({
 
 ```svelte
 <script>
-  import { createVormiaStore } from 'vormiaquery/adapters/svelte';
+  import { createVormiaStore } from 'vormiaqueryjs/adapters/svelte';
   const store = createVormiaStore({ endpoint: '/categories', method: 'GET' });
 </script>
 
@@ -239,7 +283,7 @@ const { data, error, isLoading, refetch } = useVormiaQuery({
   <p>Error: {$store.error.message}</p>
 {:else}
   <ul>
-    {#each $store as cat}
+    {#each $store.data?.response as cat}
       <li>{cat.name}</li>
     {/each}
   </ul>
@@ -249,7 +293,7 @@ const { data, error, isLoading, refetch } = useVormiaQuery({
 ### Solid
 
 ```js
-import { createVormiaResource } from "vormiaquery/adapters/solid";
+import { createVormiaResource } from "vormiaqueryjs/adapters/solid";
 
 const [categories] = createVormiaResource({
   endpoint: "/categories",
@@ -270,7 +314,7 @@ function CategoriesList() {
 ### Qwik
 
 ```js
-import { useVormiaQuery } from "vormiaquery/adapters/qwik";
+import { useVormiaQuery } from "vormiaqueryjs/adapters/qwik";
 
 export default function CategoriesList() {
   const { data, isLoading, error } = useVormiaQuery({
@@ -286,7 +330,7 @@ export default function CategoriesList() {
 ## Authentication Example (React)
 
 ```jsx
-import { useVrmAuth } from "vormiaquery";
+import { useVrmAuth } from "vormiaqueryjs";
 
 function LoginForm() {
   const { login, isLoading, error, isAuthenticated } = useVrmAuth({
@@ -328,7 +372,7 @@ function LoginForm() {
 ## Mutations Example (React)
 
 ```jsx
-import { useVrmMutation } from "vormiaquery";
+import { useVrmMutation } from "vormiaqueryjs";
 
 function AddCategory() {
   const mutation = useVrmMutation({ endpoint: "/categories", method: "POST" });
@@ -392,7 +436,7 @@ MIT License. See [LICENSE](LICENSE) for details.
 ### 1. Encrypted Mutation (React)
 
 ```jsx
-import { useVrmMutation } from "vormiaquery";
+import { useVrmMutation } from "vormiaqueryjs";
 
 function SendSecret() {
   const mutation = useVrmMutation({
@@ -412,7 +456,7 @@ function SendSecret() {
 ### 2. Decrypting an Encrypted Response (Node.js/SSR)
 
 ```js
-import { VormiaClient } from "vormiaquery";
+import { VormiaClient } from "vormiaqueryjs";
 
 const client = new VormiaClient({
   baseURL: "https://api.example.com",
@@ -431,7 +475,7 @@ async function getEncryptedData() {
 ### 3. Using VormiaQuery with Custom Headers
 
 ```js
-import { useVrmQuery } from "vormiaquery";
+import { useVrmQuery } from "vormiaqueryjs";
 
 const { data } = useVrmQuery({
   endpoint: "/profile",
@@ -446,7 +490,7 @@ const { data } = useVrmQuery({
 ### 4. Error Handling for Validation Errors
 
 ```js
-import { useVrmMutation } from "vormiaquery";
+import { useVrmMutation } from "vormiaqueryjs";
 
 function RegisterForm() {
   const mutation = useVrmMutation({ endpoint: "/register", method: "POST" });
@@ -471,7 +515,7 @@ function RegisterForm() {
 
 ```js
 // pages/api/proxy.js
-import { VormiaClient } from "vormiaquery";
+import { VormiaClient } from "vormiaqueryjs";
 
 const client = new VormiaClient({
   baseURL: "https://api.example.com",
