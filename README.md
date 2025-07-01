@@ -154,46 +154,6 @@ public function handleRequest(Request $request)
 - 🧪 **Tested with Vitest**: Modern, fast JavaScript testing
 - 🟩 **Pure JavaScript**: No TypeScript required
 
-## Installation
-
-```bash
-npm install vormiaquery
-```
-
-### Peer Dependencies
-
-Install the peer dependencies for your framework:
-
-**React:**
-
-```bash
-npm install react react-dom @tanstack/react-query
-```
-
-**Vue:**
-
-```bash
-npm install vue @tanstack/vue-query
-```
-
-**Svelte:**
-
-```bash
-npm install svelte @tanstack/svelte-query
-```
-
-**Solid:**
-
-```bash
-npm install solid-js @tanstack/solid-query
-```
-
-**Qwik:**
-
-```bash
-npm install @builder.io/qwik
-```
-
 ## Quick Start
 
 ### Environment Variables
