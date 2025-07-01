@@ -1,2 +1,4 @@
 export { VormiaClient, createVormiaClient, getGlobalVormiaClient, setGlobalVormiaClient } from './VormiaClient';
-export * from '../types';
+
+// Export error types
+export { VormiaError } from './VormiaClient';
