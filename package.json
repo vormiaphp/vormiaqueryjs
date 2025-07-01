@@ -2,13 +2,44 @@
   "name": "vormiaquery",
   "version": "1.0.0",
   "description": "A npm package for query management with VormiaPHP laravel Backend application",
-  "main": "dist/index.umd.js",
-  "module": "dist/index.es.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.es.js",
-      "require": "./dist/index.umd.js"
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./react": {
+      "import": "./dist/esm/adapters/react.js",
+      "require": "./dist/cjs/adapters/react.js",
+      "types": "./dist/types/adapters/react.d.ts"
+    },
+    "./svelte": {
+      "import": "./dist/esm/adapters/svelte.js",
+      "require": "./dist/cjs/adapters/svelte.js",
+      "types": "./dist/types/adapters/svelte.d.ts"
+    },
+    "./solid": {
+      "import": "./dist/esm/adapters/solid.js",
+      "require": "./dist/cjs/adapters/solid.js",
+      "types": "./dist/types/adapters/solid.d.ts"
+    },
+    "./core": {
+      "import": "./dist/esm/core.js",
+      "require": "./dist/cjs/core.js",
+      "types": "./dist/types/core.d.ts"
+    },
+    "./vue": {
+      "import": "./dist/esm/adapters/vue.js",
+      "require": "./dist/cjs/adapters/vue.js",
+      "types": "./dist/types/adapters/vue.d.ts"
+    },
+    "./qwik": {
+      "import": "./dist/esm/adapters/qwik.js",
+      "require": "./dist/cjs/adapters/qwik.js",
+      "types": "./dist/types/adapters/qwik.d.ts"
     }
   },
   "files": [
@@ -38,23 +69,53 @@
   "author": "vormiateam",
   "type": "commonjs",
   "scripts": {
+    "dev": "vite",
     "build": "tsc && vite build",
-    "dev": "vite build --watch",
+    "preview": "vite preview",
     "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint src --ext .js,.jsx,.ts,.tsx --fix",
     "type-check": "tsc --noEmit",
     "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
-    "@tanstack/react-query": ">=4.0.0",
-    "axios": ">=0.27.0"
+    "@builder.io/qwik": ">=0.0.0",
+    "@tanstack/react-query": ">=5.0.0",
+    "axios": ">=0.27.0",
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0",
+    "solid-js": ">=1.0.0",
+    "svelte": ">=3.0.0",
+    "vue": ">=3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "svelte": {
+      "optional": true
+    },
+    "solid-js": {
+      "optional": true
+    },
+    "vue": {
+      "optional": true
+    },
+    "@builder.io/qwik": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.22.0",
+    "@builder.io/qwik": "^1.14.1",
+    "@tanstack/react-query": "^5.81.5",
+    "@testing-library/svelte": "^5.2.8",
+    "@types/axios": "^0.9.36",
     "@types/crypto-js": "^4.2.2",
+    "@types/jest": "^30.0.0",
     "@types/node": "^24.0.8",
     "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@types/vue": "^1.0.31",
     "@typescript-eslint/eslint-plugin": "^8.35.1",
     "@typescript-eslint/parser": "^8.35.1",
     "@vitejs/plugin-react": "^4.2.0",
@@ -62,11 +123,16 @@
     "eslint-plugin-react": "^7.32.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "jest": "^30.0.3",
+    "solid-js": "^1.9.7",
+    "svelte": "^5.34.9",
+    "svelte-jester": "^5.0.0",
     "terser": "^5.43.1",
+    "ts-jest": "^29.4.0",
     "typescript": "^5.0.0",
     "vite": "^7.0.0",
     "vite-plugin-dts": "^4.5.4",
-    "vite-plugin-lib-inject-css": "^2.2.2"
+    "vite-plugin-lib-inject-css": "^2.2.2",
+    "vue": "^3.5.17"
   },
   "dependencies": {
     "crypto-js": "^4.2.0"

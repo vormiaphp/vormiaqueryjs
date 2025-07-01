@@ -1,4 +1,13 @@
-import { AxiosRequestConfig, AxiosResponse } from 'axios';
+// Define our own types to avoid direct axios dependency
+type AxiosRequestConfig = any;
+type AxiosResponse<T = any> = {
+  data: T;
+  status: number;
+  statusText: string;
+  headers: Record<string, string>;
+  config: AxiosRequestConfig;
+  request?: any;
+};
 import { UseQueryOptions, UseMutationOptions } from '@tanstack/react-query';
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -15,33 +24,47 @@ export interface VormiaConfig {
 }
 
 export interface VormiaResponse<T = any> {
-  response: T;
+  status: 'success' | 'error';
   message?: string;
-  status?: number;
+  response: T;
+  errors?: Record<string, string[]>;
   meta?: {
+    current_page?: number;
+    from?: number;
+    last_page?: number;
+    per_page?: number;
+    to?: number;
     total?: number;
-    page?: number;
-    perPage?: number;
-    [key: string]: any;
   };
 }
 
-export interface VormiaAuthResponse<T = any> extends VormiaResponse<T> {
-  token?: string;
-  user?: any;
-  expires_at?: string;
+export interface VormiaErrorResponse {
+  message: string;
+  errors?: Record<string, string[]>;
+  status?: number;
 }
 
-export interface VormiaQueryOptions<T = any> extends Omit<UseQueryOptions<VormiaResponse<T>>, 'queryFn'> {
+export interface VormiaAuthResponse<T = any> {
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+  expires_at?: string;
+  user?: T;
+}
+
+export interface VormiaQueryOptions<T = any> {
   endpoint: string;
   method?: HttpMethod;
   params?: Record<string, any>;
   data?: any;
   headers?: Record<string, string>;
-  axiosConfig?: AxiosRequestConfig;
   transform?: (data: any) => T;
   onSuccess?: (data: VormiaResponse<T>) => void;
   onError?: (error: VormiaError) => void;
+  axiosConfig?: AxiosRequestConfig;
+  autoFetch?: boolean;
+  retry?: number;
+  retryDelay?: number;
 }
 
 export interface VormiaAuthOptions<T = any> extends Omit<VormiaQueryOptions<T>, 'onSuccess'> {
