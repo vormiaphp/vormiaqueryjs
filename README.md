@@ -1,5 +1,17 @@
 # VormiaQuery
 
+> **🚨 Required Peer Dependencies**
+>
+> After installing `vormiaquery`, you must also install the correct peer dependencies for your stack:
+>
+> - React: `npm install @tanstack/react-query axios @tanstack/eslint-plugin-query`
+> - Vue: `npm install @tanstack/vue-query axios @tanstack/eslint-plugin-query`
+> - Svelte: `npm install @tanstack/svelte-query axios @tanstack/eslint-plugin-query`
+> - Solid: `npm install @tanstack/solid-query axios @tanstack/eslint-plugin-query`
+> - Qwik: `npm install @builder.io/qwik axios @tanstack/eslint-plugin-query`
+>
+> **You will be prompted after install, or see the instructions above.**
+
 A universal query and mutation library for seamless data fetching and state management, designed for use with React, Vue, Svelte, Solid, and Qwik. Built for modern JavaScript projects and Laravel/VormiaPHP backends.
 
 ## Features
