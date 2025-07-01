@@ -1,0 +1,24 @@
+{
+  "name": "vormiaquery",
+  "version": "1.0.0",
+  "description": "A npm package for query management with VormiaPHP laravel Backend application",
+  "keywords": [
+    "vormia",
+    "vormiaquery"
+  ],
+  "homepage": "https://github.com/vormiaphp/vormiaquery#readme",
+  "bugs": {
+    "url": "https://github.com/vormiaphp/vormiaquery/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vormiaphp/vormiaquery.git"
+  },
+  "license": "MIT",
+  "author": "vormiateam",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
