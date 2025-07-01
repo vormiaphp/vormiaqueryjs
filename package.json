@@ -69,8 +69,7 @@
     "test:watch": "NODE_OPTIONS=--experimental-vm-modules vitest",
     "test:coverage": "NODE_OPTIONS=--experimental-vm-modules vitest run --coverage",
     "lint": "eslint src --ext .js,.jsx",
-    "lint:fix": "eslint src --ext .js,.jsx --fix",
-    "postinstall": "node postinstall.js"
+    "lint:fix": "eslint src --ext .js,.jsx --fix"
   },
   "peerDependencies": {
     "@builder.io/qwik": ">=0.0.0",

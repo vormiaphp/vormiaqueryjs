@@ -1,16 +1,6 @@
 # VormiaQuery
 
-> **🚨 Required Peer Dependencies**
->
-> After installing `vormiaquery`, you must also install the correct peer dependencies for your stack:
->
-> - React: `npm install @tanstack/react-query axios @tanstack/eslint-plugin-query`
-> - Vue: `npm install @tanstack/vue-query axios @tanstack/eslint-plugin-query`
-> - Svelte: `npm install @tanstack/svelte-query axios @tanstack/eslint-plugin-query`
-> - Solid: `npm install @tanstack/solid-query axios @tanstack/eslint-plugin-query`
-> - Qwik: `npm install @builder.io/qwik axios @tanstack/eslint-plugin-query`
->
-> **You will be prompted after install, or see the instructions above.**
+> **Note:** As of v1.0.2, VormiaQuery no longer prompts you to install peer dependencies after installation. Please refer to the instructions above and install the required dependencies for your framework manually. This change improves compatibility with bun, pnpm, and other package managers.
 
 ---
 
@@ -30,6 +20,16 @@ This will create two files in your project directory:
 
 - `vormia_public.pem` (public key)
 - `vormia_private.pem` (private key)
+
+> **🚨 Required Peer Dependencies**
+>
+> After installing `vormiaquery`, you must also install the correct peer dependencies for your stack:
+>
+> - React: `npm install @tanstack/react-query axios @tanstack/eslint-plugin-query`
+> - Vue: `npm install @tanstack/vue-query axios @tanstack/eslint-plugin-query`
+> - Svelte: `npm install @tanstack/svelte-query axios @tanstack/eslint-plugin-query`
+> - Solid: `npm install @tanstack/solid-query axios @tanstack/eslint-plugin-query`
+> - Qwik: `npm install @builder.io/qwik axios @tanstack/eslint-plugin-query`
 
 ### Key Storage Recommendations
 
