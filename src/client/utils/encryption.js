@@ -1,4 +1,16 @@
-import CryptoJS from 'crypto-js';
+import CryptoJS from "crypto-js";
+
+// Node.js crypto for RSA
+let crypto;
+try {
+  crypto = require("crypto");
+} catch (e) {
+  crypto = null;
+}
+
+// Load keys from environment variables (for SSR/Node.js)
+const PUBLIC_KEY = process.env.VORMIA_PUBLIC_KEY;
+const PRIVATE_KEY = process.env.VORMIA_PRIVATE_KEY;
 
 /**
  * Encrypts data using AES encryption
@@ -9,11 +21,9 @@ import CryptoJS from 'crypto-js';
 export const encryptData = (data, key) => {
   try {
     const jsonString = JSON.stringify(data);
-    const encrypted = CryptoJS.AES.encrypt(jsonString, key).toString();
-    return encrypted;
-  } catch (error) {
-    console.error('Encryption failed:', error);
-    throw new Error('Failed to encrypt data');
+    return CryptoJS.AES.encrypt(jsonString, key).toString();
+  } catch (e) {
+    return null;
   }
 };
 
@@ -26,17 +36,10 @@ export const encryptData = (data, key) => {
 export const decryptData = (encryptedData, key) => {
   try {
     const bytes = CryptoJS.AES.decrypt(encryptedData, key);
-    const decryptedString = bytes.toString(CryptoJS.enc.Utf8);
-    
-    // Handle case where decryption fails but doesn't throw
-    if (!decryptedString) {
-      throw new Error('Failed to decrypt data: Invalid key or corrupted data');
-    }
-    
-    return JSON.parse(decryptedString);
-  } catch (error) {
-    console.error('Decryption failed:', error);
-    throw new Error('Failed to decrypt data: ' + error.message);
+    const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+    return JSON.parse(decrypted);
+  } catch (e) {
+    return null;
   }
 };
 
@@ -46,9 +49,6 @@ export const decryptData = (encryptedData, key) => {
  * @returns {string} The hashed string
  */
 export const hashData = (data) => {
-  if (typeof data !== 'string') {
-    data = JSON.stringify(data);
-  }
   return CryptoJS.SHA256(data).toString();
 };
 
@@ -80,10 +80,33 @@ export const createSecureToken = () => {
 export const secureCompare = (a, b) => {
   const aBuffer = Buffer.from(a);
   const bBuffer = Buffer.from(b);
-  
+
   if (aBuffer.length !== bBuffer.length) {
     return false;
   }
-  
+
   return crypto.subtle.timingSafeEqual(aBuffer, bBuffer);
 };
+
+// --- RSA ENCRYPTION/DECRYPTION (Node.js only) ---
+
+export function encryptWithPublicKey(data, publicKey = PUBLIC_KEY) {
+  if (!crypto || !publicKey)
+    throw new Error("RSA encryption requires Node.js and a public key");
+  const buffer = Buffer.from(
+    typeof data === "string" ? data : JSON.stringify(data)
+  );
+  return crypto.publicEncrypt(publicKey, buffer).toString("base64");
+}
+
+export function decryptWithPrivateKey(encrypted, privateKey = PRIVATE_KEY) {
+  if (!crypto || !privateKey)
+    throw new Error("RSA decryption requires Node.js and a private key");
+  const buffer = Buffer.from(encrypted, "base64");
+  const decrypted = crypto.privateDecrypt(privateKey, buffer).toString("utf8");
+  try {
+    return JSON.parse(decrypted);
+  } catch {
+    return decrypted;
+  }
+}

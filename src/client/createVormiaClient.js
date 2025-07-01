@@ -1,4 +1,8 @@
-import { encryptData } from "./utils/encryption.js";
+import {
+  encryptData,
+  encryptWithPublicKey,
+  decryptWithPrivateKey,
+} from "./utils/encryption.js";
 
 // Helper function to convert headers to HeadersInit
 const toHeadersInit = (headers) => {
@@ -117,6 +121,9 @@ class VormiaClient {
       authTokenKey: "auth_token",
       withCredentials: false,
       timeout: 30000,
+      rsaEncrypt: false,
+      publicKey: process.env.VORMIA_PUBLIC_KEY,
+      privateKey: process.env.VORMIA_PRIVATE_KEY,
       ...config,
     };
 
@@ -202,7 +209,24 @@ class VormiaClient {
         },
       });
 
+      // Encrypt request data if enabled
+      let requestData = processedConfig.data;
+      if (this.config.rsaEncrypt && requestData) {
+        requestData = encryptWithPublicKey(requestData, this.config.publicKey);
+        processedConfig.data = { encrypted: requestData };
+      }
+
       const response = await this.http.request(processedConfig);
+
+      // Decrypt response data if enabled
+      let responseData = response.data;
+      if (this.config.rsaEncrypt && responseData && responseData.encrypted) {
+        responseData = decryptWithPrivateKey(
+          responseData.encrypted,
+          this.config.privateKey
+        );
+        response.data = responseData;
+      }
       return response;
     } catch (error) {
       if (error.status === 401) {

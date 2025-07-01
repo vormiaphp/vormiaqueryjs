@@ -12,6 +12,96 @@
 >
 > **You will be prompted after install, or see the instructions above.**
 
+---
+
+## 🔐 Encryption & Key Management
+
+VormiaQuery supports optional end-to-end encryption using RSA public/private key pairs.
+
+### Key Generation
+
+Generate a secure RSA key pair using the built-in CLI tool:
+
+```bash
+npx vormiaquery-gen-keys
+```
+
+This will create two files in your project directory:
+
+- `vormia_public.pem` (public key)
+- `vormia_private.pem` (private key)
+
+### Key Storage Recommendations
+
+- **Backend (Laravel):**
+  - Store the **public key** and **private key** in your `.env` or a secure config file.
+  - Example:
+    ```env
+    VORMIA_PUBLIC_KEY="<contents of vormia_public.pem>"
+    VORMIA_PRIVATE_KEY="<contents of vormia_private.pem>"
+    ```
+- **Frontend (SSR/Node.js):**
+  - Store the **private key** and **public key** in your `.env` or config.
+  - Example:
+    ```env
+    VORMIA_PRIVATE_KEY="<contents of vormia_private.pem>"
+    VORMIA_PUBLIC_KEY="<contents of vormia_public.pem>"
+    ```
+- **Never expose your private key in client-side browser code!**
+
+### Usage
+
+- VormiaQuery can use these keys to encrypt requests and decrypt responses.
+- Your Laravel backend should use the same keys to decrypt/encrypt data.
+- See the VormiaQuery and Laravel documentation for integration details.
+
+---
+
+## Laravel Integration Example
+
+To use RSA encryption/decryption in your Laravel backend, use [phpseclib](https://github.com/phpseclib/phpseclib):
+
+### 1. Install phpseclib
+
+```bash
+composer require phpseclib/phpseclib
+```
+
+### 2. Example Controller Usage
+
+```php
+use phpseclib3\Crypt\RSA;
+
+public function handleRequest(Request $request)
+{
+    $privateKey = env('VORMIA_PRIVATE_KEY');
+    $publicKey = env('VORMIA_PUBLIC_KEY');
+
+    // Decrypt incoming data
+    if ($request->has('encrypted')) {
+        $rsa = RSA::loadPrivateKey($privateKey);
+        $decrypted = $rsa->decrypt(base64_decode($request->input('encrypted')));
+        $data = json_decode($decrypted, true);
+        // ... process $data ...
+    }
+
+    // Prepare response
+    $response = ['foo' => 'bar'];
+    if ($request->expectsEncryptedResponse) {
+        $rsa = RSA::loadPublicKey($publicKey);
+        $encrypted = base64_encode($rsa->encrypt(json_encode($response)));
+        return response()->json(['encrypted' => $encrypted]);
+    }
+
+    return response()->json($response);
+}
+```
+
+- Store your keys in `.env` as described above.
+- Never expose your private key in frontend/browser code.
+
+---
+
 A universal query and mutation library for seamless data fetching and state management, designed for use with React, Vue, Svelte, Solid, and Qwik. Built for modern JavaScript projects and Laravel/VormiaPHP backends.
 
 ## Features
