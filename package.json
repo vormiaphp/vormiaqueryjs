@@ -61,7 +61,7 @@
   "author": "vormiateam",
   "type": "module",
   "bin": {
-    "vormiaquery-gen-keys": "./vormiaquery-gen-keys.js"
+    "vormiaquery-gen-keys": "./vormiaquery-gen-keys.cjs"
   },
   "scripts": {
     "dev": "vite",

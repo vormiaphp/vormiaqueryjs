@@ -88,6 +88,8 @@ Or, if installed globally:
 vormiaquery-gen-keys
 ```
 
+> **Note:** The CLI script is now implemented as a `.cjs` file for compatibility with Node.js projects using ES modules. You should still use the command `npx vormiaquery-gen-keys` (or `vormiaquery-gen-keys` if installed globally); the usage does not change for end users.
+
 This will create two files in your project directory:
 
 - `vormia_public.pem` (public key)
