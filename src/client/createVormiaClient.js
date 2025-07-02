@@ -4,6 +4,8 @@ import {
   decryptWithPrivateKey,
 } from "./utils/encryption.js";
 
+/* global process */
+
 // Helper function to convert headers to HeadersInit
 const toHeadersInit = (headers) => {
   const result = {};

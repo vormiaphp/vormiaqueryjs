@@ -1,5 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getGlobalVormiaClient } from '../client/createVormiaClient';
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { getGlobalVormiaClient } from "../client/createVormiaClient";
 
 /**
  * Hook for authenticated queries with encryption
@@ -15,12 +15,11 @@ import { getGlobalVormiaClient } from '../client/createVormiaClient';
  * @returns {Object} Query result
  */
 export const useVrmAuthQuery = (options) => {
-  const queryClient = useQueryClient();
   const client = getGlobalVormiaClient();
 
   const {
     endpoint,
-    method = 'GET',
+    method = "GET",
     params,
     data,
     headers = {},
@@ -37,10 +36,10 @@ export const useVrmAuthQuery = (options) => {
       const config = {
         method,
         url: endpoint,
-        params: method === 'GET' ? params : undefined,
-        data: method !== 'GET' ? data : undefined,
+        params: method === "GET" ? params : undefined,
+        data: method !== "GET" ? data : undefined,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           ...headers,
         },
         encryptData,
@@ -53,10 +52,10 @@ export const useVrmAuthQuery = (options) => {
         client.setAuthToken(response.data.token);
       }
 
-      if (transform && typeof transform === 'function') {
+      if (transform && typeof transform === "function") {
         return {
           ...response,
-          data: transform(response.data)
+          data: transform(response.data),
         };
       }
 
@@ -66,7 +65,9 @@ export const useVrmAuthQuery = (options) => {
       if (error.status === 401) {
         client.removeAuthToken();
       }
-      throw error instanceof Error ? error : new Error('Authentication query failed');
+      throw error instanceof Error
+        ? error
+        : new Error("Authentication query failed");
     }
   };
 
@@ -95,12 +96,11 @@ export const useVrmAuthQuery = (options) => {
  * @returns {Object} Mutation result and auth utilities
  */
 export const useVrmAuth = (options) => {
-  const queryClient = useQueryClient();
   const client = getGlobalVormiaClient();
 
   const {
     endpoint,
-    method = 'POST',
+    method = "POST",
     headers = {},
     transform,
     encryptData = false,
@@ -119,7 +119,7 @@ export const useVrmAuth = (options) => {
           url: endpoint,
           data: variables,
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             ...headers,
           },
           encryptData,
@@ -132,10 +132,10 @@ export const useVrmAuth = (options) => {
           client.setAuthToken(response.data.token);
         }
 
-        if (transform && typeof transform === 'function') {
+        if (transform && typeof transform === "function") {
           return {
             ...response,
-            data: transform(response.data)
+            data: transform(response.data),
           };
         }
 
@@ -145,7 +145,9 @@ export const useVrmAuth = (options) => {
         if (error.status === 401) {
           client.removeAuthToken();
         }
-        throw error instanceof Error ? error : new Error('Authentication failed');
+        throw error instanceof Error
+          ? error
+          : new Error("Authentication failed");
       }
     },
     onSuccess: (data, variables, context) => {
@@ -155,8 +157,6 @@ export const useVrmAuth = (options) => {
       if (onLoginSuccess && data.data?.token) {
         onLoginSuccess(data);
       }
-      // Invalidate auth-related queries
-      queryClient.invalidateQueries({ queryKey: ['auth'] });
     },
     onError: (error, variables, context) => {
       if (onError) {
@@ -174,7 +174,6 @@ export const useVrmAuth = (options) => {
   // Logout helper
   const logout = () => {
     client.removeAuthToken();
-    queryClient.invalidateQueries({ queryKey: ['auth'] });
   };
 
   // Check if user is authenticated
@@ -195,7 +194,7 @@ export const useVrmAuth = (options) => {
 export const useAuthStatus = () => {
   const client = getGlobalVormiaClient();
   const isAuthenticated = !!client.getAuthToken();
-  
+
   return {
     isAuthenticated,
     isLoading: false,

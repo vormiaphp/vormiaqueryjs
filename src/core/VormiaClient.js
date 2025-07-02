@@ -1,17 +1,22 @@
-import axios from 'axios';
+import axios from "axios";
+
+/* global process */
 
 // Environment variable fallbacks
 const DEFAULT_CONFIG = {
-  VORMIA_API_URL: process.env.VORMIA_API_URL || '',
-  VORMIA_AUTH_TOKEN_KEY: process.env.VORMIA_AUTH_TOKEN_KEY || 'auth_token',
-  VORMIA_TIMEOUT: process.env.VORMIA_TIMEOUT ? parseInt(process.env.VORMIA_TIMEOUT, 10) : 30000,
-  VORMIA_WITH_CREDENTIALS: process.env.VORMIA_WITH_CREDENTIALS === 'true' || false
+  VORMIA_API_URL: process.env.VORMIA_API_URL || "",
+  VORMIA_AUTH_TOKEN_KEY: process.env.VORMIA_AUTH_TOKEN_KEY || "auth_token",
+  VORMIA_TIMEOUT: process.env.VORMIA_TIMEOUT
+    ? parseInt(process.env.VORMIA_TIMEOUT, 10)
+    : 30000,
+  VORMIA_WITH_CREDENTIALS:
+    process.env.VORMIA_WITH_CREDENTIALS === "true" || false,
 };
 
 export class VormiaError extends Error {
   constructor(message, status, response, code) {
     super(message);
-    this.name = 'VormiaError';
+    this.name = "VormiaError";
     this.status = status;
     this.response = response;
     this.code = code;
@@ -22,7 +27,7 @@ export class VormiaClient {
   constructor(config = {}) {
     // Start with default config from environment variables
     const defaultConfig = {
-      baseURL: DEFAULT_CONFIG.VORMIA_API_URL || '',
+      baseURL: DEFAULT_CONFIG.VORMIA_API_URL || "",
       authTokenKey: DEFAULT_CONFIG.VORMIA_AUTH_TOKEN_KEY,
       withCredentials: DEFAULT_CONFIG.VORMIA_WITH_CREDENTIALS,
       timeout: DEFAULT_CONFIG.VORMIA_TIMEOUT,
@@ -33,7 +38,9 @@ export class VormiaClient {
 
     // Validate required configuration
     if (!this.config.baseURL) {
-      console.warn('VormiaClient: No baseURL provided. Please set VORMIA_API_URL in your .env file or pass baseURL in the config.');
+      console.warn(
+        "VormiaClient: No baseURL provided. Please set VORMIA_API_URL in your .env file or pass baseURL in the config."
+      );
     }
 
     // Create axios instance
@@ -41,7 +48,7 @@ export class VormiaClient {
       baseURL: this.config.baseURL,
       timeout: this.config.timeout,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...this.config.headers,
       },
       withCredentials: this.config.withCredentials,
@@ -87,46 +94,46 @@ export class VormiaClient {
     } catch (error) {
       const status = error.response?.status;
       const response = error.response?.data;
-      const message = error.message || 'Request failed';
+      const message = error.message || "Request failed";
       throw new VormiaError(message, status, response, error.code);
     }
   }
 
   get(url, config) {
-    return this.request({ ...config, method: 'GET', url });
+    return this.request({ ...config, method: "GET", url });
   }
 
   post(url, data, config) {
-    return this.request({ ...config, method: 'POST', url, data });
+    return this.request({ ...config, method: "POST", url, data });
   }
 
   put(url, data, config) {
-    return this.request({ ...config, method: 'PUT', url, data });
+    return this.request({ ...config, method: "PUT", url, data });
   }
 
   delete(url, config) {
-    return this.request({ ...config, method: 'DELETE', url });
+    return this.request({ ...config, method: "DELETE", url });
   }
 
   patch(url, data, config) {
-    return this.request({ ...config, method: 'PATCH', url, data });
+    return this.request({ ...config, method: "PATCH", url, data });
   }
 
   // Auth methods
   setAuthToken(token) {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       localStorage.setItem(this.config.authTokenKey, token);
     }
   }
 
   clearAuthToken() {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       localStorage.removeItem(this.config.authTokenKey);
     }
   }
 
   getAuthToken() {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       return localStorage.getItem(this.config.authTokenKey);
     }
     return null;
@@ -143,7 +150,9 @@ export function createVormiaClient(config) {
 
 export function getGlobalVormiaClient() {
   if (!globalClient) {
-    throw new Error('VormiaClient has not been initialized. Call createVormiaClient first.');
+    throw new Error(
+      "VormiaClient has not been initialized. Call createVormiaClient first."
+    );
   }
   return globalClient;
 }

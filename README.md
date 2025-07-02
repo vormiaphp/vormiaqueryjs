@@ -46,11 +46,25 @@ import vormiaqueryjs from "npm:vormiaqueryjs";
 
 After installing `vormiaqueryjs`, you must also install the correct peer dependencies for your stack:
 
-- React: `npm install @tanstack/react-query axios @tanstack/eslint-plugin-query`
-- Vue: `npm install @tanstack/vue-query axios @tanstack/eslint-plugin-query`
-- Svelte: `npm install @tanstack/svelte-query axios @tanstack/eslint-plugin-query`
-- Solid: `npm install @tanstack/solid-query axios @tanstack/eslint-plugin-query`
-- Qwik: `npm install @builder.io/qwik axios @tanstack/eslint-plugin-query`
+- React:
+  - `npm install @tanstack/react-query`
+  - `npm install @tanstack/eslint-plugin-query` (optional)
+- Vue:
+  - `npm install @tanstack/vue-query`
+  - `npm install @tanstack/eslint-plugin-query` (optional)
+- Svelte:
+  - `npm install @tanstack/svelte-query`
+  - `npm install @tanstack/eslint-plugin-query` (optional)
+- Solid:
+  - `npm install @tanstack/solid-query`
+  - `npm install @tanstack/eslint-plugin-query` (optional)
+- Qwik:
+
+  - `npm install @builder.io/qwik`
+  - `npm install @tanstack/eslint-plugin-query` (optional)
+
+- Common dependency for all frameworks:
+  - `npm install axios`
 
 > **Note:** VormiaQuery no longer prompts you to install peer dependencies after installation. Please refer to the instructions above and install the required dependencies for your framework manually. This change improves compatibility with bun, pnpm, and other package managers.
 
@@ -62,10 +76,16 @@ VormiaQuery supports optional end-to-end encryption using RSA public/private key
 
 ### Key Generation
 
-Generate a secure RSA key pair using the built-in CLI tool:
+After installing `vormiaqueryjs`, you can generate a secure RSA key pair using the built-in CLI tool:
 
 ```bash
 npx vormiaquery-gen-keys
+```
+
+Or, if installed globally:
+
+```bash
+vormiaquery-gen-keys
 ```
 
 This will create two files in your project directory:
@@ -96,6 +116,8 @@ This will create two files in your project directory:
 - VormiaQuery can use these keys to encrypt requests and decrypt responses.
 - Your Laravel backend should use the same keys to decrypt/encrypt data.
 - See the VormiaQuery and Laravel documentation for integration details.
+
+> **Note:** The `vormiaquery-gen-keys` CLI is included with the `vormiaqueryjs` package and is available after installation. You can run it with `npx vormiaquery-gen-keys` (locally) or `vormiaquery-gen-keys` (globally) to generate your RSA key pair for encryption support.
 
 ---
 

@@ -1,12 +1,12 @@
-import { createResource } from 'solid-js';
-import { getGlobalVormiaClient } from '../../client/createVormiaClient';
-import { VormiaError } from '../../client/utils/VormiaError';
+import { createResource } from "solid-js";
+import { getGlobalVormiaClient } from "../../client/createVormiaClient";
+import { VormiaError } from "../../client/utils/VormiaError";
 
 export function createVormiaResource(options) {
   const client = getGlobalVormiaClient();
   const {
     endpoint,
-    method = 'GET',
+    method = "GET",
     params,
     data: bodyData,
     headers,
@@ -18,14 +18,14 @@ export function createVormiaResource(options) {
     try {
       const config = {
         method,
-        params: method === 'GET' ? params : undefined,
-        data: method !== 'GET' ? (bodyData || params) : undefined,
-        headers
+        params: method === "GET" ? params : undefined,
+        data: method !== "GET" ? bodyData || params : undefined,
+        headers,
       };
 
       const response = await client.request({
         url: endpoint,
-        ...config
+        ...config,
       });
 
       let result = response.data;
@@ -36,19 +36,16 @@ export function createVormiaResource(options) {
 
       return result;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      const errorMessage =
+        error instanceof Error ? error.message : "An unknown error occurred";
       const status = error?.response?.status;
       const errorData = error?.response?.data;
-      
-      throw new VormiaError(
-        errorMessage,
-        status,
-        errorData
-      );
+
+      throw new VormiaError(errorMessage, status, errorData);
     }
   };
 
-  const [resource, { refetch }] = createResource(
+  const [resource] = createResource(
     resourceOptions.autoFetch !== false ? fetchData : undefined,
     resourceOptions
   );

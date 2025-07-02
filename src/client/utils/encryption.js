@@ -4,7 +4,7 @@ import CryptoJS from "crypto-js";
 let crypto;
 try {
   crypto = require("crypto");
-} catch (e) {
+} catch {
   crypto = null;
 }
 
@@ -22,7 +22,7 @@ export const encryptData = (data, key) => {
   try {
     const jsonString = JSON.stringify(data);
     return CryptoJS.AES.encrypt(jsonString, key).toString();
-  } catch (e) {
+  } catch {
     return null;
   }
 };
@@ -38,7 +38,7 @@ export const decryptData = (encryptedData, key) => {
     const bytes = CryptoJS.AES.decrypt(encryptedData, key);
     const decrypted = bytes.toString(CryptoJS.enc.Utf8);
     return JSON.parse(decrypted);
-  } catch (e) {
+  } catch {
     return null;
   }
 };
@@ -110,3 +110,5 @@ export function decryptWithPrivateKey(encrypted, privateKey = PRIVATE_KEY) {
     return decrypted;
   }
 }
+
+/* global process, require, Buffer */

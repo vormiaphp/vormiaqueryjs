@@ -1,5 +1,5 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { getGlobalVormiaClient } from '../client/createVormiaClient';
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getGlobalVormiaClient } from "../client/createVormiaClient";
 
 /**
  * Hook for making API queries with Vormia
@@ -14,12 +14,11 @@ import { getGlobalVormiaClient } from '../client/createVormiaClient';
  * @returns {Object} Query result
  */
 export const useVrmQuery = (options) => {
-  const queryClient = useQueryClient();
   const client = getGlobalVormiaClient();
 
   const {
     endpoint,
-    method = 'GET',
+    method = "GET",
     params,
     data,
     headers,
@@ -35,24 +34,26 @@ export const useVrmQuery = (options) => {
       const config = {
         method,
         url: endpoint,
-        params: method === 'GET' ? params : undefined,
-        data: method !== 'GET' ? data : undefined,
+        params: method === "GET" ? params : undefined,
+        data: method !== "GET" ? data : undefined,
         headers,
       };
 
       const response = await client.request(config);
-      
-      if (transform && typeof transform === 'function') {
+
+      if (transform && typeof transform === "function") {
         return {
           ...response,
-          data: transform(response.data)
+          data: transform(response.data),
         };
       }
-      
+
       return response;
     } catch (error) {
       // Re-throw with VormiaError for consistent error handling
-      throw error instanceof Error ? error : new Error('An unknown error occurred');
+      throw error instanceof Error
+        ? error
+        : new Error("An unknown error occurred");
     }
   };
 
@@ -70,7 +71,7 @@ export const useVrmQuery = (options) => {
  */
 export const useInvalidateVrmQuery = () => {
   const queryClient = useQueryClient();
-  
+
   return (endpoint, params) => {
     return queryClient.invalidateQueries({
       queryKey: [endpoint, params],
@@ -85,20 +86,20 @@ export const useInvalidateVrmQuery = () => {
 export const usePrefetchVrmQuery = () => {
   const queryClient = useQueryClient();
   const client = getGlobalVormiaClient();
-  
+
   return async (options) => {
     const {
       endpoint,
-      method = 'GET',
+      method = "GET",
       params,
       data,
       headers,
       transform,
       ...queryOptions
     } = options;
-    
+
     const queryKey = [endpoint, method, params, data];
-    
+
     await queryClient.prefetchQuery({
       queryKey,
       queryFn: async () => {
@@ -106,20 +107,20 @@ export const usePrefetchVrmQuery = () => {
           const config = {
             method,
             url: endpoint,
-            params: method === 'GET' ? params : undefined,
-            data: method !== 'GET' ? data : undefined,
+            params: method === "GET" ? params : undefined,
+            data: method !== "GET" ? data : undefined,
             headers,
           };
-          
+
           const response = await client.request(config);
-          
-          if (transform && typeof transform === 'function') {
+
+          if (transform && typeof transform === "function") {
             return transform(response.data);
           }
-          
+
           return response.data;
         } catch (error) {
-          throw error instanceof Error ? error : new Error('Prefetch failed');
+          throw error instanceof Error ? error : new Error("Prefetch failed");
         }
       },
       ...queryOptions,
