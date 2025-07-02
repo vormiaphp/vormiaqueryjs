@@ -95,23 +95,26 @@ This will create two files in your project directory:
 - `vormia_public.pem` (public key)
 - `vormia_private.pem` (private key)
 
-### Key Storage Recommendations
+### Next Steps
 
-- **Backend (Laravel):**
-  - Store the **public key** and **private key** in your `.env` or a secure config file.
-  - Example:
-    ```env
-    VORMIA_PUBLIC_KEY="<contents of vormia_public.pem>"
-    VORMIA_PRIVATE_KEY="<contents of vormia_private.pem>"
-    ```
-- **Frontend (SSR/Node.js):**
-  - Store the **private key** and **public key** in your `.env` or config.
-  - Example:
-    ```env
-    VORMIA_PRIVATE_KEY="<contents of vormia_private.pem>"
-    VORMIA_PUBLIC_KEY="<contents of vormia_public.pem>"
-    ```
-- **Never expose your private key in client-side browser code!**
+1. **Copy BOTH the public key and private key to your Laravel backend's `.env` or config** (both are needed for encryption/decryption).
+2. **Copy the private key (and optionally the public key) to your frontend SSR/Node.js `.env` or config.**
+   Example .env entries:
+   ```env
+   VORMIA_PRIVATE_KEY="<contents of vormia_private.pem>"
+   VORMIA_PUBLIC_KEY="<contents of vormia_public.pem>"
+   ```
+3. **Never expose your private key in client-side browser code or commit it to version control!**
+4. **Add `.env`, `vormia_private.pem`, and `vormia_public.pem` to your `.gitignore`.**
+5. **After copying, you may delete the generated key files from your project directory.**
+
+#### Summary Table
+
+| Location        | Needs Public Key | Needs Private Key | .env Recommended | .gitignore? | Delete PEM after? |
+| --------------- | :--------------: | :---------------: | :--------------: | :---------: | :---------------: |
+| Laravel Backend |       Yes        |        Yes        |       Yes        |     Yes     |        Yes        |
+| SSR/Node.js     |       Yes        |        Yes        |       Yes        |     Yes     |        Yes        |
+| Browser Client  |       Yes        |        No         |        No        |     N/A     |        N/A        |
 
 ### Usage
 
