@@ -1,5 +1,5 @@
 <script>
-  import { createVormiaStore } from "vormiaquery/adapters/svelte";
+  import { createVormiaStore } from "vormiaqueryjs/adapters/svelte";
   const store = createVormiaStore({ endpoint: "/categories", method: "GET" });
 </script>
 
@@ -9,7 +9,7 @@
   <p>Error: {$store.error.message}</p>
 {:else}
   <ul>
-    {#each $store as cat}
+    {#each $store.data?.response as cat}
       <li>{cat.name}</li>
     {/each}
   </ul>

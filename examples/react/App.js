@@ -1,5 +1,5 @@
 import React from "react";
-import { VormiaQueryProvider, useVrmQuery } from "vormiaquery";
+import { VormiaQueryProvider, useVrmQuery } from "vormiaqueryjs";
 
 function CategoriesList() {
   const { data, isLoading, error } = useVrmQuery({

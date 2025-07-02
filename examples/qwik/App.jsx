@@ -1,4 +1,4 @@
-import { useVormiaQuery } from "vormiaquery/adapters/qwik";
+import { useVormiaQuery } from "vormiaqueryjs/adapters/qwik";
 
 export default function App() {
   const { data, isLoading, error } = useVormiaQuery({

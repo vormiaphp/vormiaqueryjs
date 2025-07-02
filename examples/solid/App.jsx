@@ -1,4 +1,4 @@
-import { createVormiaResource } from "vormiaquery/adapters/solid";
+import { createVormiaResource } from "vormiaqueryjs/adapters/solid";
 
 const [categories] = createVormiaResource({
   endpoint: "/categories",
