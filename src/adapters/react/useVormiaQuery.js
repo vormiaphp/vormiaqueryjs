@@ -1,51 +1,59 @@
-import { useQuery } from '@tanstack/react-query';
-import { getGlobalVormiaClient } from '../../client/createVormiaClient';
-import { VormiaError } from '../../client/utils/VormiaError';
+import { useQuery } from "@tanstack/react-query";
+import { getGlobalVormiaClient } from "../../client/createVormiaClient";
+import { VormiaError } from "../../client/utils/VormiaError";
 
 export function useVormiaQuery(options) {
   const client = getGlobalVormiaClient();
   const {
     endpoint,
-    method = 'GET',
+    method = "GET",
     params,
     data: bodyData,
     headers,
     transform,
     enabled = true,
+    setEncrypt = false,
     ...queryOptions
   } = options;
 
-  const queryKey = [endpoint, method, params, bodyData, headers];
+  const queryKey = [endpoint, method, params, bodyData, headers, setEncrypt];
 
   const queryFn = async () => {
     try {
-      const config = {
+      let config = {
         method,
-        params: method === 'GET' ? params : undefined,
-        data: method !== 'GET' ? (bodyData || params) : undefined,
-        headers
+        params: method === "GET" ? params : undefined,
+        data: method !== "GET" ? bodyData || params : undefined,
+        headers,
       };
-
+      if (setEncrypt && config.data) {
+        const { encryptWithPublicKey } = await import(
+          "../../client/utils/encryption"
+        );
+        config.data = encryptWithPublicKey(config.data);
+      }
       const response = await client.request({
         url: endpoint,
-        ...config
+        ...config,
       });
-
-      if (transform) {
-        response.data = transform(response.data);
+      let responseData = response.data;
+      if (setEncrypt && responseData) {
+        const { decryptWithPrivateKey } = await import(
+          "../../client/utils/encryption"
+        );
+        responseData = decryptWithPrivateKey(responseData);
       }
-
-      return response.data;
+      if (transform) {
+        responseData = transform(responseData);
+      }
+      return responseData;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      const errorMessage =
+        error instanceof Error ? error.message : "An unknown error occurred";
       const status = error?.response?.status;
       const errorData = error?.response?.data;
-      
-      throw new VormiaError(
-        errorMessage,
-        status,
-        errorData
-      );
+
+      throw new VormiaError(errorMessage, status, errorData);
     }
   };
 
@@ -53,6 +61,6 @@ export function useVormiaQuery(options) {
     queryKey,
     queryFn,
     enabled,
-    ...queryOptions
+    ...queryOptions,
   });
 }

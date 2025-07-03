@@ -20,6 +20,7 @@ export function useVormiaQuery(options) {
       transform,
       onSuccess,
       onError,
+      setEncrypt = false,
     } = mergedOptions;
 
     isLoading.value = true;
@@ -27,28 +28,35 @@ export function useVormiaQuery(options) {
     isSuccess.value = false;
 
     try {
-      const config = {
+      let config = {
         method,
         url: endpoint,
         params: method === "GET" ? params : undefined,
         data: method !== "GET" ? bodyData || params : undefined,
         headers,
       };
-
+      if (setEncrypt && config.data) {
+        const { encryptWithPublicKey } = await import(
+          "../../client/utils/encryption"
+        );
+        config.data = encryptWithPublicKey(config.data);
+      }
       const response = await client.request(config);
       let result = response.data;
-
+      if (setEncrypt && result) {
+        const { decryptWithPrivateKey } = await import(
+          "../../client/utils/encryption"
+        );
+        result = decryptWithPrivateKey(result);
+      }
       if (transform && result?.response) {
         result.response = transform(result.response);
       }
-
       data.value = result.response;
       isSuccess.value = true;
-
       if (onSuccess) {
         onSuccess(result);
       }
-
       return result;
     } catch (err) {
       const vormiaError =
@@ -58,14 +66,11 @@ export function useVormiaQuery(options) {
               err?.message || "An unknown error occurred",
               err?.response?.status
             );
-
       error.value = vormiaError;
       isError.value = true;
-
       if (onError) {
         onError(vormiaError);
       }
-
       throw vormiaError;
     } finally {
       isLoading.value = false;

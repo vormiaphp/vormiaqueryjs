@@ -14,7 +14,7 @@ import { getGlobalVormiaClient } from "../client/createVormiaClient";
  * @param {boolean} [options.storeToken=true] - Whether to store the auth token
  * @returns {Object} Query result
  */
-export const useVrmAuthQuery = (options) => {
+export const useVormiaQueryAuth = (options) => {
   const client = getGlobalVormiaClient();
 
   const {
@@ -95,7 +95,7 @@ export const useVrmAuthQuery = (options) => {
  * @param {Function} [options.onLoginSuccess] - Callback on successful login
  * @returns {Object} Mutation result and auth utilities
  */
-export const useVrmAuth = (options) => {
+export const useVormiaQueryAuthMutation = (options) => {
   const client = getGlobalVormiaClient();
 
   const {
