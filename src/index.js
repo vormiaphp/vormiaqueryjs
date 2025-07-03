@@ -1,15 +1,11 @@
 // Main entry point
+export * from "./client/createVormiaClient.js";
 export { useVrmQuery } from "./hooks/useVrmQuery.js";
 export {
   useVormiaQueryAuth,
   useVormiaQueryAuthMutation,
 } from "./hooks/useVrmAuth.js";
 export { useVrmMutation } from "./hooks/useVrmMutation.js";
-export {
-  createVormiaClient,
-  getGlobalVormiaClient,
-  setGlobalVormiaClient,
-} from "./client/createVormiaClient.js";
 
 // Export types as plain objects for documentation purposes
 export const VormiaError = {};
