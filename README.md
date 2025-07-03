@@ -1,6 +1,6 @@
 # VormiaQuery
 
-A universal query and mutation library for seamless data fetching and state management, designed for use with React, Vue, Svelte, Solid, and Qwik. Built for modern JavaScript projects and Laravel/VormiaPHP backends.
+A universal query and mutation library for seamless data fetching and state management, designed for use with React, Vue, Svelte, Solid, Qwik, and Astro. Built for modern JavaScript projects and Laravel/VormiaPHP backends.
 
 ---
 
@@ -59,10 +59,12 @@ After installing `vormiaqueryjs`, you must also install the correct peer depende
   - `npm install @tanstack/solid-query`
   - `npm install @tanstack/eslint-plugin-query` (optional)
 - Qwik:
-
   - `npm install @builder.io/qwik`
   - `npm install @tanstack/eslint-plugin-query` (optional)
-
+- Astro:
+  - `npm install @tanstack/react-query`
+  - `npm install @tanstack/eslint-plugin-query` (optional)
+  - `npm install react react-dom` (if not present, for React-based hooks/components)
 - Common dependency for all frameworks:
   - `npm install axios`
 
@@ -70,9 +72,306 @@ After installing `vormiaqueryjs`, you must also install the correct peer depende
 
 ---
 
+## 🌟 Features
+
+- 🚀 **Easy to use**: Simple API for GET, POST, PUT, DELETE operations
+- 🔒 **Built-in Authentication**: Token-based auth with automatic handling
+- 🔐 **Data Encryption**: Optional AES/RSA encryption for sensitive data
+- ⚡ **Framework Agnostic**: Works with React, Vue, Svelte, Solid, Qwik, **Astro**
+- 🛡️ **Error Handling**: Comprehensive error handling with custom error types
+- 🧪 **Tested with Vitest**: Modern, fast JavaScript testing
+- 🟩 **Pure JavaScript**: No TypeScript required
+- 🔥 **Astro Support**: VormiaQueryJS now works in Astro via `src/adapters/astro/useVormia.js`.
+- 🔥 **Encryption Flag**: All adapters support `setEncrypt` in `useVormiaQuery`.
+- 🔥 **Auth Hook Renaming**: `useVrmAuth` → `useVormiaQueryAuth`, etc. Update your imports and usage accordingly.
+
+---
+
+## Usage Examples
+
+### React
+
+```jsx
+import React from "react";
+import {
+  VormiaQueryProvider,
+  useVormiaQuery,
+  useVormiaQueryAuth,
+  useVormiaQueryAuthMutation,
+} from "vormiaqueryjs";
+
+function App() {
+  return (
+    <VormiaQueryProvider config={{ baseURL: "https://api.example.com" }}>
+      <CategoriesList />
+    </VormiaQueryProvider>
+  );
+}
+
+function CategoriesList() {
+  const { data, isLoading, error, refetch } = useVormiaQuery({
+    endpoint: "/categories",
+    method: "GET",
+    setEncrypt: true, // Optional: encrypt request/response
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  return (
+    <ul>
+      {data?.response?.map((cat) => (
+        <li key={cat.id}>{cat.name}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+### React (Encrypted)
+
+```jsx
+import React from "react";
+import { useVormiaQuery } from "vormiaqueryjs";
+
+function EncryptedCategoriesList() {
+  const { data, isLoading, error } = useVormiaQuery({
+    endpoint: "/categories",
+    method: "GET",
+    setEncrypt: true,
+  });
+
+  if (isLoading) return <div>Loading (encrypted)...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  return (
+    <ul>
+      {data?.response?.map((cat) => (
+        <li key={cat.id}>{cat.name}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+### Astro
+
+> Astro uses React Query under the hood for VormiaQueryJS hooks.
+
+```jsx
+import { useVormiaQuery } from "vormiaqueryjs/adapters/astro";
+
+export default function App() {
+  const { data, isLoading, error } = useVormiaQuery({
+    endpoint: "/categories",
+    method: "GET",
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  return (
+    <ul>
+      {data?.response?.map((cat) => (
+        <li key={cat.id}>{cat.name}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+#### Astro (Encrypted)
+
+```jsx
+import { useVormiaQuery } from "vormiaqueryjs/adapters/astro";
+
+export default function AppEncrypt() {
+  const { data, isLoading, error } = useVormiaQuery({
+    endpoint: "/categories",
+    method: "GET",
+    setEncrypt: true,
+  });
+
+  if (isLoading) return <div>Loading (encrypted)...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  return (
+    <ul>
+      {data?.response?.map((cat) => (
+        <li key={cat.id}>{cat.name}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+### Vue
+
+```js
+<script setup>
+import { useVormiaQuery } from 'vormiaqueryjs/adapters/vue';
+
+const { data, error, isLoading, refetch } = useVormiaQuery({
+  endpoint: '/categories',
+  method: 'GET',
+  setEncrypt: true, // Optional: encrypt request/response
+});
+</script>
+
+<template>
+  <div v-if="isLoading">Loading...</div>
+  <div v-else-if="error">Error: {{ error.message }}</div>
+  <ul v-else>
+    <li v-for="cat in data?.response" :key="cat.id">{{ cat.name }}</li>
+  </ul>
+</template>
+```
+
+### Vue (Encrypted)
+
+```js
+<script setup>
+import { useVormiaQuery } from 'vormiaqueryjs/adapters/vue';
+
+const { data, error, isLoading, refetch } = useVormiaQuery({
+  endpoint: '/categories',
+  method: 'GET',
+  setEncrypt: true,
+});
+</script>
+
+<template>
+  <div v-if="isLoading">Loading (encrypted)...</div>
+  <div v-else-if="error">Error: {{ error.message }}</div>
+  <ul v-else>
+    <li v-for="cat in data?.response" :key="cat.id">{{ cat.name }}</li>
+  </ul>
+</template>
+```
+
+### Svelte
+
+```svelte
+<script>
+  import { createVormiaStore } from 'vormiaqueryjs/adapters/svelte';
+  const store = createVormiaStore({ endpoint: '/categories', method: 'GET', setEncrypt: true });
+</script>
+
+{#if $store.loading}
+  <p>Loading...</p>
+{:else if $store.error}
+  <p>Error: {$store.error.message}</p>
+{:else}
+  <ul>
+    {#each $store.data?.response as cat}
+      <li>{cat.name}</li>
+    {/each}
+  </ul>
+{/if}
+```
+
+### Svelte (Encrypted)
+
+```svelte
+<script>
+  import { createVormiaStore } from 'vormiaqueryjs/adapters/svelte';
+  const store = createVormiaStore({ endpoint: '/categories', method: 'GET', setEncrypt: true });
+</script>
+
+{#if $store.loading}
+  <p>Loading (encrypted)...</p>
+{:else if $store.error}
+  <p>Error: {$store.error.message}</p>
+{:else}
+  <ul>
+    {#each $store.data?.response as cat}
+      <li>{cat.name}</li>
+    {/each}
+  </ul>
+{/if}
+```
+
+### Solid
+
+```js
+import { createVormiaResource } from "vormiaqueryjs/adapters/solid";
+
+const [categories] = createVormiaResource({
+  endpoint: "/categories",
+  method: "GET",
+  setEncrypt: true, // Optional: encrypt request/response
+});
+
+function CategoriesList() {
+  return (
+    <ul>
+      {categories()?.response?.map((cat) => (
+        <li>{cat.name}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+### Solid (Encrypted)
+
+```js
+import { createVormiaResource } from "vormiaqueryjs/adapters/solid";
+
+const [categories] = createVormiaResource({
+  endpoint: "/categories",
+  method: "GET",
+  setEncrypt: true,
+});
+
+function EncryptedCategoriesList() {
+  return (
+    <ul>
+      {categories()?.response?.map((cat) => (
+        <li>{cat.name}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+### Qwik
+
+```js
+import { useVormiaQuery } from "vormiaqueryjs/adapters/qwik";
+
+export default function CategoriesList() {
+  const { data, isLoading, error } = useVormiaQuery({
+    endpoint: "/categories",
+    method: "GET",
+    setEncrypt: true, // Optional: encrypt request/response
+  });
+  // Render logic for Qwik
+}
+```
+
+### Qwik (Encrypted)
+
+```js
+import { useVormiaQuery } from "vormiaqueryjs/adapters/qwik";
+
+export default function EncryptedCategoriesList() {
+  const { data, isLoading, error } = useVormiaQuery({
+    endpoint: "/categories",
+    method: "GET",
+    setEncrypt: true,
+  });
+  // Render logic for Qwik
+}
+```
+
+---
+
 ## 🔐 Encryption & Key Management
 
 VormiaQuery supports optional end-to-end encryption using RSA public/private key pairs.
+
+> ⚠️ **Security Warning:** Never expose your private key in any client-side (browser) application. Only use the public key in frontend code. The private key should only be used in secure, server-side (Node.js/SSR) environments for full encryption/decryption. Exposing your private key in the browser can compromise all encrypted data.
 
 ### Key Generation
 
@@ -143,16 +442,6 @@ The Laravel package provides middleware, helpers, and complete integration for e
 
 ---
 
-## Features
-
-- 🚀 **Easy to use**: Simple API for GET, POST, PUT, DELETE operations
-- 🔒 **Built-in Authentication**: Token-based auth with automatic handling
-- 🔐 **Data Encryption**: Optional AES encryption for sensitive data
-- ⚡ **Framework Agnostic**: Works with React, Vue, Svelte, Solid, Qwik
-- 🛡️ **Error Handling**: Comprehensive error handling with custom error types
-- 🧪 **Tested with Vitest**: Modern, fast JavaScript testing
-- 🟩 **Pure JavaScript**: No TypeScript required
-
 ## Quick Start
 
 ### Environment Variables
@@ -168,131 +457,13 @@ VORMIA_WITH_CREDENTIALS=false
 
 ---
 
-## Usage Examples
-
-### React
-
-```jsx
-import React from "react";
-import {
-  VormiaQueryProvider,
-  useVrmQuery,
-  useVrmMutation,
-} from "vormiaqueryjs";
-
-function App() {
-  return (
-    <VormiaQueryProvider config={{ baseURL: "https://api.example.com" }}>
-      <CategoriesList />
-    </VormiaQueryProvider>
-  );
-}
-
-function CategoriesList() {
-  const { data, isLoading, error, refetch } = useVrmQuery({
-    endpoint: "/categories",
-    method: "GET",
-  });
-
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
-
-  return (
-    <ul>
-      {data?.response?.map((cat) => (
-        <li key={cat.id}>{cat.name}</li>
-      ))}
-    </ul>
-  );
-}
-```
-
-### Vue
-
-```js
-<script setup>
-import { useVormiaQuery } from 'vormiaqueryjs/adapters/vue';
-
-const { data, error, isLoading, refetch } = useVormiaQuery({
-  endpoint: '/categories',
-  method: 'GET',
-});
-</script>
-
-<template>
-  <div v-if="isLoading">Loading...</div>
-  <div v-else-if="error">Error: {{ error.message }}</div>
-  <ul v-else>
-    <li v-for="cat in data?.response" :key="cat.id">{{ cat.name }}</li>
-  </ul>
-</template>
-```
-
-### Svelte
-
-```svelte
-<script>
-  import { createVormiaStore } from 'vormiaqueryjs/adapters/svelte';
-  const store = createVormiaStore({ endpoint: '/categories', method: 'GET' });
-</script>
-
-{#if $store.loading}
-  <p>Loading...</p>
-{:else if $store.error}
-  <p>Error: {$store.error.message}</p>
-{:else}
-  <ul>
-    {#each $store.data?.response as cat}
-      <li>{cat.name}</li>
-    {/each}
-  </ul>
-{/if}
-```
-
-### Solid
-
-```js
-import { createVormiaResource } from "vormiaqueryjs/adapters/solid";
-
-const [categories] = createVormiaResource({
-  endpoint: "/categories",
-  method: "GET",
-});
-
-function CategoriesList() {
-  return (
-    <ul>
-      {categories()?.response?.map((cat) => (
-        <li>{cat.name}</li>
-      ))}
-    </ul>
-  );
-}
-```
-
-### Qwik
-
-```js
-import { useVormiaQuery } from "vormiaqueryjs/adapters/qwik";
-
-export default function CategoriesList() {
-  const { data, isLoading, error } = useVormiaQuery({
-    endpoint: "/categories",
-    method: "GET",
-  });
-  // Render logic for Qwik
-}
-```
-
----
-
 ## Authentication Example (React)
 
 ```jsx
-import { useVrmAuth } from "vormiaqueryjs";
+import { useVormiaQueryAuth } from "vormiaqueryjs";
 
 function LoginForm() {
-  const { login, isLoading, error, isAuthenticated } = useVrmAuth({
+  const { login, isLoading, error, isAuthenticated } = useVormiaQueryAuth({
     endpoint: "/auth/login",
     encryptData: true,
     storeToken: true,
@@ -331,10 +502,13 @@ function LoginForm() {
 ## Mutations Example (React)
 
 ```jsx
-import { useVrmMutation } from "vormiaqueryjs";
+import { useVormiaQueryAuthMutation } from "vormiaqueryjs";
 
 function AddCategory() {
-  const mutation = useVrmMutation({ endpoint: "/categories", method: "POST" });
+  const mutation = useVormiaQueryAuthMutation({
+    endpoint: "/categories",
+    method: "POST",
+  });
 
   const handleAdd = async () => {
     await mutation.mutate({ name: "New Category" });
@@ -395,10 +569,10 @@ MIT License. See [LICENSE](LICENSE) for details.
 ### 1. Encrypted Mutation (React)
 
 ```jsx
-import { useVrmMutation } from "vormiaqueryjs";
+import { useVormiaQueryAuthMutation } from "vormiaqueryjs";
 
 function SendSecret() {
-  const mutation = useVrmMutation({
+  const mutation = useVormiaQueryAuthMutation({
     endpoint: "/secret",
     method: "POST",
     rsaEncrypt: true, // Enable RSA encryption
@@ -434,9 +608,9 @@ async function getEncryptedData() {
 ### 3. Using VormiaQuery with Custom Headers
 
 ```js
-import { useVrmQuery } from "vormiaqueryjs";
+import { useVormiaQuery } from "vormiaqueryjs";
 
-const { data } = useVrmQuery({
+const { data } = useVormiaQuery({
   endpoint: "/profile",
   method: "GET",
   headers: {
@@ -449,10 +623,13 @@ const { data } = useVrmQuery({
 ### 4. Error Handling for Validation Errors
 
 ```js
-import { useVrmMutation } from "vormiaqueryjs";
+import { useVormiaQueryAuthMutation } from "vormiaqueryjs";
 
 function RegisterForm() {
-  const mutation = useVrmMutation({ endpoint: "/register", method: "POST" });
+  const mutation = useVormiaQueryAuthMutation({
+    endpoint: "/register",
+    method: "POST",
+  });
 
   const handleRegister = async (formData) => {
     try {
