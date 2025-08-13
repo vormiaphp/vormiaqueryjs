@@ -20,7 +20,7 @@ export default defineConfig({
         ),
         "adapters/react/VormiaProvider": resolve(
           __dirname,
-          "src/providers/VormiaProvider.js"
+          "src/providers/VormiaProvider.jsx"
         ),
         "adapters/svelte": resolve(
           __dirname,
