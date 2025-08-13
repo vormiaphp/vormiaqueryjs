@@ -87,6 +87,44 @@ After installing `vormiaqueryjs`, you must also install the correct peer depende
 
 ---
 
+## 🚀 Quick Start with VormiaProvider
+
+The easiest way to get started with VormiaQueryJS is using the `VormiaProvider` component. This automatically handles client initialization and configuration:
+
+```jsx
+import React from "react";
+import { VormiaProvider } from "vormiaqueryjs";
+
+function App() {
+  return (
+    <VormiaProvider config={{ baseURL: "https://api.example.com" }}>
+      <YourApp />
+    </VormiaProvider>
+  );
+}
+```
+
+### Configuration Options
+
+The `VormiaProvider` accepts these configuration options:
+
+- **`baseURL`** (required): Your API base URL
+- **`publicKey`** (optional): Public key for encryption
+- **`privateKey`** (optional): Private key for encryption  
+- **`timeout`** (optional): Request timeout in milliseconds
+- **`withCredentials`** (optional): Whether to include credentials
+- **`authTokenKey`** (optional): Key for storing auth token
+
+### Alternative Setup Methods
+
+If you prefer manual setup or need more control, you can also:
+
+1. **Manual Initialization**: Use `createVormiaClient()` and `setGlobalVormiaClient()` directly
+2. **Configuration Hook**: Use `useVormiaConfig()` hook for dynamic configuration
+3. **Auto-Initialization**: Let hooks auto-initialize with default values
+
+---
+
 ## Usage Examples
 
 ### React
@@ -94,7 +132,7 @@ After installing `vormiaqueryjs`, you must also install the correct peer depende
 ```jsx
 import React from "react";
 import {
-  VormiaQueryProvider,
+  VormiaProvider,
   useVormiaQuery,
   useVormiaQueryAuth,
   useVormiaQueryAuthMutation,
@@ -102,9 +140,9 @@ import {
 
 function App() {
   return (
-    <VormiaQueryProvider config={{ baseURL: "https://api.example.com" }}>
+    <VormiaProvider config={{ baseURL: "https://api.example.com" }}>
       <CategoriesList />
-    </VormiaQueryProvider>
+    </VormiaProvider>
   );
 }
 
