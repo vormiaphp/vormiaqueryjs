@@ -34,7 +34,6 @@ yarn add vormiaqueryjs
 
 > **🌐 Browser Compatibility**: VormiaQueryJS is designed for **browser environments** and uses ESM modules for optimal compatibility with modern bundlers like Vite, Webpack, and Rollup. It does not support Node.js environments.
 
-
 ### **yarn**
 
 ```bash
@@ -123,7 +122,6 @@ function App() {
 
 The `VormiaProvider` accepts these configuration options:
 
-
 - **`timeout`** (optional): Request timeout in milliseconds
 - **`withCredentials`** (optional): Whether to include credentials
 - **`authTokenKey`** (optional): Key for storing auth token
@@ -165,12 +163,12 @@ vormiaqueryjs/
 
 ## Usage Examples
 
-
 ## 🔧 How It Works
 
 VormiaQueryJS provides a simple, provider-based approach to API management:
 
 ### 1. **Provider Setup** (Recommended)
+
 ```jsx
 <VormiaProvider config={{ baseURL: "https://api.example.com" }}>
   <YourApp />
@@ -178,12 +176,14 @@ VormiaQueryJS provides a simple, provider-based approach to API management:
 ```
 
 ### 2. **Hook Usage**
+
 Once the provider is set up, use hooks anywhere in your component tree:
+
 ```jsx
 const { mutate: registerUser, isPending } = useVormiaQueryAuthMutation({
   endpoint: "/auth/register",
   onSuccess: (data) => console.log("Success:", data),
-  onError: (error) => console.error("Error:", error)
+  onError: (error) => console.error("Error:", error),
 });
 
 // Use the mutation
@@ -191,30 +191,34 @@ registerUser({ name: "John", email: "john@example.com" });
 ```
 
 ### 3. **Automatic Client Management**
+
 - **Global Client**: Automatically initialized and managed by VormiaProvider
 - **Configuration**: Centralized in one place
 - **Error Handling**: Built-in error handling and retry logic
 - **Type Safety**: Full TypeScript support (when using TypeScript)
 
-
 ## 📦 Available Exports
 
 ### **Core Components**
+
 - **`VormiaProvider`** - React provider for easy setup and configuration
 - **`useVormiaConfig`** - Hook for dynamic configuration management
 
 ### **Query Hooks**
+
 - **`useVrmQuery`** - General purpose query hook for data fetching
 - **`useVormiaQueryAuth`** - Authentication query hook
 - **`useVormiaQueryAuthMutation`** - Authentication mutation hook (login, register, etc.)
 - **`useVrmMutation`** - General purpose mutation hook
 
 ### **Client Management**
+
 - **`createVormiaClient`** - Create a new VormiaClient instance
 - **`setGlobalVormiaClient`** - Set the global client instance
 - **`getGlobalVormiaClient`** - Get the current global client instance
 
 ### **Utilities**
+
 - **`HttpMethod`** - Enum of HTTP methods (GET, POST, PUT, DELETE, etc.)
 - **`VormiaError`** - Error handling utilities
 
@@ -256,8 +260,6 @@ function CategoriesList() {
 }
 ```
 
-
-
 ### Astro
 
 > Astro uses React Query under the hood for VormiaQueryJS hooks.
@@ -284,8 +286,6 @@ export default function App() {
 }
 ```
 
-
-
 ### Vue
 
 ```js
@@ -306,8 +306,6 @@ const { data, error, isLoading, refetch } = useVormiaQuery({
   </ul>
 </template>
 ```
-
-
 
 ### Svelte
 
@@ -330,8 +328,6 @@ const { data, error, isLoading, refetch } = useVormiaQuery({
 {/if}
 ```
 
-
-
 ### Solid
 
 ```js
@@ -353,8 +349,6 @@ function CategoriesList() {
 }
 ```
 
-
-
 ### Qwik
 
 ```js
@@ -369,13 +363,7 @@ export default function CategoriesList() {
 }
 ```
 
-
-
 ---
-
-
-
-
 
 ### Next Steps
 
