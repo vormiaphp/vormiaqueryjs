@@ -2,6 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { getGlobalVormiaClient } from "../../client/createVormiaClient";
 import { VormiaError } from "../../client/utils/VormiaError";
 
+// Export VormiaProvider from the React adapter
+export { VormiaProvider } from "../../providers/VormiaProvider";
+
 export function useVormiaQuery(options) {
   const client = getGlobalVormiaClient();
   const {
