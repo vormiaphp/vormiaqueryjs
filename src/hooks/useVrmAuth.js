@@ -10,7 +10,6 @@ import { getGlobalVormiaClient } from "../client/createVormiaClient";
  * @param {Object} [options.data] - Request body
  * @param {Object} [options.headers] - Custom headers
  * @param {Function} [options.transform] - Transform function for response data
- * @param {boolean} [options.encryptData=false] - Whether to encrypt the request data
  * @param {boolean} [options.storeToken=true] - Whether to store the auth token
  * @returns {Object} Query result
  */
@@ -88,7 +87,6 @@ export const useVormiaQueryAuth = (options) => {
  * @param {string} [options.method='POST'] - HTTP method
  * @param {Object} [options.headers] - Custom headers
  * @param {Function} [options.transform] - Transform function for response data
- * @param {boolean} [options.encryptData=false] - Whether to encrypt the request data
  * @param {boolean} [options.storeToken=true] - Whether to store the auth token
  * @param {Function} [options.onLoginSuccess] - Callback on successful login
  * @returns {Object} Mutation result and auth utilities
@@ -119,7 +117,7 @@ export const useVormiaQueryAuthMutation = (options) => {
             "Content-Type": "application/json",
             ...headers,
           },
-          encryptData,
+  
         };
 
         const response = await client.request(config);

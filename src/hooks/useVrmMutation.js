@@ -39,7 +39,7 @@ export const useVrmMutation = (options) => {
             "Content-Type": "application/json",
             ...headers,
           },
-          encryptData,
+
         };
 
         const response = await client.request(config);

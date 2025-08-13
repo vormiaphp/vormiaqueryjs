@@ -21,7 +21,7 @@ export function useVormiaQuery(options) {
         transform,
         onSuccess,
         onError,
-        setEncrypt = false,
+
       } = mergedOptions;
       setIsLoading(true);
       setIsError(false);
@@ -34,20 +34,10 @@ export function useVormiaQuery(options) {
           data: method !== "GET" ? bodyData || params : undefined,
           headers,
         };
-        if (setEncrypt && config.data) {
-          const { encryptWithPublicKey } = await import(
-            "../../client/utils/encryption"
-          );
-          config.data = encryptWithPublicKey(config.data);
-        }
+
         const response = await client.request(config);
         let result = response.data;
-        if (setEncrypt && result) {
-          const { decryptWithPrivateKey } = await import(
-            "../../client/utils/encryption"
-          );
-          result = decryptWithPrivateKey(result);
-        }
+
         if (transform && result?.response) {
           result.response = transform(result.response);
         }
