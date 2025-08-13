@@ -8,12 +8,9 @@ try {
   crypto = null;
 }
 
-// Load keys from environment variables (for SSR/Node.js and browser)
-const PUBLIC_KEY = (typeof process !== 'undefined' && process.env) ? process.env.VORMIA_PUBLIC_KEY : 
-                   (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env.VITE_VORMIA_PUBLIC_KEY : undefined;
-
-const PRIVATE_KEY = (typeof process !== 'undefined' && process.env) ? process.env.VORMIA_PRIVATE_KEY : 
-                    (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env.VITE_VORMIA_PRIVATE_KEY : undefined;
+// Load keys from environment variables (browser-compatible)
+const PUBLIC_KEY = import.meta.env.VITE_VORMIA_PUBLIC_KEY;
+const PRIVATE_KEY = import.meta.env.VITE_VORMIA_PRIVATE_KEY;
 
 /**
  * Encrypts data using AES encryption
@@ -114,4 +111,4 @@ export function decryptWithPrivateKey(encrypted, privateKey = PRIVATE_KEY) {
   }
 }
 
-/* global process, require, Buffer */
+/* global require, Buffer */

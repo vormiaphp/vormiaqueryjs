@@ -124,10 +124,8 @@ class VormiaClient {
       withCredentials: false,
       timeout: 30000,
       rsaEncrypt: false,
-      publicKey: (typeof process !== 'undefined' && process.env) ? process.env.VORMIA_PUBLIC_KEY : 
-                 (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env.VITE_VORMIA_PUBLIC_KEY : undefined,
-      privateKey: (typeof process !== 'undefined' && process.env) ? process.env.VORMIA_PRIVATE_KEY : 
-                  (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env.VITE_VORMIA_PRIVATE_KEY : undefined,
+      publicKey: import.meta.env.VITE_VORMIA_PUBLIC_KEY,
+      privateKey: import.meta.env.VITE_VORMIA_PRIVATE_KEY,
       ...config,
     };
 

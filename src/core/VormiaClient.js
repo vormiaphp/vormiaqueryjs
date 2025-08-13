@@ -1,16 +1,16 @@
 import axios from "axios";
 
-/* global process */
 
-// Environment variable fallbacks
+
+// Environment variable fallbacks (browser-compatible)
 const DEFAULT_CONFIG = {
-  VORMIA_API_URL: process.env.VORMIA_API_URL || "",
-  VORMIA_AUTH_TOKEN_KEY: process.env.VORMIA_AUTH_TOKEN_KEY || "auth_token",
-  VORMIA_TIMEOUT: process.env.VORMIA_TIMEOUT
-    ? parseInt(process.env.VORMIA_TIMEOUT, 10)
+  VORMIA_API_URL: import.meta.env.VITE_VORMIA_API_URL || "",
+  VORMIA_AUTH_TOKEN_KEY: import.meta.env.VITE_VORMIA_AUTH_TOKEN_KEY || "auth_token",
+  VORMIA_TIMEOUT: import.meta.env.VITE_VORMIA_TIMEOUT
+    ? parseInt(import.meta.env.VITE_VORMIA_TIMEOUT, 10)
     : 30000,
   VORMIA_WITH_CREDENTIALS:
-    process.env.VORMIA_WITH_CREDENTIALS === "true" || false,
+    import.meta.env.VITE_VORMIA_WITH_CREDENTIALS === "true" || false,
 };
 
 export class VormiaError extends Error {
