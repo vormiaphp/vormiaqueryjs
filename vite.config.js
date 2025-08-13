@@ -14,8 +14,14 @@ export default defineConfig({
       entry: {
         index: resolve(__dirname, "src/index.js"),
         core: resolve(__dirname, "src/core/index.js"),
-        "adapters/react/useVormiaQuery": resolve(__dirname, "src/adapters/react/useVormiaQuery.js"),
-        "adapters/react/VormiaProvider": resolve(__dirname, "src/providers/VormiaProvider.js"),
+        "adapters/react/useVormiaQuery": resolve(
+          __dirname,
+          "src/adapters/react/useVormiaQuery.js"
+        ),
+        "adapters/react/VormiaProvider": resolve(
+          __dirname,
+          "src/providers/VormiaProvider.js"
+        ),
         "adapters/svelte": resolve(
           __dirname,
           "src/adapters/svelte/vormiaStore.js"

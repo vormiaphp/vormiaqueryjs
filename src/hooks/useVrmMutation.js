@@ -1,5 +1,5 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { getGlobalVormiaClient } from '../client/createVormiaClient';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { getGlobalVormiaClient } from "../client/createVormiaClient";
 
 /**
  * Hook for making API mutations with Vormia
@@ -19,7 +19,7 @@ export const useVrmMutation = (options) => {
 
   const {
     endpoint,
-    method = 'POST',
+    method = "POST",
     headers,
     transform,
 
@@ -36,7 +36,7 @@ export const useVrmMutation = (options) => {
           url: endpoint,
           data: variables,
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             ...headers,
           },
           encryptData,
@@ -44,16 +44,16 @@ export const useVrmMutation = (options) => {
 
         const response = await client.request(config);
 
-        if (transform && typeof transform === 'function') {
+        if (transform && typeof transform === "function") {
           return {
             ...response,
-            data: transform(response.data)
+            data: transform(response.data),
           };
         }
 
         return response;
       } catch (error) {
-        throw error instanceof Error ? error : new Error('Mutation failed');
+        throw error instanceof Error ? error : new Error("Mutation failed");
       }
     },
     onSuccess: (data, variables, context) => {
@@ -95,7 +95,7 @@ export const useVrmMutation = (options) => {
 export const useVrmCreate = (endpoint, options = {}) => {
   return useVrmMutation({
     endpoint,
-    method: 'POST',
+    method: "POST",
     ...options,
   });
 };
@@ -109,7 +109,7 @@ export const useVrmCreate = (endpoint, options = {}) => {
 export const useVrmUpdate = (endpoint, options = {}) => {
   return useVrmMutation({
     endpoint,
-    method: 'PUT',
+    method: "PUT",
     ...options,
   });
 };
@@ -123,7 +123,7 @@ export const useVrmUpdate = (endpoint, options = {}) => {
 export const useVrmPatch = (endpoint, options = {}) => {
   return useVrmMutation({
     endpoint,
-    method: 'PATCH',
+    method: "PATCH",
     ...options,
   });
 };
@@ -137,7 +137,7 @@ export const useVrmPatch = (endpoint, options = {}) => {
 export const useVrmDelete = (endpoint, options = {}) => {
   return useVrmMutation({
     endpoint,
-    method: 'DELETE',
+    method: "DELETE",
     ...options,
   });
 };

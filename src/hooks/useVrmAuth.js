@@ -41,7 +41,6 @@ export const useVormiaQueryAuth = (options) => {
           "Content-Type": "application/json",
           ...headers,
         },
-
       };
 
       const response = await client.request(config);

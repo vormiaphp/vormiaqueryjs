@@ -1,5 +1,3 @@
-
-
 /* global process */
 
 // Helper function to convert headers to HeadersInit
@@ -119,7 +117,7 @@ class VormiaClient {
       authTokenKey: "auth_token",
       withCredentials: false,
       timeout: 30000,
-      
+
       ...config,
     };
 
@@ -145,8 +143,6 @@ class VormiaClient {
         Authorization: `Bearer ${token}`,
       };
     }
-
-
 
     return config;
   }

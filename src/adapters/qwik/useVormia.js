@@ -20,7 +20,6 @@ export function useVormiaQuery(options) {
       transform,
       onSuccess,
       onError,
-    
     } = mergedOptions;
 
     isLoading.value = true;

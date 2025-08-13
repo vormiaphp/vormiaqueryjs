@@ -15,7 +15,7 @@ export function useVormiaQuery(options) {
     headers,
     transform,
     enabled = true,
-  
+
     ...queryOptions
   } = options;
 
@@ -29,13 +29,13 @@ export function useVormiaQuery(options) {
         data: method !== "GET" ? bodyData || params : undefined,
         headers,
       };
-      
+
       const response = await client.request({
         url: endpoint,
         ...config,
       });
       let responseData = response.data;
-      
+
       if (transform) {
         responseData = transform(responseData);
       }
