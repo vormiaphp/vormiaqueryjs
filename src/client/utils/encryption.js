@@ -9,10 +9,11 @@ try {
 }
 
 // Load keys from environment variables (for SSR/Node.js and browser)
-const PUBLIC_KEY =
-  process?.env?.VORMIA_PUBLIC_KEY || import.meta?.env?.VITE_VORMIA_PUBLIC_KEY;
-const PRIVATE_KEY =
-  process?.env?.VORMIA_PRIVATE_KEY || import.meta?.env?.VITE_VORMIA_PRIVATE_KEY;
+const PUBLIC_KEY = (typeof process !== 'undefined' && process.env) ? process.env.VORMIA_PUBLIC_KEY : 
+                   (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env.VITE_VORMIA_PUBLIC_KEY : undefined;
+
+const PRIVATE_KEY = (typeof process !== 'undefined' && process.env) ? process.env.VORMIA_PRIVATE_KEY : 
+                    (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env.VITE_VORMIA_PRIVATE_KEY : undefined;
 
 /**
  * Encrypts data using AES encryption
