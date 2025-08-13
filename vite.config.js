@@ -69,7 +69,7 @@ export default defineConfig({
         },
       },
     },
-    minify: 'terser',
+    minify: "terser",
     sourcemap: true,
     emptyOutDir: true,
   },
