@@ -124,8 +124,12 @@ class VormiaClient {
       withCredentials: false,
       timeout: 30000,
       rsaEncrypt: false,
-      publicKey: process.env.VORMIA_PUBLIC_KEY,
-      privateKey: process.env.VORMIA_PRIVATE_KEY,
+      publicKey:
+        process?.env?.VORMIA_PUBLIC_KEY ||
+        import.meta?.env?.VITE_VORMIA_PUBLIC_KEY,
+      privateKey:
+        process?.env?.VORMIA_PRIVATE_KEY ||
+        import.meta?.env?.VITE_VORMIA_PRIVATE_KEY,
       ...config,
     };
 
