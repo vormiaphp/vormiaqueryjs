@@ -7,8 +7,8 @@ export {
 } from "./hooks/useVrmAuth.js";
 export { useVrmMutation } from "./hooks/useVrmMutation.js";
 
-// Provider component for easy setup
-export { VormiaProvider } from "./providers/VormiaProvider.js";
+// Provider component for easy setup (default export)
+export { default as VormiaProvider } from "./providers/VormiaProvider.js";
 
 // Configuration hook for dynamic setup
 export { useVormiaConfig } from "./hooks/useVormiaConfig.js";
