@@ -103,7 +103,7 @@ After installing `vormiaqueryjs`, you must also install the correct peer depende
 
 ## 🚀 Quick Start with VormiaProvider
 
-The easiest way to get started with VormiaQueryJS is using the `VormiaProvider` component. This automatically handles client initialization and configuration:
+The easiest way to get started with VormiaQueryJS is using the `VormiaProvider` component. This automatically handles client initialization and configuration with built-in loading states and error handling:
 
 ```jsx
 import React from "react";
@@ -122,9 +122,19 @@ function App() {
 
 The `VormiaProvider` accepts these configuration options:
 
+- **`baseURL`** (required): Your API base URL
 - **`timeout`** (optional): Request timeout in milliseconds
 - **`withCredentials`** (optional): Whether to include credentials
 - **`authTokenKey`** (optional): Key for storing auth token
+
+### Initialization Behavior
+
+The `VormiaProvider` includes intelligent initialization handling:
+
+- **Loading State**: Shows "Initializing VormiaQuery..." while setting up the client
+- **Error Handling**: Displays clear error messages if initialization fails
+- **Safety**: Children only render after successful client initialization
+- **Direct Navigation**: Handles direct route access without "client not initialized" errors
 
 ### Alternative Setup Methods
 
@@ -193,6 +203,7 @@ registerUser({ name: "John", email: "john@example.com" });
 ### 3. **Automatic Client Management**
 
 - **Global Client**: Automatically initialized and managed by VormiaProvider
+- **Loading States**: Built-in loading indicators during initialization
 - **Configuration**: Centralized in one place
 - **Error Handling**: Built-in error handling and retry logic
 - **Type Safety**: Full TypeScript support (when using TypeScript)
