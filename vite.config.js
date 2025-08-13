@@ -68,6 +68,11 @@ export default defineConfig({
           "@builder.io/qwik/jsx-runtime": "qwikJsxRuntime",
         },
       },
+      onwarn(warning, warn) {
+        // Suppress circular dependency warnings
+        if (warning.code === 'CIRCULAR_DEPENDENCY') return;
+        warn(warning);
+      },
     },
     minify: "terser",
     sourcemap: true,
