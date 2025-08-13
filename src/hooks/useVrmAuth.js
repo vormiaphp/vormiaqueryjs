@@ -2,7 +2,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { getGlobalVormiaClient } from "../client/createVormiaClient";
 
 /**
- * Hook for authenticated queries with encryption
+ * Hook for authenticated queries
  * @param {Object} options - Query options
  * @param {string} options.endpoint - API endpoint
  * @param {string} [options.method='GET'] - HTTP method
@@ -24,7 +24,6 @@ export const useVormiaQueryAuth = (options) => {
     data,
     headers = {},
     transform,
-    encryptData = false,
     storeToken = true,
     ...queryOptions
   } = options;
@@ -42,7 +41,7 @@ export const useVormiaQueryAuth = (options) => {
           "Content-Type": "application/json",
           ...headers,
         },
-        encryptData,
+
       };
 
       const response = await client.request(config);
@@ -103,7 +102,6 @@ export const useVormiaQueryAuthMutation = (options) => {
     method = "POST",
     headers = {},
     transform,
-    encryptData = false,
     storeToken = true,
     onLoginSuccess,
     onSuccess,

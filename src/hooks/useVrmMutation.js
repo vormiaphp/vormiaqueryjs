@@ -8,7 +8,7 @@ import { getGlobalVormiaClient } from '../client/createVormiaClient';
  * @param {string} [options.method='POST'] - HTTP method
  * @param {Object} [options.headers] - Custom headers
  * @param {Function} [options.transform] - Transform function for response data
- * @param {boolean} [options.encryptData=false] - Whether to encrypt the request data
+
  * @param {Function} [options.onSuccess] - Success callback
  * @param {Function} [options.onError] - Error callback
  * @returns {Object} Mutation result and utilities
@@ -22,7 +22,7 @@ export const useVrmMutation = (options) => {
     method = 'POST',
     headers,
     transform,
-    encryptData = false,
+
     onSuccess,
     onError,
     ...mutationOptions

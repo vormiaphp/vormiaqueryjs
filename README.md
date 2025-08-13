@@ -123,8 +123,6 @@ function App() {
 
 The `VormiaProvider` accepts these configuration options:
 
-- **`baseURL`** (required): Your API base URL
-- **`publicKey`** (optional): Public key for encryption
 - **`privateKey`** (optional): Private key for encryption
 - **`timeout`** (optional): Request timeout in milliseconds
 - **`withCredentials`** (optional): Whether to include credentials

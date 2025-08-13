@@ -10,8 +10,7 @@ import {
  *
  * @param {Object} config - Configuration object for VormiaClient
  * @param {string} config.baseURL - Base URL for API requests
- * @param {string} [config.publicKey] - Public key for encryption (optional)
- * @param {string} [config.privateKey] - Private key for encryption (optional)
+
  * @param {number} [config.timeout] - Request timeout in milliseconds (optional)
  * @param {boolean} [config.withCredentials] - Whether to include credentials (optional)
  * @param {string} [config.authTokenKey] - Key for storing auth token (optional)

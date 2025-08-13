@@ -15,11 +15,11 @@ export function useVormiaQuery(options) {
     headers,
     transform,
     enabled = true,
-    setEncrypt = false,
+  
     ...queryOptions
   } = options;
 
-  const queryKey = [endpoint, method, params, bodyData, headers, setEncrypt];
+  const queryKey = [endpoint, method, params, bodyData, headers];
 
   const queryFn = async () => {
     try {
@@ -29,23 +29,13 @@ export function useVormiaQuery(options) {
         data: method !== "GET" ? bodyData || params : undefined,
         headers,
       };
-      if (setEncrypt && config.data) {
-        const { encryptWithPublicKey } = await import(
-          "../../client/utils/encryption"
-        );
-        config.data = encryptWithPublicKey(config.data);
-      }
+      
       const response = await client.request({
         url: endpoint,
         ...config,
       });
       let responseData = response.data;
-      if (setEncrypt && responseData) {
-        const { decryptWithPrivateKey } = await import(
-          "../../client/utils/encryption"
-        );
-        responseData = decryptWithPrivateKey(responseData);
-      }
+      
       if (transform) {
         responseData = transform(responseData);
       }

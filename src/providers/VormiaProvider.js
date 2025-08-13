@@ -12,8 +12,7 @@ import {
  * @param {React.ReactNode} props.children - Child components
  * @param {Object} props.config - Configuration object for VormiaClient
  * @param {string} props.config.baseURL - Base URL for API requests
- * @param {string} [props.config.publicKey] - Public key for encryption (optional)
- * @param {string} [props.config.privateKey] - Private key for encryption (optional)
+
  * @param {number} [props.config.timeout] - Request timeout in milliseconds (optional)
  * @param {boolean} [props.config.withCredentials] - Whether to include credentials (optional)
  * @param {string} [props.config.authTokenKey] - Key for storing auth token (optional)

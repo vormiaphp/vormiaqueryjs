@@ -1,8 +1,4 @@
-import {
-  encryptData,
-  encryptWithPublicKey,
-  decryptWithPrivateKey,
-} from "./utils/encryption.js";
+
 
 /* global process */
 
@@ -123,9 +119,7 @@ class VormiaClient {
       authTokenKey: "auth_token",
       withCredentials: false,
       timeout: 30000,
-      rsaEncrypt: false,
-      publicKey: import.meta.env.VITE_VORMIA_PUBLIC_KEY,
-      privateKey: import.meta.env.VITE_VORMIA_PRIVATE_KEY,
+      
       ...config,
     };
 
@@ -152,25 +146,7 @@ class VormiaClient {
       };
     }
 
-    // Handle encryption if enabled
-    if (config.encryptData && this.config.encryptionKey) {
-      if (config.data) {
-        config.data = {
-          encrypted: encryptData(
-            JSON.stringify(config.data),
-            this.config.encryptionKey
-          ),
-        };
-      }
-      if (config.params) {
-        config.params = {
-          encrypted: encryptData(
-            JSON.stringify(config.params),
-            this.config.encryptionKey
-          ),
-        };
-      }
-    }
+
 
     return config;
   }
@@ -211,24 +187,7 @@ class VormiaClient {
         },
       });
 
-      // Encrypt request data if enabled
-      let requestData = processedConfig.data;
-      if (this.config.rsaEncrypt && requestData) {
-        requestData = encryptWithPublicKey(requestData, this.config.publicKey);
-        processedConfig.data = { encrypted: requestData };
-      }
-
       const response = await this.http.request(processedConfig);
-
-      // Decrypt response data if enabled
-      let responseData = response.data;
-      if (this.config.rsaEncrypt && responseData && responseData.encrypted) {
-        responseData = decryptWithPrivateKey(
-          responseData.encrypted,
-          this.config.privateKey
-        );
-        response.data = responseData;
-      }
       return response;
     } catch (error) {
       if (error.status === 401) {
