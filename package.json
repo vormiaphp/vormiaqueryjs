@@ -2,37 +2,17 @@
   "name": "vormiaqueryjs",
   "version": "1.3.15",
   "description": "Vormia Query Js - A npm package for query management with VormiaPHP laravel Backend application",
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
+  "main": "dist/esm/index.mjs",
+  "module": "dist/esm/index.mjs",
+  "type": "module",
   "exports": {
-    ".": {
-      "import": "./dist/esm/index.mjs",
-      "require": "./dist/cjs/index.js"
-    },
-    "./react": {
-      "import": "./dist/esm/adapters/react.js",
-      "require": "./dist/cjs/adapters/react.js"
-    },
-    "./svelte": {
-      "import": "./dist/esm/adapters/svelte.js",
-      "require": "./dist/cjs/adapters/svelte.js"
-    },
-    "./solid": {
-      "import": "./dist/esm/adapters/solid.js",
-      "require": "./dist/cjs/adapters/solid.js"
-    },
-    "./core": {
-      "import": "./dist/esm/core.js",
-      "require": "./dist/cjs/core.js"
-    },
-    "./vue": {
-      "import": "./dist/esm/adapters/vue.js",
-      "require": "./dist/cjs/adapters/vue.js"
-    },
-    "./qwik": {
-      "import": "./dist/esm/adapters/qwik.js",
-      "require": "./dist/cjs/adapters/qwik.js"
-    }
+    ".": "./dist/esm/index.mjs",
+    "./react": "./dist/esm/adapters/react.mjs",
+    "./svelte": "./dist/esm/adapters/svelte.mjs",
+    "./solid": "./dist/esm/adapters/solid.mjs",
+    "./core": "./dist/esm/core.mjs",
+    "./vue": "./dist/esm/adapters/vue.mjs",
+    "./qwik": "./dist/esm/adapters/qwik.mjs"
   },
   "files": [
     "dist"
@@ -59,7 +39,6 @@
   },
   "license": "MIT",
   "author": "vormiateam",
-  "type": "module",
   "bin": {
     "vormiaquery-gen-keys": "./vormiaquery-gen-keys.cjs"
   },

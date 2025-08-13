@@ -29,7 +29,7 @@ export default defineConfig({
         "adapters/vue": resolve(__dirname, "src/adapters/vue/useVormia.js"),
         "adapters/qwik": resolve(__dirname, "src/adapters/qwik/useVormia.js"),
       },
-      formats: ["es", "cjs"],
+      formats: ["es"],
       fileName: (format, entryName) => {
         const dir = format === "es" ? "esm" : "cjs";
         return `${dir}/${entryName}.${format === "es" ? "mjs" : "js"}`;
@@ -70,7 +70,7 @@ export default defineConfig({
       },
       onwarn(warning, warn) {
         // Suppress circular dependency warnings
-        if (warning.code === 'CIRCULAR_DEPENDENCY') return;
+        if (warning.code === "CIRCULAR_DEPENDENCY") return;
         warn(warning);
       },
     },
