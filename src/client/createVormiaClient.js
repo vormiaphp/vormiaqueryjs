@@ -20,9 +20,30 @@ const toHeadersInit = (headers) => {
 const createHttpClient = (baseConfig) => {
   const client = {
     request: async (config) => {
-      const fullUrl = config.url
-        ? new URL(config.url, config.baseURL || baseConfig.baseURL).toString()
-        : "";
+      // Fix URL construction to properly handle baseURL with existing path
+      let fullUrl;
+      if (config.url) {
+        if (config.url.startsWith('http')) {
+          // Absolute URL, use as is
+          fullUrl = config.url;
+        } else {
+          // Relative URL, concatenate with baseURL
+          const baseURL = config.baseURL || baseConfig.baseURL;
+          if (baseURL.endsWith('/') && config.url.startsWith('/')) {
+            // Remove trailing slash from baseURL to avoid double slashes
+            fullUrl = baseURL.slice(0, -1) + config.url;
+          } else if (!baseURL.endsWith('/') && !config.url.startsWith('/')) {
+            // Add slash between baseURL and url
+            fullUrl = baseURL + '/' + config.url;
+          } else {
+            // One of them already has a slash, just concatenate
+            fullUrl = baseURL + config.url;
+          }
+        }
+      } else {
+        fullUrl = "";
+      }
+      
       const headers = toHeadersInit({
         "Content-Type": "application/json",
         Accept: "application/json",
