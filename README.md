@@ -493,10 +493,14 @@ VormiaQueryJS provides powerful error handling utilities that work with any API 
 
 ```json
 {
-    "success": false,
-    "message": "Error message here",
-    "data": { /* optional data */ },
-    "debug": { /* any debug information */ }
+  "success": false,
+  "message": "Error message here",
+  "data": {
+    /* optional data */
+  },
+  "debug": {
+    /* any debug information */
+  }
 }
 ```
 
@@ -505,25 +509,26 @@ VormiaQueryJS provides powerful error handling utilities that work with any API 
 Perfect for complex error handling logic:
 
 ```javascript
-import { createErrorHandler } from 'vormiaqueryjs';
+import { createErrorHandler } from "vormiaqueryjs";
 
 const handleError = (error) => {
   createErrorHandler(error)
     .ifValidationError((handler) => {
       const validationErrors = handler.getValidationErrors();
       const apiMessage = handler.getApiMessage();
-      console.log('Validation failed:', apiMessage);
-      console.log('Field errors:', validationErrors);
+      console.log("Validation failed:", apiMessage);
+      console.log("Field errors:", validationErrors);
     })
     .ifServerError((handler) => {
       const apiDebug = handler.getApiDebug();
-      console.log('Server error debug:', apiDebug);
+      console.log("Server error debug:", apiDebug);
     })
-    .logDebug('Registration Error');
+    .logDebug("Registration Error");
 };
 ```
 
 **Key Methods:**
+
 - `getApiResponse()` - Gets the full API response data
 - `getApiMessage()` - Gets the API message (falls back to error.message)
 - `getApiData()` - Gets the API data field
@@ -536,22 +541,23 @@ const handleError = (error) => {
 Simple, direct access to all error information:
 
 ```javascript
-import { handleError } from 'vormiaqueryjs';
+import { handleError } from "vormiaqueryjs";
 
 const handleError = (error) => {
   const errorInfo = handleError(error);
-  
-  console.log('Status:', errorInfo.status);
-  console.log('API Message:', errorInfo.apiMessage);
-  console.log('API Debug:', errorInfo.apiDebug);
-  console.log('Is Validation Error:', errorInfo.isValidationError);
-  
+
+  console.log("Status:", errorInfo.status);
+  console.log("API Message:", errorInfo.apiMessage);
+  console.log("API Debug:", errorInfo.apiDebug);
+  console.log("Is Validation Error:", errorInfo.isValidationError);
+
   // Log debug information
-  errorInfo.logDebug('Registration Error');
+  errorInfo.logDebug("Registration Error");
 };
 ```
 
 **Available Properties:**
+
 - `status`, `code`, `message` - Basic error info
 - `apiResponse`, `apiMessage`, `apiData`, `apiDebug`, `apiSuccess` - API response data
 - `isValidationError`, `isServerError`, `isNetworkError` - Error type checks
@@ -563,20 +569,20 @@ const handleError = (error) => {
 Automatically displays appropriate toast messages:
 
 ```javascript
-import { createToastErrorHandler } from 'vormiaqueryjs';
+import { createToastErrorHandler } from "vormiaqueryjs";
 
 const handleError = createToastErrorHandler(toast, {
   showValidationErrors: true,
   showServerErrors: true,
   defaultMessages: {
     validationTitle: "Form Errors",
-    serverMessage: "Something went wrong on our end"
-  }
+    serverMessage: "Something went wrong on our end",
+  },
 });
 
 // Usage in mutation
 useVormiaQueryAuthMutation({
-  onError: handleError
+  onError: handleError,
 });
 ```
 
@@ -585,36 +591,37 @@ useVormiaQueryAuthMutation({
 Handles form-specific error scenarios:
 
 ```javascript
-import { createFormErrorHandler } from 'vormiaqueryjs';
+import { createFormErrorHandler } from "vormiaqueryjs";
 
 const handleFormError = createFormErrorHandler({
   setFieldErrors,
   setGeneralError,
   fieldMapping: {
-    'password_confirmation': 'confirmPassword'
+    password_confirmation: "confirmPassword",
   },
   toast,
-  showToasts: true
+  showToasts: true,
 });
 
 // Usage in mutation
 useVormiaQueryAuthMutation({
-  onError: handleFormError
+  onError: handleFormError,
 });
 ```
 
 ### Error Handling Examples
 
 #### Basic Usage
+
 ```javascript
 const handleError = (error) => {
   const apiResponse = error.response?.data || error.data;
   const apiMessage = apiResponse?.message || error.message;
   const apiDebug = apiResponse?.debug;
-  
-  console.log('API Message:', apiMessage);
-  console.log('API Debug:', apiDebug);
-  
+
+  console.log("API Message:", apiMessage);
+  console.log("API Debug:", apiDebug);
+
   if (error.isValidationError()) {
     // Handle validation errors
     const validationErrors = error.getValidationErrors();
@@ -627,42 +634,43 @@ const handleError = (error) => {
 ```
 
 #### Advanced Usage with Chainable Handler
+
 ```javascript
 const handleError = (error) => {
   createErrorHandler(error)
     .ifValidationError((handler) => {
       const validationErrors = handler.getValidationErrors();
       const apiMessage = handler.getApiMessage();
-      
+
       // Map validation errors to form fields
       const fieldErrors = {};
-      Object.keys(validationErrors).forEach(field => {
-        if (field === 'password_confirmation') {
+      Object.keys(validationErrors).forEach((field) => {
+        if (field === "password_confirmation") {
           fieldErrors.confirmPassword = validationErrors[field];
         } else {
           fieldErrors[field] = validationErrors[field];
         }
       });
-      
+
       setFieldErrors(fieldErrors);
       toast({
         title: "Validation Error",
         description: apiMessage,
-        variant: "destructive"
+        variant: "destructive",
       });
     })
     .ifServerError((handler) => {
       const apiDebug = handler.getApiDebug();
-      console.log('Server error details:', apiDebug);
-      
+      console.log("Server error details:", apiDebug);
+
       setGeneralError(handler.getApiMessage());
       toast({
         title: "Server Error",
         description: handler.getApiMessage(),
-        variant: "destructive"
+        variant: "destructive",
       });
     })
-    .logDebug('Registration Error');
+    .logDebug("Registration Error");
 };
 ```
 
@@ -673,23 +681,23 @@ The error handling utilities provide easy access to any debug information your A
 ```javascript
 const handleError = (error) => {
   const apiDebug = error.response?.data?.debug || error.data?.debug;
-  
+
   if (apiDebug) {
-    console.group('🐛 API Debug Information');
-    console.log('Full Debug Object:', apiDebug);
-    
+    console.group("🐛 API Debug Information");
+    console.log("Full Debug Object:", apiDebug);
+
     // Access any debug properties your API provides
     if (apiDebug.execution_time !== undefined) {
-      console.log('Execution Time:', apiDebug.execution_time);
+      console.log("Execution Time:", apiDebug.execution_time);
     }
     if (apiDebug.memory_usage !== undefined) {
-      console.log('Memory Usage:', apiDebug.memory_usage);
+      console.log("Memory Usage:", apiDebug.memory_usage);
     }
     if (apiDebug.trace) {
-      console.log('Stack Trace:', apiDebug.trace);
+      console.log("Stack Trace:", apiDebug.trace);
     }
     if (apiDebug.custom_field) {
-      console.log('Custom Debug:', apiDebug.custom_field);
+      console.log("Custom Debug:", apiDebug.custom_field);
     }
     console.groupEnd();
   }
