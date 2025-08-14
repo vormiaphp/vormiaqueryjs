@@ -1,4 +1,4 @@
-/* global process */
+import { VormiaError } from './utils/VormiaError';
 
 // Helper function to convert headers to HeadersInit
 const toHeadersInit = (headers) => {
@@ -65,18 +65,20 @@ const createHttpClient = (baseConfig) => {
         const responseData = await response.json().catch(() => ({}));
 
         if (!response.ok) {
-          throw new Error(
-            JSON.stringify({
-              message: responseData.message || "Request failed",
+          // Create a VormiaError with detailed information
+          const errorData = {
+            message: responseData.message || `Request failed with status ${response.status}`,
+            status: response.status,
+            response: {
+              data: responseData,
               status: response.status,
-              response: {
-                data: responseData,
-                status: response.status,
-                statusText: response.statusText,
-                headers: {},
-              },
-            })
-          );
+              statusText: response.statusText,
+              headers: {},
+            },
+            debug: responseData.debug
+          };
+          
+          throw new VormiaError(errorData);
         }
 
         return {
@@ -87,26 +89,37 @@ const createHttpClient = (baseConfig) => {
           config,
         };
       } catch (error) {
-        let errorData;
-        try {
-          errorData = JSON.parse(error.message);
-        } catch {
-          errorData = {
-            message: error.message,
-            status: 0,
-            response: {
-              data: { message: error.message },
-              status: 0,
-              statusText: "",
-              headers: {},
-            },
-          };
+        // If it's already a VormiaError, just rethrow it
+        if (error instanceof VormiaError) {
+          throw error;
         }
-
-        const errorObj = new Error(errorData.message);
-        errorObj.status = errorData.status;
-        errorObj.response = errorData.response;
-        throw errorObj;
+        
+        // Handle network errors
+        if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
+          throw new VormiaError({
+            message: 'Network error: Unable to connect to the server',
+            code: 'NETWORK_ERROR',
+            status: 0
+          });
+        }
+        
+        // Handle JSON parse errors
+        if (error instanceof SyntaxError) {
+          throw new VormiaError({
+            message: 'Invalid JSON response from server',
+            code: 'INVALID_JSON',
+            status: 0
+          });
+        }
+        
+        // For other errors, wrap them in a VormiaError
+        throw new VormiaError({
+          message: error.message || 'An unknown error occurred',
+          code: error.code || 'UNKNOWN_ERROR',
+          status: error.status || 0,
+          response: error.response,
+          stack: error.stack
+        });
       }
     },
   };
