@@ -487,21 +487,216 @@ function AddCategory() {
 
 ---
 
-## Error Handling
+## Clean Error Handling
 
-```js
-try {
-  await mutation.mutateAsync(data);
-} catch (error) {
-  if (error.isValidationError()) {
-    // Handle validation errors
-  } else if (error.isUnauthorized()) {
-    // Handle auth errors
-  } else if (error.isServerError()) {
-    // Handle server errors
-  }
+VormiaQueryJS provides powerful error handling utilities that work with any API response format. The error handling focuses on the standard structure:
+
+```json
+{
+    "success": false,
+    "message": "Error message here",
+    "data": { /* optional data */ },
+    "debug": { /* any debug information */ }
 }
 ```
+
+### 1. Chainable Error Handler (`createErrorHandler`)
+
+Perfect for complex error handling logic:
+
+```javascript
+import { createErrorHandler } from 'vormiaqueryjs';
+
+const handleError = (error) => {
+  createErrorHandler(error)
+    .ifValidationError((handler) => {
+      const validationErrors = handler.getValidationErrors();
+      const apiMessage = handler.getApiMessage();
+      console.log('Validation failed:', apiMessage);
+      console.log('Field errors:', validationErrors);
+    })
+    .ifServerError((handler) => {
+      const apiDebug = handler.getApiDebug();
+      console.log('Server error debug:', apiDebug);
+    })
+    .logDebug('Registration Error');
+};
+```
+
+**Key Methods:**
+- `getApiResponse()` - Gets the full API response data
+- `getApiMessage()` - Gets the API message (falls back to error.message)
+- `getApiData()` - Gets the API data field
+- `getApiDebug()` - Gets the API debug object
+- `getApiSuccess()` - Gets the API success boolean
+- `logDebug(label)` - Logs comprehensive error information
+
+### 2. Object-Based Handler (`handleError`)
+
+Simple, direct access to all error information:
+
+```javascript
+import { handleError } from 'vormiaqueryjs';
+
+const handleError = (error) => {
+  const errorInfo = handleError(error);
+  
+  console.log('Status:', errorInfo.status);
+  console.log('API Message:', errorInfo.apiMessage);
+  console.log('API Debug:', errorInfo.apiDebug);
+  console.log('Is Validation Error:', errorInfo.isValidationError);
+  
+  // Log debug information
+  errorInfo.logDebug('Registration Error');
+};
+```
+
+**Available Properties:**
+- `status`, `code`, `message` - Basic error info
+- `apiResponse`, `apiMessage`, `apiData`, `apiDebug`, `apiSuccess` - API response data
+- `isValidationError`, `isServerError`, `isNetworkError` - Error type checks
+- `validationErrors` - Field validation errors
+- `userMessage`, `errorMessage` - User-friendly messages
+
+### 3. Toast Error Handler (`createToastErrorHandler`)
+
+Automatically displays appropriate toast messages:
+
+```javascript
+import { createToastErrorHandler } from 'vormiaqueryjs';
+
+const handleError = createToastErrorHandler(toast, {
+  showValidationErrors: true,
+  showServerErrors: true,
+  defaultMessages: {
+    validationTitle: "Form Errors",
+    serverMessage: "Something went wrong on our end"
+  }
+});
+
+// Usage in mutation
+useVormiaQueryAuthMutation({
+  onError: handleError
+});
+```
+
+### 4. Form Error Handler (`createFormErrorHandler`)
+
+Handles form-specific error scenarios:
+
+```javascript
+import { createFormErrorHandler } from 'vormiaqueryjs';
+
+const handleFormError = createFormErrorHandler({
+  setFieldErrors,
+  setGeneralError,
+  fieldMapping: {
+    'password_confirmation': 'confirmPassword'
+  },
+  toast,
+  showToasts: true
+});
+
+// Usage in mutation
+useVormiaQueryAuthMutation({
+  onError: handleFormError
+});
+```
+
+### Error Handling Examples
+
+#### Basic Usage
+```javascript
+const handleError = (error) => {
+  const apiResponse = error.response?.data || error.data;
+  const apiMessage = apiResponse?.message || error.message;
+  const apiDebug = apiResponse?.debug;
+  
+  console.log('API Message:', apiMessage);
+  console.log('API Debug:', apiDebug);
+  
+  if (error.isValidationError()) {
+    // Handle validation errors
+    const validationErrors = error.getValidationErrors();
+    setFieldErrors(validationErrors);
+  } else if (error.isServerError()) {
+    // Handle server errors
+    setGeneralError(apiMessage);
+  }
+};
+```
+
+#### Advanced Usage with Chainable Handler
+```javascript
+const handleError = (error) => {
+  createErrorHandler(error)
+    .ifValidationError((handler) => {
+      const validationErrors = handler.getValidationErrors();
+      const apiMessage = handler.getApiMessage();
+      
+      // Map validation errors to form fields
+      const fieldErrors = {};
+      Object.keys(validationErrors).forEach(field => {
+        if (field === 'password_confirmation') {
+          fieldErrors.confirmPassword = validationErrors[field];
+        } else {
+          fieldErrors[field] = validationErrors[field];
+        }
+      });
+      
+      setFieldErrors(fieldErrors);
+      toast({
+        title: "Validation Error",
+        description: apiMessage,
+        variant: "destructive"
+      });
+    })
+    .ifServerError((handler) => {
+      const apiDebug = handler.getApiDebug();
+      console.log('Server error details:', apiDebug);
+      
+      setGeneralError(handler.getApiMessage());
+      toast({
+        title: "Server Error",
+        description: handler.getApiMessage(),
+        variant: "destructive"
+      });
+    })
+    .logDebug('Registration Error');
+};
+```
+
+### Debug Information Access
+
+The error handling utilities provide easy access to any debug information your API returns:
+
+```javascript
+const handleError = (error) => {
+  const apiDebug = error.response?.data?.debug || error.data?.debug;
+  
+  if (apiDebug) {
+    console.group('🐛 API Debug Information');
+    console.log('Full Debug Object:', apiDebug);
+    
+    // Access any debug properties your API provides
+    if (apiDebug.execution_time !== undefined) {
+      console.log('Execution Time:', apiDebug.execution_time);
+    }
+    if (apiDebug.memory_usage !== undefined) {
+      console.log('Memory Usage:', apiDebug.memory_usage);
+    }
+    if (apiDebug.trace) {
+      console.log('Stack Trace:', apiDebug.trace);
+    }
+    if (apiDebug.custom_field) {
+      console.log('Custom Debug:', apiDebug.custom_field);
+    }
+    console.groupEnd();
+  }
+};
+```
+
+This approach works with **any** debug object structure your API returns, making it flexible for different backend implementations.
 
 ---
 
