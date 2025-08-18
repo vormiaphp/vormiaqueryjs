@@ -13,6 +13,9 @@ export { default as VormiaProvider } from "./providers/VormiaProvider.jsx";
 // Configuration hook for dynamic setup
 export { useVormiaConfig } from "./hooks/useVormiaConfig.js";
 
+// Debug & Notification System Components
+export * from "./components/index.js";
+
 // Export types as plain objects for documentation purposes
 export const VormiaError = {};
 export const VormiaConfig = {};
