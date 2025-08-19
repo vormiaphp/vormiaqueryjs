@@ -90,14 +90,23 @@ After installing `vormiaqueryjs`, you must also install the correct peer depende
 
 - 🚀 **Easy to use**: Simple API for GET, POST, PUT, DELETE operations
 - 🔒 **Built-in Authentication**: Token-based auth with automatic handling
-
 - ⚡ **Framework Agnostic**: Works with React, Vue, Svelte, Solid, Qwik, **Astro**
 - 🛡️ **Error Handling**: Comprehensive error handling with custom error types
 - 🧪 **Tested with Vitest**: Modern, fast JavaScript testing
 - 🟩 **Pure JavaScript**: No TypeScript required
-- 🔥 **Astro Support**: VormiaQueryJS now works in Astro via `src/adapters/astro/useVormia.js`.
+- 🔥 **Astro Support**: VormiaQueryJS now works in Astro via `src/adapters/astro/useVormia.js`
+- 🔥 **Auth Hook Renaming**: `useVrmAuth` → `useVormiaQueryAuth`, etc. Update your imports and usage accordingly
 
-- 🔥 **Auth Hook Renaming**: `useVrmAuth` → `useVormiaQueryAuth`, etc. Update your imports and usage accordingly.
+### 🆕 **Debug & Notification System**
+
+VormiaQueryJS now includes a comprehensive debugging and notification system:
+
+- **🔍 ErrorDebugPanel**: Technical debug information for developers
+- **🔔 NotificationPanel**: User-friendly success, error, warning, and info notifications
+- **📝 FieldErrors**: Comprehensive field-level validation error handling
+- **⚙️ EnhancedErrorHandler**: Unified error handling that integrates all components
+- **🌍 Framework-Agnostic**: Works with any framework or vanilla JavaScript
+- **🔧 Environment-Based**: Debug mode controlled by `VITE_VORMIA_DEBUG` environment variable
 
 ---
 
@@ -373,6 +382,428 @@ export default function CategoriesList() {
   // Render logic for Qwik
 }
 ```
+
+---
+
+## 🆕 Debug & Notification System
+
+VormiaQueryJS includes a comprehensive debugging and notification system that works with any framework or vanilla JavaScript.
+
+### Quick Start
+
+```javascript
+import {
+  createEnhancedErrorHandler,
+  createFieldErrorManager,
+  showSuccessNotification,
+} from "vormiaqueryjs";
+
+// Initialize error handler
+const errorHandler = createEnhancedErrorHandler({
+  debugEnabled: true,
+  showNotifications: true,
+  showDebugPanel: true,
+});
+
+// Initialize field error manager
+const fieldErrorManager = createFieldErrorManager();
+
+// Handle API success
+errorHandler.handleSuccess(response, {
+  notificationMessage: "Operation completed successfully!",
+});
+
+// Handle API errors with field validation
+errorHandler.handleError(error, {
+  handleFieldErrors: true,
+  fieldMapping: { password_confirmation: "confirmPassword" },
+});
+
+// Show notifications
+showSuccessNotification("Welcome!", "Success", "#notifications", 3000);
+```
+
+### Framework Examples
+
+#### React
+
+```jsx
+import {
+  createEnhancedErrorHandler,
+  createFieldErrorManager,
+} from "vormiaqueryjs";
+
+function MyComponent() {
+  const [errorHandler] = useState(() => createEnhancedErrorHandler());
+  const [fieldErrorManager] = useState(() => createFieldErrorManager());
+
+  useEffect(() => {
+    fieldErrorManager.addListener((errors) => {
+      setFieldErrors(errors);
+    });
+  }, []);
+
+  // Use in your component...
+}
+```
+
+#### Vue
+
+```vue
+<script setup>
+import {
+  createEnhancedErrorHandler,
+  createFieldErrorManager,
+} from "vormiaqueryjs";
+
+const errorHandler = createEnhancedErrorHandler();
+const fieldErrorManager = createFieldErrorManager();
+
+onMounted(() => {
+  fieldErrorManager.addListener((errors) => {
+    fieldErrors.value = errors;
+  });
+});
+</script>
+```
+
+#### Svelte
+
+```svelte
+<script>
+import { createEnhancedErrorHandler, createFieldErrorManager } from 'vormiaqueryjs';
+
+let errorHandler = createEnhancedErrorHandler();
+let fieldErrorManager = createFieldErrorManager();
+
+onMount(() => {
+  fieldErrorManager.addListener((errors) => {
+    fieldErrors = errors;
+  });
+});
+</script>
+```
+
+#### Solid
+
+```jsx
+import {
+  createEnhancedErrorHandler,
+  createFieldErrorManager,
+} from "vormiaqueryjs";
+
+function MyComponent() {
+  const [errorHandler, setErrorHandler] = createSignal(null);
+  const [fieldErrorManager, setFieldErrorManager] = createSignal(null);
+
+  onMount(() => {
+    setErrorHandler(createEnhancedErrorHandler());
+    setFieldErrorManager(createFieldErrorManager());
+  });
+}
+```
+
+#### Qwik
+
+```jsx
+import {
+  createEnhancedErrorHandler,
+  createFieldErrorManager,
+} from "vormiaqueryjs";
+
+export default component$(() => {
+  const errorHandler = useSignal(null);
+  const fieldErrorManager = useSignal(null);
+
+  useVisibleTask$(() => {
+    errorHandler.value = createEnhancedErrorHandler();
+    fieldErrorManager.value = createFieldErrorManager();
+  });
+});
+```
+
+#### Astro
+
+```astro
+---
+// Astro component script
+---
+
+<script>
+import { createEnhancedErrorHandler, createFieldErrorManager } from 'vormiaqueryjs';
+
+document.addEventListener('DOMContentLoaded', () => {
+  const errorHandler = createEnhancedErrorHandler();
+  const fieldErrorManager = createFieldErrorManager();
+
+  // Use in your component...
+});
+</script>
+```
+
+### Environment Configuration
+
+Set `VITE_VORMIA_DEBUG=true` in your environment to enable debug mode:
+
+```bash
+# .env
+VITE_VORMIA_DEBUG=true
+```
+
+### Key Components
+
+- **ErrorDebugPanel**: Shows technical debug information for developers
+- **NotificationPanel**: Displays user-friendly notifications
+- **FieldErrorManager**: Handles field-level validation errors
+- **EnhancedErrorHandler**: Orchestrates all error handling components
+
+For detailed API documentation and advanced usage examples, see the examples in the `examples/` directory.
+
+### Advanced Implementation Examples
+
+#### Comprehensive Error Handling with Debug & Notifications
+
+Here's an advanced example showing how to integrate the Debug & Notification System with VormiaQueryJS mutations:
+
+```jsx
+import { useVormiaQueryAuthMutation } from "vormiaqueryjs";
+import {
+  createEnhancedErrorHandler,
+  createFieldErrorManager,
+  showSuccessNotification,
+  showErrorNotification,
+} from "vormiaqueryjs";
+
+function RegistrationForm() {
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [generalError, setGeneralError] = useState("");
+  const [debugInfo, setDebugInfo] = useState(null);
+  const [showDebug, setShowDebug] = useState(false);
+  const [notification, setNotification] = useState(null);
+
+  // Initialize error handler and field error manager
+  const errorHandler = createEnhancedErrorHandler({
+    debugEnabled: true,
+    showNotifications: true,
+    showDebugPanel: true,
+    notificationTarget: "#notifications",
+    debugTarget: "#debug-panel",
+  });
+
+  const fieldErrorManager = createFieldErrorManager();
+
+  const registerMutation = useVormiaQueryAuthMutation({
+    endpoint: "/register",
+
+    onSuccess: (data) => {
+      // Log success for debugging
+      errorHandler.logSuccessForDebug(data, "Registration Success");
+
+      // Show success notification
+      showSuccessNotification(
+        data?.data?.message ||
+          "Account created successfully. Please check your email to verify your account.",
+        "Account Created! 🎉",
+        "#notifications",
+        3000
+      );
+
+      // Clear all errors and notification info
+      setFieldErrors({
+        name: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+      });
+      setGeneralError("");
+
+      // Set debug info for debug panel
+      const debugInfo = {
+        status: 200,
+        message: "Registration successful",
+        response: {
+          response: {
+            data: {
+              success: true,
+              message: data?.data?.message || "Account created successfully",
+              data: data?.data,
+              debug: data?.debug,
+            },
+          },
+          debug: data?.debug,
+        },
+        errorType: "success",
+        timestamp: new Date().toISOString(),
+      };
+
+      setDebugInfo(debugInfo);
+
+      // Show debug panel if enabled (controlled by environment variable)
+      const isDebugEnabled = import.meta.env.VITE_VORMIA_DEBUG === "true";
+      console.log("Success - Debug enabled:", isDebugEnabled);
+      console.log("Success - Setting showDebug to:", isDebugEnabled);
+      setShowDebug(isDebugEnabled);
+
+      // Force show debug panel if we have debug info and debug is enabled
+      if (isDebugEnabled) {
+        setShowDebug(true);
+      }
+
+      // Navigate to login after a short delay to show success message
+      setTimeout(() => {
+        // navigate('/login');
+      }, 2000);
+    },
+
+    onError: (error) => {
+      // Get clean error info using enhanced error handler
+      const errorInfo = errorHandler.handleError(error, {
+        handleFieldErrors: true,
+        fieldMapping: {
+          password_confirmation: "confirmPassword",
+        },
+      });
+
+      setDebugInfo(errorInfo);
+
+      // Show debug panel if enabled (controlled by environment variable)
+      const isDebugEnabled = import.meta.env.VITE_VORMIA_DEBUG === "true";
+      console.log("Debug enabled (error):", isDebugEnabled);
+      console.log("Setting showNotification to (error):", isDebugEnabled);
+      setShowDebug(isDebugEnabled);
+
+      // Force show debug panel if we have debug info and debug is enabled
+      if (isDebugEnabled) {
+        setShowDebug(true);
+      }
+
+      // Log for debugging
+      errorHandler.logErrorForDebug(error, "Registration Error");
+
+      // Handle based on whether there are field-specific errors
+      const hasFieldErrors =
+        error.response?.errors || error.response?.response?.data?.errors;
+      if (hasFieldErrors) {
+        // Field errors are automatically handled by the enhanced error handler
+        // You can also manually access them through fieldErrorManager
+        const currentFieldErrors = fieldErrorManager.getAllFieldErrors();
+        setFieldErrors(currentFieldErrors);
+        setGeneralError("");
+      } else {
+        // General error handling
+        setGeneralError(errorInfo.message);
+        setFieldErrors({
+          name: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        });
+      }
+
+      // Create error notification
+      showErrorNotification(
+        error.response?.message ||
+          error.response?.response?.data?.message ||
+          "An error occurred during registration.",
+        "Registration Failed",
+        "#notifications",
+        0 // No auto-hide for errors
+      );
+    },
+  });
+
+  // Handle form submission
+  const handleSubmit = async (formData) => {
+    // Clear previous errors
+    fieldErrorManager.clearAllFieldErrors();
+    setGeneralError("");
+
+    // Submit form
+    registerMutation.mutate(formData);
+  };
+
+  return (
+    <div>
+      {/* Your form JSX */}
+      <form onSubmit={handleSubmit}>{/* Form fields */}</form>
+
+      {/* Debug Panel */}
+      {showDebug && debugInfo && (
+        <div id="debug-panel">{/* Debug panel content */}</div>
+      )}
+
+      {/* Notifications Container */}
+      <div id="notifications"></div>
+    </div>
+  );
+}
+```
+
+#### Alternative: Using Enhanced Error Handler Directly
+
+You can also use the enhanced error handler more directly for cleaner code:
+
+```jsx
+import { createEnhancedErrorHandler } from "vormiaqueryjs";
+
+function RegistrationForm() {
+  const errorHandler = createEnhancedErrorHandler({
+    debugEnabled: true,
+    showNotifications: true,
+    showDebugPanel: true,
+    notificationTarget: "#notifications",
+    debugTarget: "#debug-panel",
+  });
+
+  const registerMutation = useVormiaQueryAuthMutation({
+    endpoint: "/register",
+
+    onSuccess: (data) => {
+      // Handle success with enhanced error handler
+      errorHandler.handleSuccess(data, {
+        notificationMessage:
+          "Account created successfully! Please check your email.",
+        debugLabel: "Registration Success",
+      });
+
+      // Additional success logic...
+    },
+
+    onError: (error) => {
+      // Handle error with enhanced error handler
+      errorHandler.handleError(error, {
+        handleFieldErrors: true,
+        fieldMapping: { password_confirmation: "confirmPassword" },
+        customErrorHandler: (error, errorInfo) => {
+          // Custom error handling logic
+          console.log("Custom error handling:", errorInfo);
+        },
+      });
+    },
+  });
+}
+```
+
+#### Environment Configuration
+
+Set up your environment variables for debug mode:
+
+```bash
+# .env
+VITE_VORMIA_DEBUG=true
+VITE_VORMIA_NOTIFICATION_TARGET=#notifications
+VITE_VORMIA_DEBUG_TARGET=#debug-panel
+```
+
+#### Key Benefits of This Approach
+
+1. **Centralized Error Handling**: All error logic is managed in one place
+2. **Automatic Debug Panel**: Debug information is automatically displayed when enabled
+3. **Field Error Mapping**: Automatically maps API field names to form field names
+4. **Environment-Based Control**: Debug features can be enabled/disabled per environment
+5. **Framework Agnostic**: Works with React, Vue, Svelte, Solid, Qwik, and Astro
+6. **Consistent Notifications**: Standardized notification system across your app
+7. **Developer Experience**: Rich debugging information during development
 
 ---
 
