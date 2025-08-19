@@ -8,6 +8,7 @@ import React from "react";
  * @property {string} message - Notification message
  * @property {string} key - Unique key for the notification
  * @property {number} [duration] - Auto-dismiss duration in milliseconds
+ * @property {'toast' | 'banner' | 'inapp' | 'modal'} [variant] - Notification display variant
  */
 
 /**
@@ -17,22 +18,36 @@ import React from "react";
 export function NotificationPanel({ notification, onClose, className = "" }) {
   if (!notification) return null;
 
-  const { type, title, message, duration = 5000 } = notification;
+  const { type, title, message, duration = 5000, variant = "inapp" } = notification;
 
-  // Auto-dismiss after duration
+  // Auto-dismiss after duration (only for toast and banner)
   React.useEffect(() => {
-    if (duration > 0) {
+    if (duration > 0 && (variant === "toast" || variant === "banner")) {
       const timer = setTimeout(() => {
         onClose();
       }, duration);
       return () => clearTimeout(timer);
     }
-  }, [duration, onClose]);
+  }, [duration, onClose, variant]);
 
-  // Get notification styles based on type
+  // Get notification styles based on type and variant
   const getNotificationStyles = () => {
-    const baseStyles = "p-4 rounded-lg border shadow-lg max-w-md w-full";
+    const baseStyles = "rounded-lg border shadow-lg";
+    
+    // Variant-specific styles
+    switch (variant) {
+      case "banner":
+        return `${baseStyles} w-full p-3 border-l-4`;
+      case "modal":
+        return `${baseStyles} max-w-md w-full p-6 mx-auto`;
+      case "toast":
+        return `${baseStyles} max-w-sm w-full p-4`;
+      case "inapp":
+      default:
+        return `${baseStyles} max-w-md w-full p-4`;
+    }
 
+    // Type-specific colors
     switch (type) {
       case "success":
         return `${baseStyles} bg-green-50 border-green-200 text-green-800`;
@@ -63,6 +78,57 @@ export function NotificationPanel({ notification, onClose, className = "" }) {
     }
   };
 
+  // Banner variant - spans full width at top
+  if (variant === "banner") {
+    return (
+      <div className={`${getNotificationStyles()} ${className} sticky top-0 z-50`}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <span className="text-lg">{getIcon()}</span>
+            <div>
+              <h3 className="font-semibold text-sm">{title}</h3>
+              <p className="text-sm">{message}</p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+            aria-label="Close notification"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Modal variant - centered overlay
+  if (variant === "modal") {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className={`${getNotificationStyles()} ${className} relative`}>
+          <div className="flex items-start justify-between">
+            <div className="flex items-start space-x-3">
+              <span className="text-lg">{getIcon()}</span>
+              <div className="flex-1">
+                <h3 className="font-semibold text-sm">{title}</h3>
+                <p className="text-sm mt-1">{message}</p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+              aria-label="Close notification"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Default inapp variant (original behavior)
   return (
     <div className={`${getNotificationStyles()} ${className}`}>
       <div className="flex items-start justify-between">
@@ -194,6 +260,78 @@ export function showSuccessNotification(
 }
 
 /**
+ * Show success banner notification (top of page)
+ * @param {string} message - Success message
+ * @param {string} title - Success title
+ * @param {Object} options - Additional options
+ */
+export function showSuccessBanner(
+  message,
+  title = "Success",
+  options = {}
+) {
+  const notification = {
+    type: "success",
+    title,
+    message,
+    variant: "banner",
+    key: `success-banner-${Date.now()}`,
+    duration: 0, // No auto-dismiss for banners
+    ...options,
+  };
+
+  return notification;
+}
+
+/**
+ * Show success in-app notification (inline)
+ * @param {string} message - Success message
+ * @param {string} title - Success title
+ * @param {Object} options - Additional options
+ */
+export function showSuccessInApp(
+  message,
+  title = "Success",
+  options = {}
+) {
+  const notification = {
+    type: "success",
+    title,
+    message,
+    variant: "inapp",
+    key: `success-inapp-${Date.now()}`,
+    duration: 0, // No auto-dismiss for in-app
+    ...options,
+  };
+
+  return notification;
+}
+
+/**
+ * Show success modal notification (overlay)
+ * @param {string} message - Success message
+ * @param {string} title - Success title
+ * @param {Object} options - Additional options
+ */
+export function showSuccessModal(
+  message,
+  title = "Success",
+  options = {}
+) {
+  const notification = {
+    type: "success",
+    title,
+    message,
+    variant: "modal",
+    key: `success-modal-${Date.now()}`,
+    duration: 0, // No auto-dismiss for modals
+    ...options,
+  };
+
+  return notification;
+}
+
+/**
  * Show error notification
  * @param {string} message - Error message
  * @param {string} title - Error title
@@ -209,6 +347,78 @@ export function showErrorNotification(message, title = "Error", options = {}) {
   };
 
   showNotificationToast(notification, options);
+  return notification;
+}
+
+/**
+ * Show error banner notification (top of page)
+ * @param {string} message - Error message
+ * @param {string} title - Error title
+ * @param {Object} options - Additional options
+ */
+export function showErrorBanner(
+  message,
+  title = "Error",
+  options = {}
+) {
+  const notification = {
+    type: "error",
+    title,
+    message,
+    variant: "banner",
+    key: `error-banner-${Date.now()}`,
+    duration: 0, // No auto-dismiss for banners
+    ...options,
+  };
+
+  return notification;
+}
+
+/**
+ * Show error in-app notification (inline)
+ * @param {string} message - Error message
+ * @param {string} title - Error title
+ * @param {Object} options - Additional options
+ */
+export function showErrorInApp(
+  message,
+  title = "Error",
+  options = {}
+) {
+  const notification = {
+    type: "error",
+    title,
+    message,
+    variant: "inapp",
+    key: `error-inapp-${Date.now()}`,
+    duration: 0, // No auto-dismiss for in-app
+    ...options,
+  };
+
+  return notification;
+}
+
+/**
+ * Show error modal notification (overlay)
+ * @param {string} message - Error message
+ * @param {string} title - Error title
+ * @param {Object} options - Additional options
+ */
+export function showErrorModal(
+  message,
+  title = "Error",
+  options = {}
+) {
+  const notification = {
+    type: "error",
+    title,
+    message,
+    variant: "modal",
+    key: `error-modal-${Date.now()}`,
+    duration: 0, // No auto-dismiss for modals
+    ...options,
+  };
+
   return notification;
 }
 
@@ -236,6 +446,78 @@ export function showWarningNotification(
 }
 
 /**
+ * Show warning banner notification (top of page)
+ * @param {string} message - Warning message
+ * @param {string} title - Warning title
+ * @param {Object} options - Additional options
+ */
+export function showWarningBanner(
+  message,
+  title = "Warning",
+  options = {}
+) {
+  const notification = {
+    type: "warning",
+    title,
+    message,
+    variant: "banner",
+    key: `warning-banner-${Date.now()}`,
+    duration: 0, // No auto-dismiss for banners
+    ...options,
+  };
+
+  return notification;
+}
+
+/**
+ * Show warning in-app notification (inline)
+ * @param {string} message - Warning message
+ * @param {string} title - Warning title
+ * @param {Object} options - Additional options
+ */
+export function showWarningInApp(
+  message,
+  title = "Warning",
+  options = {}
+) {
+  const notification = {
+    type: "warning",
+    title,
+    message,
+    variant: "inapp",
+    key: `warning-inapp-${Date.now()}`,
+    duration: 0, // No auto-dismiss for in-app
+    ...options,
+  };
+
+  return notification;
+}
+
+/**
+ * Show warning modal notification (overlay)
+ * @param {string} message - Warning message
+ * @param {string} title - Warning title
+ * @param {Object} options - Additional options
+ */
+export function showWarningModal(
+  message,
+  title = "Warning",
+  options = {}
+) {
+  const notification = {
+    type: "warning",
+    title,
+    message,
+    variant: "modal",
+    key: `warning-modal-${Date.now()}`,
+    duration: 0, // No auto-dismiss for modals
+    ...options,
+  };
+
+  return notification;
+}
+
+/**
  * Show info notification
  * @param {string} message - Info message
  * @param {string} title - Info title
@@ -251,5 +533,77 @@ export function showInfoNotification(message, title = "Info", options = {}) {
   };
 
   showNotificationToast(notification, options);
+  return notification;
+}
+
+/**
+ * Show info banner notification (top of page)
+ * @param {string} message - Info message
+ * @param {string} title - Info title
+ * @param {Object} options - Additional options
+ */
+export function showInfoBanner(
+  message,
+  title = "Info",
+  options = {}
+) {
+  const notification = {
+    type: "info",
+    title,
+    message,
+    variant: "banner",
+    key: `info-banner-${Date.now()}`,
+    duration: 0, // No auto-dismiss for banners
+    ...options,
+  };
+
+  return notification;
+}
+
+/**
+ * Show info in-app notification (inline)
+ * @param {string} message - Info message
+ * @param {string} title - Info title
+ * @param {Object} options - Additional options
+ */
+export function showInfoInApp(
+  message,
+  title = "Info",
+  options = {}
+) {
+  const notification = {
+    type: "info",
+    title,
+    message,
+    variant: "inapp",
+    key: `info-inapp-${Date.now()}`,
+    duration: 0, // No auto-dismiss for in-app
+    ...options,
+  };
+
+  return notification;
+}
+
+/**
+ * Show info modal notification (overlay)
+ * @param {string} message - Info message
+ * @param {string} title - Info title
+ * @param {Object} options - Additional options
+ */
+export function showInfoModal(
+  message,
+  title = "Info",
+  options = {}
+) {
+  const notification = {
+    type: "info",
+    title,
+    message,
+    variant: "modal",
+    key: `info-modal-${Date.now()}`,
+    duration: 0, // No auto-dismiss for modals
+    ...options,
+  };
+
   return notification;
 }

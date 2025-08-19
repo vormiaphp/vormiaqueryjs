@@ -95,9 +95,11 @@ import { VormiaProvider } from "vormiaqueryjs";
 
 function App() {
   return (
-    <VormiaProvider config={{ 
-      baseURL: import.meta.env.VITE_VORMIA_API_URL 
-    }}>
+    <VormiaProvider
+      config={{
+        baseURL: import.meta.env.VITE_VORMIA_API_URL,
+      }}
+    >
       <YourApp />
     </VormiaProvider>
   );

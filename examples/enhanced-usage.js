@@ -412,6 +412,413 @@ function getFrameworkAgnosticContent() {
 }
 
 // ============================================================================
+// ENHANCED NOTIFICATION EXAMPLES
+// ============================================================================
+
+import {
+  NotificationPanel,
+  showSuccessBanner,
+  showSuccessInApp,
+  showSuccessModal,
+  showErrorBanner,
+  showErrorInApp,
+  showErrorModal,
+  showWarningBanner,
+  showWarningInApp,
+  showWarningModal,
+  showInfoBanner,
+  showInfoInApp,
+  showInfoModal,
+} from "vormiaqueryjs";
+
+// ============================================================================
+// BANNER NOTIFICATIONS (Top of page)
+// ============================================================================
+
+function BannerNotificationExample() {
+  const [bannerNotification, setBannerNotification] = useState(null);
+
+  const showBanner = (type) => {
+    let notification;
+    switch (type) {
+      case "success":
+        notification = showSuccessBanner(
+          "Your changes have been saved successfully!",
+          "Changes Saved"
+        );
+        break;
+      case "error":
+        notification = showErrorBanner(
+          "Failed to save changes. Please try again.",
+          "Save Failed"
+        );
+        break;
+      case "warning":
+        notification = showWarningBanner(
+          "You have unsaved changes. Save before leaving?",
+          "Unsaved Changes"
+        );
+        break;
+      case "info":
+        notification = showInfoBanner(
+          "New features are available. Check them out!",
+          "New Features"
+        );
+        break;
+    }
+    setBannerNotification(notification);
+  };
+
+  return (
+    <div>
+      {/* Banner notification at top */}
+      {bannerNotification && (
+        <NotificationPanel
+          notification={bannerNotification}
+          onClose={() => setBannerNotification(null)}
+        />
+      )}
+
+      {/* Banner controls */}
+      <div className="space-x-2">
+        <button onClick={() => showBanner("success")}>Show Success Banner</button>
+        <button onClick={() => showBanner("error")}>Show Error Banner</button>
+        <button onClick={() => showBanner("warning")}>Show Warning Banner</button>
+        <button onClick={() => showBanner("info")}>Show Info Banner</button>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// IN-APP NOTIFICATIONS (Inline, above forms)
+// ============================================================================
+
+function InAppNotificationExample() {
+  const [inAppNotification, setInAppNotification] = useState(null);
+
+  const showInApp = (type) => {
+    let notification;
+    switch (type) {
+      case "success":
+        notification = showSuccessInApp(
+          "Form submitted successfully!",
+          "Success"
+        );
+        break;
+      case "error":
+        notification = showErrorInApp(
+          "Please fix the errors below.",
+          "Form Errors"
+        );
+        break;
+      case "warning":
+        notification = showWarningInApp(
+          "Some fields may be incomplete.",
+          "Warning"
+        );
+        break;
+      case "info":
+        notification = showInfoInApp(
+          "All fields marked with * are required.",
+          "Form Info"
+        );
+        break;
+    }
+    setInAppNotification(notification);
+  };
+
+  return (
+    <div>
+      {/* In-app notification above form */}
+      {inAppNotification && (
+        <NotificationPanel
+          notification={inAppNotification}
+          onClose={() => setInAppNotification(null)}
+        />
+      )}
+
+      {/* Form */}
+      <form className="space-y-4">
+        <h3>Contact Form</h3>
+        
+        {/* Form fields */}
+        <div>
+          <label>Name *</label>
+          <input type="text" placeholder="Enter your name" />
+        </div>
+        
+        <div>
+          <label>Email *</label>
+          <input type="email" placeholder="Enter your email" />
+        </div>
+
+        {/* In-app notification controls */}
+        <div className="space-x-2">
+          <button type="button" onClick={() => showInApp("success")}>
+            Show Success
+          </button>
+          <button type="button" onClick={() => showInApp("error")}>
+            Show Error
+          </button>
+          <button type="button" onClick={() => showInApp("warning")}>
+            Show Warning
+          </button>
+          <button type="button" onClick={() => showInApp("info")}>
+            Show Info
+          </button>
+        </div>
+
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  );
+}
+
+// ============================================================================
+// MODAL NOTIFICATIONS (Overlay)
+// ============================================================================
+
+function ModalNotificationExample() {
+  const [modalNotification, setModalNotification] = useState(null);
+
+  const showModal = (type) => {
+    let notification;
+    switch (type) {
+      case "success":
+        notification = showSuccessModal(
+          "Your account has been created successfully! You can now log in.",
+          "Account Created"
+        );
+        break;
+      case "error":
+        notification = showErrorModal(
+          "An unexpected error occurred. Please contact support if the problem persists.",
+          "System Error"
+        );
+        break;
+      case "warning":
+        notification = showWarningModal(
+          "This action cannot be undone. Are you sure you want to continue?",
+          "Confirm Action"
+        );
+        break;
+      case "info":
+        notification = showInfoModal(
+          "Your session will expire in 5 minutes. Save your work.",
+          "Session Expiry"
+        );
+        break;
+    }
+    setModalNotification(notification);
+  };
+
+  return (
+    <div>
+      {/* Modal notification overlay */}
+      {modalNotification && (
+        <NotificationPanel
+          notification={modalNotification}
+          onClose={() => setModalNotification(null)}
+        />
+      )}
+
+      {/* Modal controls */}
+      <div className="space-x-2">
+        <button onClick={() => showModal("success")}>Show Success Modal</button>
+        <button onClick={() => showModal("error")}>Show Error Modal</button>
+        <button onClick={() => showModal("warning")}>Show Warning Modal</button>
+        <button onClick={() => showModal("info")}>Show Info Modal</button>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// COMPREHENSIVE NOTIFICATION USAGE
+// ============================================================================
+
+function ComprehensiveNotificationExample() {
+  const [notifications, setNotifications] = useState({
+    banner: null,
+    inapp: null,
+    modal: null,
+  });
+
+  const showNotification = (variant, type) => {
+    const messages = {
+      success: {
+        title: "Success",
+        message: "Operation completed successfully!",
+      },
+      error: {
+        title: "Error",
+        message: "Something went wrong. Please try again.",
+      },
+      warning: {
+        title: "Warning",
+        message: "Please review the information before proceeding.",
+      },
+      info: {
+        title: "Information",
+        message: "Here's some helpful information for you.",
+      },
+    };
+
+    const { title, message } = messages[type];
+    let notification;
+
+    switch (variant) {
+      case "banner":
+        switch (type) {
+          case "success":
+            notification = showSuccessBanner(message, title);
+            break;
+          case "error":
+            notification = showErrorBanner(message, title);
+            break;
+          case "warning":
+            notification = showWarningBanner(message, title);
+            break;
+          case "info":
+            notification = showInfoBanner(message, title);
+            break;
+        }
+        setNotifications(prev => ({ ...prev, banner: notification }));
+        break;
+
+      case "inapp":
+        switch (type) {
+          case "success":
+            notification = showSuccessInApp(message, title);
+            break;
+          case "error":
+            notification = showErrorInApp(message, title);
+            break;
+          case "warning":
+            notification = showWarningInApp(message, title);
+            break;
+          case "info":
+            notification = showInfoInApp(message, title);
+            break;
+        }
+        setNotifications(prev => ({ ...prev, inapp: notification }));
+        break;
+
+      case "modal":
+        switch (type) {
+          case "success":
+            notification = showSuccessModal(message, title);
+            break;
+          case "error":
+            notification = showErrorModal(message, title);
+            break;
+          case "warning":
+            notification = showWarningModal(message, title);
+            break;
+          case "info":
+            notification = showInfoModal(message, title);
+            break;
+        }
+        setNotifications(prev => ({ ...prev, modal: notification }));
+        break;
+    }
+  };
+
+  const clearNotification = (variant) => {
+    setNotifications(prev => ({ ...prev, [variant]: null }));
+  };
+
+  return (
+    <div className="space-y-8">
+      {/* Banner Notification */}
+      {notifications.banner && (
+        <NotificationPanel
+          notification={notifications.banner}
+          onClose={() => clearNotification("banner")}
+        />
+      )}
+
+      {/* In-App Notification */}
+      {notifications.inapp && (
+        <NotificationPanel
+          notification={notifications.inapp}
+          onClose={() => clearNotification("inapp")}
+        />
+      )}
+
+      {/* Modal Notification */}
+      {notifications.modal && (
+        <NotificationPanel
+          notification={notifications.modal}
+          onClose={() => clearNotification("modal")}
+        />
+      )}
+
+      {/* Notification Controls */}
+      <div className="grid grid-cols-3 gap-4">
+        {/* Banner Controls */}
+        <div className="border p-4 rounded">
+          <h4 className="font-semibold mb-2">Banner Notifications</h4>
+          <div className="space-y-2">
+            <button onClick={() => showNotification("banner", "success")}>
+              Success Banner
+            </button>
+            <button onClick={() => showNotification("banner", "error")}>
+              Error Banner
+            </button>
+            <button onClick={() => showNotification("banner", "warning")}>
+              Warning Banner
+            </button>
+            <button onClick={() => showNotification("banner", "info")}>
+              Info Banner
+            </button>
+          </div>
+        </div>
+
+        {/* In-App Controls */}
+        <div className="border p-4 rounded">
+          <h4 className="font-semibold mb-2">In-App Notifications</h4>
+          <div className="space-y-2">
+            <button onClick={() => showNotification("inapp", "success")}>
+              Success In-App
+            </button>
+            <button onClick={() => showNotification("inapp", "error")}>
+              Error In-App
+            </button>
+            <button onClick={() => showNotification("inapp", "warning")}>
+              Warning In-App
+            </button>
+            <button onClick={() => showNotification("inapp", "info")}>
+              Info In-App
+            </button>
+          </div>
+        </div>
+
+        {/* Modal Controls */}
+        <div className="border p-4 rounded">
+          <h4 className="font-semibold mb-2">Modal Notifications</h4>
+          <div className="space-y-2">
+            <button onClick={() => showNotification("modal", "success")}>
+              Success Modal
+            </button>
+            <button onClick={() => showNotification("modal", "error")}>
+              Error Modal
+            </button>
+            <button onClick={() => showNotification("modal", "warning")}>
+              Warning Modal
+            </button>
+            <button onClick={() => showNotification("modal", "info")}>
+              Info Modal
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
 // EXPORTS
 // ============================================================================
 
@@ -423,4 +830,9 @@ export {
   ManualTransformationForm,
   TestComponent,
   getFrameworkAgnosticContent,
+  // New notification examples
+  BannerNotificationExample,
+  InAppNotificationExample,
+  ModalNotificationExample,
+  ComprehensiveNotificationExample,
 };
