@@ -223,14 +223,19 @@ export function getDebugFlag() {
       if (debugValue !== undefined) {
         // If explicitly set to false, disable debug
         if (String(debugValue).toLowerCase() === "false") {
-          console.log("🔍 VormiaQuery Debug: Debug mode explicitly disabled via environment variable");
+          console.log(
+            "🔍 VormiaQuery Debug: Debug mode explicitly disabled via environment variable"
+          );
           return false;
         }
-        
+
         // If set to true or any other value, enable debug
-        const isEnabled = String(debugValue).toLowerCase() === "true" || debugValue !== "";
+        const isEnabled =
+          String(debugValue).toLowerCase() === "true" || debugValue !== "";
         console.log(
-          `🔍 VormiaQuery Debug: Debug mode ${isEnabled ? "enabled" : "enabled (default)"} via environment variable`
+          `🔍 VormiaQuery Debug: Debug mode ${
+            isEnabled ? "enabled" : "enabled (default)"
+          } via environment variable`
         );
         console.log(`🔍 VormiaQuery Debug: Raw value: "${debugValue}"`);
         return isEnabled;
@@ -267,13 +272,17 @@ export function getDebugFlag() {
     ) {
       const isEnabled = Boolean(window.__VORMIA_DEBUG__);
       console.log(
-        `🔍 VormiaQuery Debug: Debug mode ${isEnabled ? "enabled" : "disabled"} via window.__VORMIA_DEBUG__`
+        `🔍 VormiaQuery Debug: Debug mode ${
+          isEnabled ? "enabled" : "disabled"
+        } via window.__VORMIA_DEBUG__`
       );
       return isEnabled;
     }
 
     // Default: Debug is ENABLED unless explicitly disabled
-    console.log("🔍 VormiaQuery Debug: Debug mode enabled by default (no environment variable found)");
+    console.log(
+      "🔍 VormiaQuery Debug: Debug mode enabled by default (no environment variable found)"
+    );
     return true;
   } catch (error) {
     console.error("🔍 VormiaQuery Debug: Error checking debug flag:", error);
