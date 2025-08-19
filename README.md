@@ -151,27 +151,37 @@ function MyComponent() {
 }
 ```
 
-### **ErrorDisplay & SuccessDisplay** - Simple Drop-in Components
+### **SimpleNotification** - Unified Drop-in Component
 
 ```jsx
-import { ErrorDisplay, SuccessDisplay } from "vormiaqueryjs";
+import { SimpleNotification } from "vormiaqueryjs";
 
 function MyComponent() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [info, setInfo] = useState(null);
 
   return (
     <div>
       {/* Easy error display - matches your exact styling */}
-      <ErrorDisplay 
-        error={error} 
+      <SimpleNotification 
+        type="error" 
+        message={error} 
         onClose={() => setError(null)} 
       />
       
       {/* Easy success display */}
-      <SuccessDisplay 
+      <SimpleNotification 
+        type="success" 
         message={success} 
         onClose={() => setSuccess(null)} 
+      />
+
+      {/* Info notification */}
+      <SimpleNotification 
+        type="info" 
+        message={info} 
+        onClose={() => setInfo(null)} 
       />
     </div>
   );
@@ -180,30 +190,52 @@ function MyComponent() {
 
 **💡 Pro Tip**: Instead of writing manual HTML with Tailwind classes, use these pre-styled components!
 
+#### **Available Notification Types:**
+- **`type="success"`** - Green styling with ✅ icon
+- **`type="error"`** - Red styling with ❌ icon  
+- **`type="warning"** - Yellow styling with ⚠️ icon
+- **`type="info"** - Blue styling with ℹ️ icon
+- **`type="announce"`** - Black/white styling with 🔔 icon
+
 #### **Before (Manual HTML - Don't do this!):**
+
 ```jsx
-{/* ❌ Manual HTML with Tailwind - hard to maintain */}
-{generalError && (
-  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-    <div className="flex items-center">
-      <div className="flex-shrink-0">
-        <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-        </svg>
-      </div>
-      <div className="ml-3">
-        <p className="text-sm text-red-800">{generalError}</p>
+{
+  /* ❌ Manual HTML with Tailwind - hard to maintain */
+}
+{
+  generalError && (
+    <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+      <div className="flex items-center">
+        <div className="flex-shrink-0">
+          <svg
+            className="h-5 w-5 text-red-400"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </div>
+        <div className="ml-3">
+          <p className="text-sm text-red-800">{generalError}</p>
+        </div>
       </div>
     </div>
-  </div>
-)}
+  );
+}
 ```
 
 #### **After (Easy Component - Do this!):**
+
 ```jsx
 {/* ✅ Simple component - easy to use and maintain */}
-<ErrorDisplay 
-  error={generalError} 
+<SimpleNotification 
+  type="error" 
+  message={generalError} 
   onClose={() => setGeneralError(null)} 
 />
 ```
