@@ -1,12 +1,75 @@
 # VormiaQueryJS
 
-A universal query and mutation library for seamless data fetching and state management, designed for use with React, Vue, Svelte, Solid, Qwik, and Astro. Built for modern JavaScript projects and Laravel/VormiaPHP backends.
+A powerful, framework-agnostic query and mutation library with built-in error handling, notifications, and debug capabilities.
 
-> **📦 Latest Version**: `v1.4.4` - Cleaned up unused environment variables and improved documentation accuracy
+## ✨ **What's New in v1.4.6**
 
----
+### 🚀 **Major Improvements**
 
-## 🚨 Required Peer Dependencies
+- **Notifications Always Enabled**: No more need to specify `enableNotifications: true` in every query
+- **Enhanced Debug Panel**: Better error/success response display with improved structure detection
+- **Cleaner API**: Simplified hook usage with sensible defaults
+
+### 🔧 **Bug Fixes**
+
+- Fixed ErrorDebugPanel not showing API responses correctly
+- Improved environment variable detection for debug mode
+- Better handling of different response structures (success vs error)
+
+### 📝 **Usage Changes**
+
+```javascript
+// Before (v1.4.5 and earlier):
+const mutation = useVormiaQueryAuthMutation({
+  endpoint: "/register",
+  enableNotifications: true, // ← Required every time
+  showDebug: true,
+  formdata: {
+    /* ... */
+  },
+});
+
+// After (v1.4.6+):
+const mutation = useVormiaQueryAuthMutation({
+  endpoint: "/register",
+  showDebug: true, // ← Notifications enabled by default!
+  formdata: {
+    /* ... */
+  },
+});
+```
+
+### 🎯 **SimpleNotification Component**
+
+The `SimpleNotification` component provides a clean, consistent way to display notifications without manual HTML styling:
+
+```jsx
+// ✅ Recommended: Use SimpleNotification
+{
+  generalError && (
+    <SimpleNotification
+      type="error"
+      title="Error"
+      message={generalError}
+      onClose={() => setGeneralError("")}
+      className="mb-4"
+    />
+  );
+}
+
+// ❌ Avoid: Manual HTML styling
+{
+  generalError && (
+    <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+      {/* ... manual styling ... */}
+    </div>
+  );
+}
+```
+
+**Available Types**: `success`, `error`, `warning`, `info`, `announce`
+
+## 📦 **Required Peer Dependencies**
 
 Before installing `vormiaqueryjs`, you must install the correct peer dependencies for your framework:
 
@@ -189,28 +252,6 @@ function MyComponent() {
     </div>
   );
 }
-```
-
-**💡 Pro Tip**: Instead of writing manual HTML with Tailwind classes, use these pre-styled components!
-
-#### **Available Notification Types:**
-
-- **`type="success"`** - Green styling with ✅ icon
-- **`type="error"`** - Red styling with ❌ icon
-- **`type="warning"`** - Yellow styling with ⚠️ icon
-- **`type="info"** - Blue styling with ℹ️ icon
-- **`type="announce"`** - Black/white styling with 🔔 icon
-
-```jsx
-{
-  /* ✅ Simple component - easy to use and maintain */
-}
-<SimpleNotification
-  type="error"
-  message={generalError}
-  onClose={() => setGeneralError(null)}
-/>;
-```
 
 ### **ErrorDebugPanel** - Debug Information
 
