@@ -1,522 +1,416 @@
 /**
- * Vanilla JavaScript Example for VormiaQueryJS Debug & Notification System
- * Demonstrates ErrorDebugPanel, NotificationPanel, and fieldErrors usage
+ * VormiaQueryJS Vanilla JavaScript Example
+ * This demonstrates how to use the package in non-framework environments
  */
 
-import {
-  createVormiaClient,
-  createEnhancedErrorHandler,
-  createFieldErrorManager,
-  showSuccessNotification,
-  showErrorNotification,
-  createErrorDebugPanel,
-} from "vormiaqueryjs";
-
-// Initialize VormiaQueryJS client
-const client = createVormiaClient({
-  baseURL: "https://api.example.com",
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
-// Create enhanced error handler
-const errorHandler = createEnhancedErrorHandler({
-  debugEnabled: true,
-  showNotifications: true,
-  showDebugPanel: true,
-  notificationTarget: "#notifications",
-  debugTarget: "#debug-panel",
-});
-
-// Create field error manager
-const fieldErrorManager = createFieldErrorManager();
-
-// Form data
-let formData = {
-  name: "",
-  email: "",
-  password: "",
-  confirmPassword: "",
-};
-
-// DOM elements
-let form, nameInput, emailInput, passwordInput, confirmPasswordInput;
-let nameError, emailError, passwordError, confirmPasswordError;
-
-// Initialize the application
-function init() {
-  setupDOM();
-  setupEventListeners();
-  setupFieldErrorListeners();
-
-  // Show welcome notification
-  showSuccessNotification(
-    "Welcome to VormiaQueryJS Debug & Notification System!",
-    "System Ready",
-    "#notifications",
-    3000
-  );
-}
-
-// Setup DOM elements
-function setupDOM() {
-  // Create main container
-  const container = document.createElement("div");
-  container.innerHTML = `
-    <div class="vormia-demo">
-      <h1>VormiaQueryJS Debug & Notification System</h1>
-      
-      <div id="notifications"></div>
-      
-      <div class="form-section">
-        <h2>User Registration Form</h2>
-        <form id="registration-form">
-          <div class="form-group">
-            <label for="name">Name:</label>
-            <input type="text" id="name" name="name" required>
-            <div class="error-display" data-field="name"></div>
-          </div>
-          
-          <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-            <div class="error-display" data-field="email"></div>
-          </div>
-          
-          <div class="form-group">
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-            <div class="error-display" data-field="password"></div>
-          </div>
-          
-          <div class="form-group">
-            <label for="confirmPassword">Confirm Password:</label>
-            <input type="password" id="confirmPassword" name="confirmPassword" required>
-            <div class="error-display" data-field="confirmPassword"></div>
-          </div>
-          
-          <button type="submit">Register</button>
-          <button type="button" id="clear-errors">Clear Errors</button>
-        </form>
-      </div>
-      
-      <div class="debug-section">
-        <h2>Debug Panel</h2>
-        <div id="debug-panel"></div>
-      </div>
-      
-      <div class="controls">
-        <button id="test-success">Test Success</button>
-        <button id="test-error">Test Error</button>
-        <button id="test-validation">Test Validation Error</button>
-        <button id="toggle-debug">Toggle Debug Panel</button>
-      </div>
-    </div>
-  `;
-
-  document.body.appendChild(container);
-
-  // Get references to DOM elements
-  form = document.getElementById("registration-form");
-  nameInput = document.getElementById("name");
-  emailInput = document.getElementById("email");
-  passwordInput = document.getElementById("password");
-  confirmPasswordInput = document.getElementById("confirmPassword");
-
-  nameError = document.querySelector('[data-field="name"]');
-  emailError = document.querySelector('[data-field="email"]');
-  passwordError = document.querySelector('[data-field="password"]');
-  confirmPasswordError = document.querySelector(
-    '[data-field="confirmPassword"]'
-  );
-}
-
-// Setup event listeners
-function setupEventListeners() {
-  // Form submission
-  form.addEventListener("submit", handleFormSubmit);
-
-  // Input change events for clearing errors
-  nameInput.addEventListener("input", () =>
-    fieldErrorManager.clearOnInput(fieldErrorManager, "name")
-  );
-  emailInput.addEventListener("input", () =>
-    fieldErrorManager.clearOnInput(fieldErrorManager, "email")
-  );
-  passwordInput.addEventListener("input", () =>
-    fieldErrorManager.clearOnInput(fieldErrorManager, "password")
-  );
-  confirmPasswordInput.addEventListener("input", () =>
-    fieldErrorManager.clearOnInput(fieldErrorManager, "confirmPassword")
-  );
-
-  // Control buttons
-  document
-    .getElementById("clear-errors")
-    .addEventListener("click", clearAllErrors);
-  document
-    .getElementById("test-success")
-    .addEventListener("click", testSuccess);
-  document.getElementById("test-error").addEventListener("click", testError);
-  document
-    .getElementById("test-validation")
-    .addEventListener("click", testValidationError);
-  document
-    .getElementById("toggle-debug")
-    .addEventListener("click", toggleDebugPanel);
-}
-
-// Setup field error listeners
-function setupFieldErrorListeners() {
-  fieldErrorManager.addListener((fieldErrors) => {
-    updateFieldErrorDisplays(fieldErrors);
-  });
-}
-
-// Handle form submission
-async function handleFormSubmit(event) {
-  event.preventDefault();
-
-  // Clear previous errors
-  fieldErrorManager.clearAllFieldErrors();
-
-  // Get form data
-  formData = {
-    name: nameInput.value.trim(),
-    email: emailInput.value.trim(),
-    password: passwordInput.value,
-    confirmPassword: confirmPasswordInput.value,
-  };
-
-  // Validate form
-  if (!validateForm()) {
-    return;
+class VormiaQueryJSExample {
+  constructor() {
+    this.formData = {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: ''
+    };
+    
+    this.fieldErrors = {};
+    this.generalError = '';
+    this.notification = null;
+    this.isLoading = false;
+    this.hasData = false;
+    this.hasError = false;
+    
+    this.init();
   }
-
-  try {
-    // Simulate API call
-    const response = await simulateApiCall(formData);
-
-    // Handle success
-    errorHandler.handleSuccess(response, {
-      notificationMessage: "User registered successfully!",
-      debugLabel: "User Registration Success",
-    });
-
-    // Reset form
-    form.reset();
-    formData = { name: "", email: "", password: "", confirmPassword: "" };
-  } catch (error) {
-    // Handle error
-    errorHandler.handleError(error, {
-      handleFieldErrors: true,
-      fieldMapping: {
-        password_confirmation: "confirmPassword",
-      },
-    });
+  
+  init() {
+    this.render();
+    this.bindEvents();
+    this.showNotification('success', 'Welcome to VormiaQueryJS Vanilla JS Example!', 'System Ready');
   }
-}
-
-// Validate form
-function validateForm() {
-  let isValid = true;
-
-  // Required field validation
-  if (!formData.name) {
-    fieldErrorManager.setFieldError("name", "Name is required");
-    isValid = false;
-  }
-
-  if (!formData.email) {
-    fieldErrorManager.setFieldError("email", "Email is required");
-    isValid = false;
-  } else if (!fieldErrorUtils.validateEmail(formData.email)) {
-    fieldErrorManager.setFieldError(
-      "email",
-      "Please enter a valid email address"
-    );
-    isValid = false;
-  }
-
-  if (!formData.password) {
-    fieldErrorManager.setFieldError("password", "Password is required");
-    isValid = false;
-  } else if (!fieldErrorUtils.validatePassword(formData.password)) {
-    fieldErrorManager.setFieldError(
-      "password",
-      "Password must be at least 8 characters with uppercase, lowercase, and number"
-    );
-    isValid = false;
-  }
-
-  if (!formData.confirmPassword) {
-    fieldErrorManager.setFieldError(
-      "confirmPassword",
-      "Please confirm your password"
-    );
-    isValid = false;
-  } else if (
-    !fieldErrorUtils.validatePasswordConfirmation(
-      formData.password,
-      formData.confirmPassword
-    )
-  ) {
-    fieldErrorManager.setFieldError(
-      "confirmPassword",
-      "Passwords do not match"
-    );
-    isValid = false;
-  }
-
-  return isValid;
-}
-
-// Update field error displays
-function updateFieldErrorDisplays(fieldErrors) {
-  // Clear all error displays
-  [nameError, emailError, passwordError, confirmPasswordError].forEach((el) => {
-    if (el) el.innerHTML = "";
-  });
-
-  // Show errors for fields that have them
-  Object.keys(fieldErrors).forEach((fieldName) => {
-    const errorElement = document.querySelector(`[data-field="${fieldName}"]`);
-    if (errorElement) {
-      errorElement.innerHTML = `<span class="error-message">${fieldErrors[fieldName]}</span>`;
+  
+  bindEvents() {
+    // Form submission
+    const form = document.getElementById('registrationForm');
+    if (form) {
+      form.addEventListener('submit', (e) => this.handleSubmit(e));
     }
-  });
-
-  // Update input field classes
-  updateFieldClasses();
-}
-
-// Update field classes based on error state
-function updateFieldClasses() {
-  nameInput.className = fieldErrorManager.getFieldClasses(
-    "name",
-    "form-input",
-    "error"
-  );
-  emailInput.className = fieldErrorManager.getFieldClasses(
-    "email",
-    "form-input",
-    "error"
-  );
-  passwordInput.className = fieldErrorManager.getFieldClasses(
-    "password",
-    "form-input",
-    "error"
-  );
-  confirmPasswordInput.className = fieldErrorManager.getFieldClasses(
-    "confirmPassword",
-    "form-input",
-    "error"
-  );
-}
-
-// Clear all errors
-function clearAllErrors() {
-  fieldErrorManager.clearAllFieldErrors();
-  updateFieldClasses();
-}
-
-// Test functions
-function testSuccess() {
-  const mockResponse = {
-    data: {
-      success: true,
-      message: "Test operation completed successfully",
-      data: { id: 123, status: "active" },
-      debug: { timestamp: new Date().toISOString() },
-    },
-  };
-
-  errorHandler.handleSuccess(mockResponse, {
-    notificationMessage: "Test success operation completed!",
-    debugLabel: "Test Success",
-  });
-}
-
-function testError() {
-  const mockError = {
-    status: 500,
-    message: "Internal server error",
-    response: {
-      message: "Something went wrong on the server",
-      response: {
-        data: {
-          success: false,
-          message: "Server is experiencing issues",
-          debug: { errorCode: "INT_ERR_001" },
-        },
-      },
-    },
-    isServerError: () => true,
-  };
-
-  errorHandler.handleError(mockError, {
-    debugLabel: "Test Server Error",
-  });
-}
-
-function testValidationError() {
-  const mockValidationError = {
-    status: 422,
-    message: "Validation failed",
-    response: {
-      message: "Please check the form fields below",
-      errors: {
-        name: ["Name must be at least 2 characters"],
-        email: ["Email format is invalid"],
-        password: ["Password is too weak"],
-      },
-    },
-    isValidationError: () => true,
-  };
-
-  errorHandler.handleError(mockValidationError, {
-    handleFieldErrors: true,
-    fieldMapping: {},
-    debugLabel: "Test Validation Error",
-  });
-}
-
-function toggleDebugPanel() {
-  const debugPanel = document.getElementById("debug-panel");
-  if (debugPanel.style.display === "none") {
-    debugPanel.style.display = "block";
-  } else {
-    debugPanel.style.display = "none";
+    
+    // Input changes
+    const inputs = form.querySelectorAll('input');
+    inputs.forEach(input => {
+      input.addEventListener('input', (e) => {
+        this.formData[e.target.name] = e.target.value;
+        this.clearFieldError(e.target.name);
+      });
+    });
   }
-}
-
-// Simulate API call
-async function simulateApiCall(data) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      // Simulate random success/failure
-      if (Math.random() > 0.3) {
-        resolve({
-          data: {
-            success: true,
-            message: "User registered successfully",
-            data: { id: Math.floor(Math.random() * 1000), ...data },
-            debug: { timestamp: new Date().toISOString() },
-          },
-        });
+  
+  async handleSubmit(e) {
+    e.preventDefault();
+    
+    // Clear previous errors
+    this.fieldErrors = {};
+    this.generalError = '';
+    this.isLoading = true;
+    this.updateUI();
+    
+    try {
+      // Simulate API call with form data transformation
+      const transformedData = this.transformFormData(this.formData);
+      
+      // Simulate API response
+      await this.simulateApiCall(transformedData);
+      
+      // Success
+      this.showNotification('success', 'Account created successfully!', 'Success');
+      this.hasData = true;
+      this.hasError = false;
+      
+      // Reset form
+      this.formData = { name: '', email: '', password: '', confirmPassword: '' };
+      this.resetForm();
+      
+    } catch (error) {
+      // Error
+      this.showNotification('error', error.message || 'Registration failed', 'Error');
+      this.hasError = true;
+      this.hasData = false;
+      
+      // Handle field errors if available
+      if (error.fieldErrors) {
+        this.fieldErrors = error.fieldErrors;
+        this.generalError = '';
       } else {
-        reject({
-          status: 422,
-          message: "Validation failed",
-          response: {
-            message: "Please check the form fields below",
-            errors: {
-              name: ["Name must be at least 2 characters"],
-              email: ["Email format is invalid"],
-              password: ["Password is too weak"],
-            },
-          },
-          isValidationError: () => true,
-        });
+        this.generalError = error.message || 'Registration failed';
+        this.fieldErrors = {};
       }
-    }, 1000);
-  });
+    } finally {
+      this.isLoading = false;
+      this.updateUI();
+    }
+  }
+  
+  transformFormData(formData) {
+    // Simulate the form data transformation that VormiaQueryJS does
+    return {
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      password_confirmation: formData.confirmPassword, // Renamed
+      terms: true, // Added
+      source: 'web' // Added
+      // confirmPassword removed
+    };
+  }
+  
+  async simulateApiCall(data) {
+    // Simulate API call with random success/failure
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (Math.random() > 0.3) {
+          // Success
+          resolve({ success: true, data });
+        } else {
+          // Error - simulate validation errors
+          reject({
+            message: 'Validation failed',
+            fieldErrors: {
+              name: ['Name must be at least 2 characters'],
+              email: ['Email format is invalid'],
+              password: ['Password is too weak']
+            }
+          });
+        }
+      }, 1000);
+    });
+  }
+  
+  showNotification(type, message, title = '') {
+    this.notification = { type, message, title };
+    this.renderNotification();
+  }
+  
+  closeNotification() {
+    this.notification = null;
+    this.renderNotification();
+  }
+  
+  clearFieldError(field) {
+    delete this.fieldErrors[field];
+    this.updateUI();
+  }
+  
+  clearGeneralError() {
+    this.generalError = '';
+    this.updateUI();
+  }
+  
+  resetForm() {
+    const form = document.getElementById('registrationForm');
+    if (form) {
+      form.reset();
+    }
+  }
+  
+  updateUI() {
+    this.updateFormFields();
+    this.updateErrorDisplay();
+    this.updateStatusDisplay();
+  }
+  
+  updateFormFields() {
+    // Update input values
+    Object.keys(this.formData).forEach(field => {
+      const input = document.querySelector(`input[name="${field}"]`);
+      if (input) {
+        input.value = this.formData[field];
+      }
+    });
+    
+    // Update submit button
+    const submitBtn = document.querySelector('button[type="submit"]');
+    if (submitBtn) {
+      submitBtn.disabled = this.isLoading;
+      submitBtn.textContent = this.isLoading ? 'Creating Account...' : 'Create Account';
+    }
+  }
+  
+  updateErrorDisplay() {
+    // Clear all existing error displays
+    document.querySelectorAll('.field-error').forEach(el => el.remove());
+    const generalErrorEl = document.getElementById('generalError');
+    if (generalErrorEl) {
+      generalErrorEl.innerHTML = '';
+    }
+    
+    // Show field errors
+    Object.keys(this.fieldErrors).forEach(field => {
+      const input = document.querySelector(`input[name="${field}"]`);
+      if (input) {
+        const errorDiv = this.createFieldErrorElement(field, this.fieldErrors[field]);
+        input.parentNode.appendChild(errorDiv);
+      }
+    });
+    
+    // Show general error
+    if (this.generalError) {
+      const generalErrorEl = document.getElementById('generalError');
+      if (generalErrorEl) {
+        generalErrorEl.innerHTML = this.createGeneralErrorElement();
+      }
+    }
+  }
+  
+  updateStatusDisplay() {
+    const statusEl = document.getElementById('statusDisplay');
+    if (statusEl) {
+      statusEl.innerHTML = `
+        <h3 class="font-semibold mb-2">Form Status</h3>
+        <div class="space-y-1 text-sm text-gray-600">
+          <p>Loading: ${this.isLoading ? 'Yes' : 'No'}</p>
+          <p>Has Data: ${this.hasData ? 'Yes' : 'No'}</p>
+          <p>Has Error: ${this.hasError ? 'Yes' : 'No'}</p>
+          <p>Field Errors: ${Object.keys(this.fieldErrors).length}</p>
+          <p>General Error: ${this.generalError ? 'Yes' : 'No'}</p>
+        </div>
+      `;
+    }
+  }
+  
+  createFieldErrorElement(field, message) {
+    const div = document.createElement('div');
+    div.className = 'field-error mt-2';
+    div.innerHTML = `
+      <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+        <div class="flex items-center">
+          <svg class="h-5 w-5 text-red-400 mr-3" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+          </svg>
+          <p class="text-sm text-red-800">${message}</p>
+          <button onclick="app.clearFieldError('${field}')" class="ml-auto text-red-400 hover:text-red-600">
+            ✕
+          </button>
+        </div>
+      </div>
+    `;
+    return div;
+  }
+  
+  createGeneralErrorElement() {
+    return `
+      <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+        <div class="flex items-center">
+          <svg class="h-5 w-5 text-red-400 mr-3" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+          </svg>
+          <p class="text-sm text-red-800 flex-1">${this.generalError}</p>
+          <button onclick="app.clearGeneralError()" class="text-red-400 hover:text-red-600">
+            ✕
+          </button>
+        </div>
+      </div>
+    `;
+  }
+  
+  renderNotification() {
+    const container = document.getElementById('notificationContainer');
+    if (!container) return;
+    
+    if (this.notification) {
+      const classes = this.getNotificationClasses();
+      const icon = this.getNotificationIcon();
+      
+      container.innerHTML = `
+        <div class="notification-panel">
+          <div class="${classes}">
+            <div class="flex items-center">
+              <span class="text-lg mr-3">${icon}</span>
+              <div class="flex-1">
+                ${this.notification.title ? `<h3 class="font-semibold text-sm">${this.notification.title}</h3>` : ''}
+                <p class="text-sm">${this.notification.message}</p>
+              </div>
+              <button onclick="app.closeNotification()" class="ml-3 hover:opacity-70 transition-opacity">
+                ✕
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    } else {
+      container.innerHTML = '';
+    }
+  }
+  
+  getNotificationClasses() {
+    const baseClasses = 'border rounded-lg p-4';
+    switch (this.notification?.type) {
+      case 'success':
+        return `${baseClasses} bg-green-50 border-green-200 text-green-800`;
+      case 'error':
+        return `${baseClasses} bg-red-50 border-red-200 text-red-800`;
+      case 'warning':
+        return `${baseClasses} bg-yellow-50 border-yellow-200 text-yellow-800`;
+      case 'info':
+        return `${baseClasses} bg-blue-50 border-blue-200 text-blue-800`;
+      default:
+        return `${baseClasses} bg-gray-50 border-gray-200 text-gray-800`;
+    }
+  }
+  
+  getNotificationIcon() {
+    switch (this.notification?.type) {
+      case 'success': return '✅';
+      case 'error': return '❌';
+      case 'warning': return '⚠️';
+      case 'info': return 'ℹ️';
+      default: return '📢';
+    }
+  }
+  
+  render() {
+    const app = document.getElementById('app');
+    if (!app) return;
+    
+    app.innerHTML = `
+      <div class="max-w-2xl mx-auto p-6 space-y-6">
+        <h1 class="text-3xl font-bold text-center mb-8">
+          VormiaQueryJS Vanilla JS Example
+        </h1>
+
+        <!-- Notification Display -->
+        <div id="notificationContainer"></div>
+
+        <!-- Registration Form -->
+        <div class="bg-white shadow-md rounded-lg p-6">
+          <h2 class="text-2xl font-semibold mb-6">User Registration</h2>
+          
+          <form id="registrationForm" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Full Name
+              </label>
+              <input
+                name="name"
+                type="text"
+                placeholder="Enter your full name"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
+              <input
+                name="email"
+                type="email"
+                placeholder="Enter your email"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Password
+              </label>
+              <input
+                name="password"
+                type="password"
+                placeholder="Enter your password"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Confirm Password
+              </label>
+              <input
+                name="confirmPassword"
+                type="password"
+                placeholder="Confirm your password"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Create Account
+            </button>
+          </form>
+
+          <!-- General Error Display -->
+          <div id="generalError" class="mt-4"></div>
+        </div>
+
+        <!-- Status Information -->
+        <div id="statusDisplay" class="bg-gray-50 p-4 rounded-lg">
+          <h3 class="font-semibold mb-2">Form Status</h3>
+          <div class="space-y-1 text-sm text-gray-600">
+            <p>Loading: No</p>
+            <p>Has Data: No</p>
+            <p>Has Error: No</p>
+            <p>Field Errors: 0</p>
+            <p>General Error: No</p>
+          </div>
+        </div>
+      </div>
+    `;
+  }
 }
 
-// Add styles
-function addStyles() {
-  const style = document.createElement("style");
-  style.textContent = `
-    .vormia-demo {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
-    
-    .form-section {
-      margin: 20px 0;
-      padding: 20px;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      background: #f9fafb;
-    }
-    
-    .form-group {
-      margin-bottom: 15px;
-    }
-    
-    .form-group label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: 500;
-    }
-    
-    .form-input {
-      width: 100%;
-      padding: 8px 12px;
-      border: 1px solid #d1d5db;
-      border-radius: 4px;
-      font-size: 14px;
-    }
-    
-    .form-input.error {
-      border-color: #dc2626;
-    }
-    
-    .error-display {
-      min-height: 20px;
-      margin-top: 5px;
-    }
-    
-    .error-message {
-      color: #dc2626;
-      font-size: 12px;
-    }
-    
-    button {
-      background: #3b82f6;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-right: 10px;
-      margin-bottom: 10px;
-    }
-    
-    button:hover {
-      background: #2563eb;
-    }
-    
-    .debug-section {
-      margin: 20px 0;
-      padding: 20px;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      background: #f9fafb;
-    }
-    
-    .controls {
-      margin: 20px 0;
-      padding: 20px;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      background: #f9fafb;
-    }
-  `;
+// Initialize the app when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+  window.app = new VormiaQueryJSExample();
+});
 
-  document.head.appendChild(style);
-}
-
-// Initialize when DOM is ready
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", () => {
-    addStyles();
-    init();
-  });
-} else {
-  addStyles();
-  init();
+// Export for module usage
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = VormiaQueryJSExample;
 }

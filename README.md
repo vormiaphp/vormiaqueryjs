@@ -60,6 +60,7 @@ VITE_VORMIA_WITH_CREDENTIALS=false            # Include credentials in requests
 **⚠️ Important**: All environment variables must start with `VITE_` prefix to be accessible in the browser.
 
 **🎯 Environment Variable Simplification**: We removed the redundant `VITE_VORMIA_ENV` variable. Now `VITE_VORMIA_DEBUG` serves as both the debug toggle and environment indicator:
+
 - `VITE_VORMIA_DEBUG=true` = Development mode (show debug info)
 - `VITE_VORMIA_DEBUG=false` = Production mode (hide debug info)
 
@@ -83,18 +84,21 @@ VITE_VORMIA_WITH_CREDENTIALS=false            # Include credentials in requests
 ### **📦 Components & Hooks Available:**
 
 **Core Components:**
+
 - `VormiaProvider` - Essential configuration provider
 - `NotificationPanel` - Advanced notification system
 - `SimpleNotification` - Easy drop-in notifications
 - `ErrorDebugPanel` - Debug information display
 
 **Query Hooks:**
+
 - `useVormiaQuery` - Basic queries (no auth required)
 - `useVormiaQueryAuth` - Authenticated queries
 - `useVormiaQueryAuthMutation` - Authenticated mutations with form transformation
 - `useVormiaQuerySimple` - Flexible testing queries
 
 **Utility Hooks:**
+
 - `useVormiaConfig` - Dynamic configuration management
 - `useVrmQuery` - Legacy query support
 - `useVrmMutation` - Legacy mutation support
@@ -190,47 +194,22 @@ function MyComponent() {
 **💡 Pro Tip**: Instead of writing manual HTML with Tailwind classes, use these pre-styled components!
 
 #### **Available Notification Types:**
+
 - **`type="success"`** - Green styling with ✅ icon
 - **`type="error"`** - Red styling with ❌ icon
 - **`type="warning"`** - Yellow styling with ⚠️ icon
 - **`type="info"** - Blue styling with ℹ️ icon
 - **`type="announce"`** - Black/white styling with 🔔 icon
 
-#### **Before (Manual HTML - Don't do this!):**
 ```jsx
-{/* ❌ Manual HTML with Tailwind - hard to maintain */}
-{generalError && (
-  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-    <div className="flex items-center">
-      <div className="flex-shrink-0">
-        <svg
-          className="h-5 w-5 text-red-400"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-            clipRule="evenodd"
-          />
-        </svg>
-      </div>
-      <div className="ml-3">
-        <p className="text-sm text-red-800">{generalError}</p>
-      </div>
-    </div>
-  </div>
-)}
-```
-
-#### **After (Easy Component - Do this!):**
-```jsx
-{/* ✅ Simple component - easy to use and maintain */}
+{
+  /* ✅ Simple component - easy to use and maintain */
+}
 <SimpleNotification
   type="error"
   message={generalError}
   onClose={() => setGeneralError(null)}
-/>
+/>;
 ```
 
 ### **ErrorDebugPanel** - Debug Information
@@ -352,18 +331,21 @@ mutation.mutate(formData);
 VormiaQueryJS provides a comprehensive notification system with multiple display variants:
 
 #### **Notification Types**
+
 - **Toast**: Auto-dismissing popup notifications
 - **Banner**: Full-width at top of page
 - **In-App**: Inline above forms
 - **Modal**: Overlay centered on screen
 
 #### **Notification Variants**
+
 - **Success**: Green styling with ✅ icon
 - **Error**: Red styling with ❌ icon
 - **Warning**: Yellow styling with ⚠️ icon
 - **Info**: Blue styling with ℹ️ icon
 
 #### **Usage Example**
+
 ```jsx
 // Create notifications
 const successNotification = {
@@ -383,7 +365,9 @@ const successNotification = {
 ### **🐛 Debug System**
 
 #### **Automatic Visibility**
+
 The debug panel automatically:
+
 - Shows when `VITE_VORMIA_DEBUG=true`
 - Hides when `VITE_VORMIA_DEBUG=false` (production mode)
 - Provides detailed console logging for troubleshooting
@@ -391,6 +375,7 @@ The debug panel automatically:
 **💡 Simple Rule**: One variable controls everything - `true` = development, `false` = production
 
 #### **Usage**
+
 ```jsx
 import { ErrorDebugPanel, createDebugInfo } from "vormiaqueryjs";
 
@@ -410,11 +395,13 @@ const debugInfo = createDebugInfo(response);
 ## 🌍 Framework Support
 
 ### **React Components**
+
 - `VormiaProvider`
 - `NotificationPanel`
 - `ErrorDebugPanel`
 
 ### **Framework-Agnostic HTML**
+
 ```jsx
 // Get HTML strings for other frameworks
 const notificationHtml = query.getNotificationHtml(
@@ -435,16 +422,19 @@ const debugHtml = query.getDebugHtml(response, true);
 ## 🔧 Troubleshooting
 
 ### **Debug Panel Not Showing**
+
 1. Check environment variable: `VITE_VORMIA_DEBUG=true`
 2. Verify console logs show: `🔍 VormiaQuery Debug: VITE_VORMIA_DEBUG = true`
 3. Check browser console for JavaScript errors
 
 ### **Environment Variables Not Working**
+
 1. Ensure `VITE_` prefix on all variables
 2. Restart dev server after changing `.env` file
 3. Check variable names match exactly (case-sensitive)
 
 ### **Notifications Not Styling Correctly**
+
 1. Update to v1.4.4+ (styling issues fixed)
 2. Ensure CSS classes are available
 3. Override with custom CSS if needed
@@ -454,6 +444,7 @@ const debugHtml = query.getDebugHtml(response, true);
 ## 📚 Examples
 
 See the `examples/` directory for comprehensive usage examples:
+
 - React SPA setup
 - Form data transformation
 - Notification system usage
