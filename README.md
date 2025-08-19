@@ -2,7 +2,7 @@
 
 A universal query and mutation library for seamless data fetching and state management, designed for use with React, Vue, Svelte, Solid, Qwik, and Astro. Built for modern JavaScript projects and Laravel/VormiaPHP backends.
 
-> **📦 Latest Version**: `v1.4.2` - Enhanced error handling, comprehensive notifications, and improved debug system
+> **📦 Latest Version**: `v1.4.3` - Simplified environment variables, improved ESLint configuration, and enhanced code quality
 
 ---
 
@@ -195,6 +195,7 @@ VITE_VORMIA_WITH_CREDENTIALS=false            # Include credentials in requests
 **⚠️ Important**: All environment variables must start with `VITE_` prefix to be accessible in the browser.
 
 **🎯 Environment Variable Simplification**: We removed the redundant `VITE_VORMIA_ENV` variable. Now `VITE_VORMIA_DEBUG` serves as both the debug toggle and environment indicator:
+
 - `VITE_VORMIA_DEBUG=true` = Development mode (show debug info)
 - `VITE_VORMIA_DEBUG=false` = Production mode (hide debug info)
 

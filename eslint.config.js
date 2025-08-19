@@ -15,30 +15,30 @@ export default defineConfig([
         ecmaVersion: "latest",
         sourceType: "module",
         ecmaFeatures: {
-          jsx: true
-        }
+          jsx: true,
+        },
       },
       globals: {
         ...globals.browser,
-        React: "readonly"
-      }
-    }
+        React: "readonly",
+      },
+    },
   },
-  { 
-    files: ["**/*.js"], 
-    languageOptions: { 
+  {
+    files: ["**/*.js"],
+    languageOptions: {
       sourceType: "module",
-      globals: globals.browser
-    } 
+      globals: globals.browser,
+    },
   },
   {
     files: ["**/*.{js,jsx,mjs,cjs}"],
-    languageOptions: { 
-      globals: globals.browser 
+    languageOptions: {
+      globals: globals.browser,
     },
     rules: {
-      "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
-      "no-undef": "error"
-    }
+      "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+      "no-undef": "error",
+    },
   },
 ]);

@@ -229,7 +229,10 @@ function getDebugFlag() {
       process?.env?.NEXT_PUBLIC_VORMIA_DEBUG
     ) {
       const debugValue = process.env.NEXT_PUBLIC_VORMIA_DEBUG;
-      console.log("🔍 VormiaQuery Debug: NEXT_PUBLIC_VORMIA_DEBUG =", debugValue);
+      console.log(
+        "🔍 VormiaQuery Debug: NEXT_PUBLIC_VORMIA_DEBUG =",
+        debugValue
+      );
       return debugValue === "true";
     }
   } catch (e) {
@@ -246,7 +249,9 @@ function getDebugFlag() {
     return debugValue === "true";
   }
 
-  console.log("🔍 VormiaQuery Debug: No debug environment variable found, debug disabled");
+  console.log(
+    "🔍 VormiaQuery Debug: No debug environment variable found, debug disabled"
+  );
   return false;
 }
 
@@ -255,14 +260,18 @@ function getDebugFlag() {
  * @returns {Object} Notification configuration
  */
 export function getNotificationConfig() {
-  const toastEnabled = getEnvVar("VITE_VORMIA_NOTIFICATION_TOAST", "true") === "true";
-  const panelEnabled = getEnvVar("VITE_VORMIA_NOTIFICATION_PANEL", "true") === "true";
-  const duration = parseInt(getEnvVar("VITE_VORMIA_NOTIFICATION_DURATION", "5000"));
+  const toastEnabled =
+    getEnvVar("VITE_VORMIA_NOTIFICATION_TOAST", "true") === "true";
+  const panelEnabled =
+    getEnvVar("VITE_VORMIA_NOTIFICATION_PANEL", "true") === "true";
+  const duration = parseInt(
+    getEnvVar("VITE_VORMIA_NOTIFICATION_DURATION", "5000")
+  );
 
   return {
     toast: toastEnabled,
     panel: panelEnabled,
-    duration: duration || 5000
+    duration: duration || 5000,
   };
 }
 
@@ -272,10 +281,10 @@ export function getNotificationConfig() {
  */
 export function getDebugConfig() {
   const debugEnabled = getEnvVar("VITE_VORMIA_DEBUG", "false") === "true";
-  
+
   return {
     enabled: debugEnabled,
-    isProduction: !debugEnabled // If debug is disabled, treat as production
+    isProduction: !debugEnabled, // If debug is disabled, treat as production
   };
 }
 
@@ -290,7 +299,7 @@ function getEnvVar(key, defaultValue = "") {
   if (typeof import.meta !== "undefined" && import.meta.env?.[key]) {
     return import.meta.env[key];
   }
-  
+
   // Next.js - safely check for process
   try {
     if (typeof process !== "undefined" && process?.env?.[key]) {
@@ -299,12 +308,12 @@ function getEnvVar(key, defaultValue = "") {
   } catch (e) {
     // process not available, continue
   }
-  
+
   // Astro
   if (typeof import.meta !== "undefined" && import.meta.env?.[key]) {
     return import.meta.env[key];
   }
-  
+
   return defaultValue;
 }
 
