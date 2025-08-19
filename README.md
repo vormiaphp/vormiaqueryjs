@@ -183,8 +183,8 @@ Configure your package using environment variables in your `.env` file:
 # Required
 VITE_VORMIA_API_URL=https://api.example.com
 
-# Debug System
-VITE_VORMIA_DEBUG=true                  # Enable debug panel (false = production mode)
+# Debug System (Single Control)
+VITE_VORMIA_DEBUG=true                  # true = development mode, false = production mode
 
 # Advanced Configuration (Optional)
 VITE_VORMIA_AUTH_TOKEN_KEY=vormia_auth_token  # Custom auth token storage key
@@ -193,6 +193,10 @@ VITE_VORMIA_WITH_CREDENTIALS=false            # Include credentials in requests
 ```
 
 **⚠️ Important**: All environment variables must start with `VITE_` prefix to be accessible in the browser.
+
+**🎯 Environment Variable Simplification**: We removed the redundant `VITE_VORMIA_ENV` variable. Now `VITE_VORMIA_DEBUG` serves as both the debug toggle and environment indicator:
+- `VITE_VORMIA_DEBUG=true` = Development mode (show debug info)
+- `VITE_VORMIA_DEBUG=false` = Production mode (hide debug info)
 
 ---
 
@@ -240,9 +244,11 @@ const successNotification = {
 
 The debug panel automatically:
 
-- Shows when `VITE_VORMIA_DEBUG=true`
+- Shows when `VITE_VORMIA_DEBUG=true` (development mode)
 - Hides when `VITE_VORMIA_DEBUG=false` (production mode)
 - Provides detailed console logging for troubleshooting
+
+**💡 Simple Rule**: One variable controls everything - `true` = development, `false` = production
 
 ### **Usage**
 
