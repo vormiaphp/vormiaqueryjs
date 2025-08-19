@@ -493,9 +493,22 @@ VormiaQueryJS provides powerful error handling utilities that work with any API 
 
 ```json
 {
+  "success": true,
+  "message": "Action was a success",
+  "data": {
+    /* optional data */
+  },
+  "debug": {
+    /* any debug information */
+  }
+}
+```
+
+```json
+{
   "success": false,
   "message": "Error message here",
-  "data": {
+  "errors": {
     /* optional data */
   },
   "debug": {
