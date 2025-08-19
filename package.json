@@ -1,7 +1,7 @@
 {
   "name": "vormiaqueryjs",
-  "version": "1.3.29",
-  "description": "Vormia Query Js - A npm package for query management with VormiaPHP laravel Backend application",
+  "version": "1.4.0",
+  "description": "Vormia Query Js - A npm package for query management with VormiaPHP laravel Backend application, featuring comprehensive debug and notification system",
   "main": "dist/esm/index.mjs",
   "module": "dist/esm/index.mjs",
   "type": "module",
@@ -34,7 +34,12 @@
     "laravel",
     "vormia",
     "data-fetching",
-    "api"
+    "api",
+    "debug",
+    "notifications",
+    "error-handling",
+    "form-validation",
+    "field-errors"
   ],
   "homepage": "https://github.com/vormiaphp/vormiaqueryjs#readme",
   "bugs": {
