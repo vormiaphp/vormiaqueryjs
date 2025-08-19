@@ -2,13 +2,14 @@
 
 A powerful, framework-agnostic query and mutation library with built-in error handling, notifications, and debug capabilities.
 
-## ✨ **What's New in v1.4.6**
+## ✨ **What's New in v1.4.9**
 
 ### 🚀 **Major Improvements**
 
 - **Notifications Always Enabled**: No more need to specify `enableNotifications: true` in every query
 - **Enhanced Debug Panel**: Better error/success response display with improved structure detection
 - **Cleaner API**: Simplified hook usage with sensible defaults
+- **Form Data Transformation**: Automatic field mapping and transformation for API requests
 
 ### 🔧 **Bug Fixes**
 
@@ -29,7 +30,7 @@ const mutation = useVormiaQueryAuthMutation({
   },
 });
 
-// After (v1.4.6+):
+// After (v1.4.9+):
 const mutation = useVormiaQueryAuthMutation({
   endpoint: "/register",
   showDebug: true, // ← Notifications enabled by default!
@@ -285,7 +286,7 @@ import { useVormiaQuery } from "vormiaqueryjs";
 const query = useVormiaQuery({
   endpoint: "/public/data",
   method: "GET",
-  enableNotifications: { toast: true, panel: false },
+  enableNotifications: true, // Enabled by default
   showDebug: true,
 });
 ```
@@ -298,12 +299,12 @@ import { useVormiaQueryAuth } from "vormiaqueryjs";
 const query = useVormiaQueryAuth({
   endpoint: "/user/profile",
   method: "GET",
-  enableNotifications: { toast: false, panel: true },
-  showDebug: false,
+  enableNotifications: true, // Enabled by default
+  showDebug: true,
 });
 ```
 
-### **3. useVormiaQueryAuthMutation** - Authenticated Mutation
+### **3. useVormiaQueryAuthMutation** - Authenticated Mutation with Form Transformation
 
 ```jsx
 import { useVormiaQueryAuthMutation } from "vormiaqueryjs";
@@ -311,26 +312,52 @@ import { useVormiaQueryAuthMutation } from "vormiaqueryjs";
 const mutation = useVormiaQueryAuthMutation({
   endpoint: "/register",
   method: "POST",
-  formdata: {
-    rename: { confirmPassword: "password_confirmation" },
-    add: { terms: true },
-    remove: ["confirmPassword"],
-  },
-  enableNotifications: { toast: true, panel: true },
+  enableNotifications: true, // Enabled by default
   showDebug: true,
+  formdata: {
+    rename: {
+      confirmPassword: "password_confirmation",
+      user_name: "name",
+    },
+    add: {
+      terms: true,
+      source: "web",
+    },
+    remove: ["confirmPassword", "tempField"],
+  },
 });
 ```
 
-### **4. useVormiaQuerySimple** - Flexible Test Query
+### **4. useVormiaQuerySimple** - Flexible Testing Query
 
 ```jsx
 import { useVormiaQuerySimple } from "vormiaqueryjs";
 
-const testQuery = useVormiaQuerySimple({
-  endpoint: "/test",
+const query = useVormiaQuerySimple({
+  endpoint: "/test-endpoint",
   method: "POST",
-  enableNotifications: { toast: true, panel: false },
+  data: { test: "data" },
+  enableNotifications: true, // Enabled by default
   showDebug: true,
+});
+```
+
+### **5. Legacy Hooks (Backward Compatibility)**
+
+```jsx
+import { useVrmQuery, useVrmMutation } from "vormiaqueryjs";
+
+// Legacy query hook
+const query = useVrmQuery({
+  endpoint: "/legacy/endpoint",
+  method: "GET",
+});
+
+// Legacy mutation hook
+const mutation = useVrmMutation({
+  endpoint: "/legacy/endpoint",
+  method: "POST",
+  data: { legacy: "data" },
 });
 ```
 
