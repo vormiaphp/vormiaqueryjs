@@ -219,7 +219,7 @@ function MyComponent() {
 
 ### **SimpleNotification** - Easy Drop-in Component
 
-```jsx
+````jsx
 import { SimpleNotification } from "vormiaqueryjs";
 
 function MyComponent() {
@@ -271,7 +271,7 @@ function MyComponent() {
     </div>
   );
 }
-```
+````
 
 ---
 
