@@ -35,31 +35,44 @@ export function NotificationPanel({ notification, onClose, className = "" }) {
     const baseStyles = "rounded-lg border shadow-lg";
     
     // Variant-specific styles
+    let variantStyles = "";
     switch (variant) {
       case "banner":
-        return `${baseStyles} w-full p-3 border-l-4`;
+        variantStyles = "w-full p-3 border-l-4";
+        break;
       case "modal":
-        return `${baseStyles} max-w-md w-full p-6 mx-auto`;
+        variantStyles = "max-w-md w-full p-6 mx-auto";
+        break;
       case "toast":
-        return `${baseStyles} max-w-sm w-full p-4`;
+        variantStyles = "max-w-sm w-full p-4";
+        break;
       case "inapp":
       default:
-        return `${baseStyles} max-w-md w-full p-4`;
+        variantStyles = "max-w-md w-full p-4";
+        break;
     }
 
     // Type-specific colors
+    let typeStyles = "";
     switch (type) {
       case "success":
-        return `${baseStyles} bg-green-50 border-green-200 text-green-800`;
+        typeStyles = "bg-green-50 border-green-200 text-green-800";
+        break;
       case "error":
-        return `${baseStyles} bg-red-50 border-red-200 text-red-800`;
+        typeStyles = "bg-red-50 border-red-200 text-red-800";
+        break;
       case "warning":
-        return `${baseStyles} bg-yellow-50 border-yellow-200 text-yellow-800`;
+        typeStyles = "bg-yellow-50 border-yellow-200 text-yellow-800";
+        break;
       case "info":
-        return `${baseStyles} bg-blue-50 border-blue-200 text-blue-800`;
+        typeStyles = "bg-blue-50 border-blue-200 text-blue-800";
+        break;
       default:
-        return `${baseStyles} bg-gray-50 border-gray-200 text-gray-800`;
+        typeStyles = "bg-gray-50 border-gray-200 text-gray-800";
+        break;
     }
+
+    return `${baseStyles} ${variantStyles} ${typeStyles}`;
   };
 
   // Get icon based on type

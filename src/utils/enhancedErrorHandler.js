@@ -216,7 +216,9 @@ function getDebugFlag() {
     typeof import.meta !== "undefined" &&
     import.meta.env?.VITE_VORMIA_DEBUG
   ) {
-    return import.meta.env.VITE_VORMIA_DEBUG === "true";
+    const debugValue = import.meta.env.VITE_VORMIA_DEBUG;
+    console.log("🔍 VormiaQuery Debug: VITE_VORMIA_DEBUG =", debugValue);
+    return debugValue === "true";
   }
 
   // Next.js - safely check for process
@@ -225,7 +227,9 @@ function getDebugFlag() {
       typeof process !== "undefined" &&
       process?.env?.NEXT_PUBLIC_VORMIA_DEBUG
     ) {
-      return process.env.NEXT_PUBLIC_VORMIA_DEBUG === "true";
+      const debugValue = process.env.NEXT_PUBLIC_VORMIA_DEBUG;
+      console.log("🔍 VormiaQuery Debug: NEXT_PUBLIC_VORMIA_DEBUG =", debugValue);
+      return debugValue === "true";
     }
   } catch (e) {
     // process not available, continue
@@ -236,9 +240,12 @@ function getDebugFlag() {
     typeof import.meta !== "undefined" &&
     import.meta.env?.PUBLIC_VORMIA_DEBUG
   ) {
-    return import.meta.env.PUBLIC_VORMIA_DEBUG === "true";
+    const debugValue = import.meta.env.PUBLIC_VORMIA_DEBUG;
+    console.log("🔍 VormiaQuery Debug: PUBLIC_VORMIA_DEBUG =", debugValue);
+    return debugValue === "true";
   }
 
+  console.log("🔍 VormiaQuery Debug: No debug environment variable found, debug disabled");
   return false;
 }
 
