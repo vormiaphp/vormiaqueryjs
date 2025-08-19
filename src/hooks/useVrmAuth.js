@@ -130,18 +130,20 @@ export const useVormiaQueryAuthMutation = (options) => {
     onLoginSuccess,
     formdata,
     manualTransformation = false,
-    enableNotifications,
-    showDebug,
+    showDebug = null,
     onSuccess,
     onError,
     ...mutationOptions
   } = options;
 
+  // Always enable notifications by default
+  const enableNotifications = true;
+  
   // Get global configuration
   const globalConfig = typeof window !== "undefined" ? window.__VORMIA_CONFIG__ : {};
   
   // Determine if debug should be shown (respects VITE_VORMIA_DEBUG)
-  const shouldShowDebugPanel = showDebug !== undefined ? showDebug : shouldShowDebug();
+  const shouldShowDebugPanel = showDebug !== null ? showDebug : shouldShowDebug();
 
   const mutation = useMutation({
     mutationFn: async (variables) => {
@@ -185,7 +187,7 @@ export const useVormiaQueryAuthMutation = (options) => {
       }
 
       // Show success notification if enabled
-      if (enableNotifications?.toast !== false) {
+      if (enableNotifications) {
         const message = data?.data?.message || "Operation completed successfully";
         showSuccessNotification(message, "Success");
       }
@@ -210,7 +212,7 @@ export const useVormiaQueryAuthMutation = (options) => {
       }
 
       // Show error notification if enabled
-      if (enableNotifications?.toast !== false) {
+      if (enableNotifications) {
         const message = error.response?.message || error.response?.response?.data?.message || "An error occurred. Please try again.";
         showErrorNotification(message, "Error");
       }

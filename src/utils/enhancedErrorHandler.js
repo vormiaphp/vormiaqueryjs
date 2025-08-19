@@ -211,7 +211,7 @@ export function transformApiResponse(response) {
  * Get debug flag from environment variables
  * @returns {boolean} Whether debug mode is enabled
  */
-function getDebugFlag() {
+export function getDebugFlag() {
   // Support multiple environment variable names for different frameworks
   if (
     typeof import.meta !== "undefined" &&
@@ -224,10 +224,13 @@ function getDebugFlag() {
 
   // Next.js - safely check for process
   try {
+    // eslint-disable-next-line no-undef
     if (
+      // eslint-disable-next-line no-undef
       typeof process !== "undefined" &&
       process?.env?.NEXT_PUBLIC_VORMIA_DEBUG
     ) {
+      // eslint-disable-next-line no-undef
       const debugValue = process.env.NEXT_PUBLIC_VORMIA_DEBUG;
       console.log(
         "🔍 VormiaQuery Debug: NEXT_PUBLIC_VORMIA_DEBUG =",
@@ -235,7 +238,7 @@ function getDebugFlag() {
       );
       return debugValue === "true";
     }
-  } catch (e) {
+  } catch {
     // process not available, continue
   }
 
@@ -249,6 +252,26 @@ function getDebugFlag() {
     return debugValue === "true";
   }
 
+  // Additional debugging information
+  console.log("🔍 VormiaQuery Debug: Environment variable detection:");
+  console.log("  - import.meta available:", typeof import.meta !== "undefined");
+  if (typeof import.meta !== "undefined") {
+    console.log(
+      "  - import.meta.env available:",
+      typeof import.meta.env !== "undefined"
+    );
+    if (import.meta.env) {
+      console.log(
+        "  - VITE_VORMIA_DEBUG value:",
+        import.meta.env.VITE_VORMIA_DEBUG
+      );
+      console.log(
+        "  - All VITE_ variables:",
+        Object.keys(import.meta.env).filter((key) => key.startsWith("VITE_"))
+      );
+    }
+  }
+
   console.log(
     "🔍 VormiaQuery Debug: No debug environment variable found, debug disabled"
   );
@@ -259,8 +282,8 @@ function getDebugFlag() {
 // This function is kept for backward compatibility but not actively used
 export function getNotificationConfig() {
   return {
-    toast: true,  // Default to enabled, can be overridden per-query
-    panel: true,  // Default to enabled, can be overridden per-query
+    toast: true, // Default to enabled, can be overridden per-query
+    panel: true, // Default to enabled, can be overridden per-query
     duration: 5000, // Default duration
   };
 }
@@ -270,41 +293,12 @@ export function getNotificationConfig() {
  * @returns {Object} Debug configuration
  */
 export function getDebugConfig() {
-  const debugEnabled = getEnvVar("VITE_VORMIA_DEBUG", "false") === "true";
+  const debugEnabled = getDebugFlag();
 
   return {
     enabled: debugEnabled,
     isProduction: !debugEnabled, // If debug is disabled, treat as production
   };
-}
-
-/**
- * Helper function to get environment variable value
- * @param {string} key - Environment variable key
- * @param {string} defaultValue - Default value if not set
- * @returns {string} Environment variable value
- */
-function getEnvVar(key, defaultValue = "") {
-  // Vite
-  if (typeof import.meta !== "undefined" && import.meta.env?.[key]) {
-    return import.meta.env[key];
-  }
-
-  // Next.js - safely check for process
-  try {
-    if (typeof process !== "undefined" && process?.env?.[key]) {
-      return process.env[key];
-    }
-  } catch (e) {
-    // process not available, continue
-  }
-
-  // Astro
-  if (typeof import.meta !== "undefined" && import.meta.env?.[key]) {
-    return import.meta.env[key];
-  }
-
-  return defaultValue;
 }
 
 /**

@@ -27,22 +27,29 @@ import {
  * @param {boolean} [options.showDebug] - Override debug panel visibility
  * @returns {Object} Query result with enhanced utilities
  */
-export const useVormiaQuery = (options) => {
+export function useVormiaQuery({
+  endpoint,
+  method = "GET",
+  showDebug = null,
+  onSuccess,
+  onError,
+  ...options
+}) {
+  // Always enable notifications by default
+  const enableNotifications = true;
+  
+  // Get debug configuration
+  const debugConfig = getDebugConfig();
+  const shouldShowDebug = showDebug !== null ? showDebug : debugConfig.enabled;
+
   const client = getGlobalVormiaClient();
 
   const {
-    endpoint,
-    method = "GET",
     params,
     data,
     headers = {},
-    enableNotifications,
-    showDebug,
     ...queryOptions
   } = options;
-
-  // Determine if debug should be shown (respects VITE_VORMIA_DEBUG)
-  const shouldShowDebugPanel = showDebug !== undefined ? showDebug : shouldShowDebug();
 
   const queryKey = [endpoint, method, params, data];
 

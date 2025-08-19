@@ -3,6 +3,7 @@ import { getGlobalVormiaClient } from "../client/createVormiaClient";
 import {
   logErrorForDebug,
   logSuccessForDebug,
+  getDebugConfig,
 } from "../utils/enhancedErrorHandler.js";
 import {
   showSuccessNotification,
@@ -11,7 +12,6 @@ import {
 } from "../components/NotificationPanel.jsx";
 import {
   createErrorDebugHtml,
-  shouldShowDebug,
   createDebugInfo,
 } from "../components/ErrorDebugPanel.jsx";
 
@@ -27,22 +27,25 @@ import {
  * @param {Function} [options.onError] - Error callback
  * @returns {Object} Mutation result with enhanced utilities
  */
-export const useVormiaQuerySimple = (options) => {
+export function useVormiaQuerySimple({
+  endpoint,
+  method = "POST",
+  showDebug = null,
+  onSuccess,
+  onError,
+  ...options
+}) {
+  // Always enable notifications by default
+  const enableNotifications = true;
+  
+  // Get debug configuration
+  const debugConfig = getDebugConfig();
+  const shouldShowDebug = showDebug !== null ? showDebug : debugConfig.enabled;
+
   const client = getGlobalVormiaClient();
 
-  const {
-    endpoint,
-    method = "POST",
-    headers = {},
-    enableNotifications,
-    showDebug,
-    onSuccess,
-    onError,
-    ...mutationOptions
-  } = options;
-
   // Determine if debug should be shown (respects VITE_VORMIA_DEBUG)
-  const shouldShowDebugPanel = showDebug !== undefined ? showDebug : shouldShowDebug();
+  const shouldShowDebugPanel = shouldShowDebug;
 
   const mutation = useMutation({
     mutationFn: async (data) => {
@@ -53,7 +56,7 @@ export const useVormiaQuerySimple = (options) => {
           data,
           headers: {
             "Content-Type": "application/json",
-            ...headers,
+            ...options.headers,
           },
         };
 
@@ -97,7 +100,7 @@ export const useVormiaQuerySimple = (options) => {
         onError(error, variables, context);
       }
     },
-    ...mutationOptions,
+    ...options,
   });
 
   return {

@@ -168,33 +168,73 @@ export function shouldShowDebug() {
 }
 
 /**
- * Create debug info object from API response
- * @param {Object} response - API response
- * @returns {ErrorDebugInfo} Debug info object
+ * Create debug info from API response or error
+ * @param {Object} response - API response or error object
+ * @returns {ErrorDebugInfo} Debug information object
  */
 export function createDebugInfo(response) {
-  const isSuccess = response?.data?.success === true;
-  const isError = response?.data?.success === false;
+  // Handle error objects (from onError)
+  if (response?.response) {
+    // This is an error response
+    const errorResponse = response.response;
+    return {
+      status: errorResponse.status || 0,
+      message: errorResponse.message || errorResponse.data?.message || "Error occurred",
+      response: {
+        response: {
+          data: {
+            success: false,
+            message: errorResponse.message || errorResponse.data?.message,
+            errors: errorResponse.data?.errors,
+            debug: errorResponse.data?.debug
+          },
+          debug: errorResponse.debug
+        },
+        debug: errorResponse.debug
+      },
+      errorType: "api_error",
+      timestamp: new Date().toISOString()
+    };
+  }
+  
+  // Handle success responses (from onSuccess)
+  if (response?.data) {
+    const isSuccess = response.data.success === true;
+    return {
+      status: isSuccess ? 200 : response.status || 0,
+      message: isSuccess
+        ? "Operation successful"
+        : response.data.message || "Unknown response",
+      response: {
+        response: {
+          data: {
+            success: response.data.success,
+            message: response.data.message,
+            data: response.data.data,
+            errors: response.data.errors,
+            debug: response.data.debug
+          },
+          debug: response.debug
+        },
+        debug: response.debug
+      },
+      errorType: isSuccess ? "success" : "api_response",
+      timestamp: new Date().toISOString()
+    };
+  }
 
+  // Fallback for unknown response structure
   return {
-    status: isSuccess ? 200 : response?.status || 0,
-    message: isSuccess
-      ? "Operation successful"
-      : response?.message || "Unknown response",
+    status: 0,
+    message: "Unknown response structure",
     response: {
       response: {
-        data: {
-          success: response?.data?.success,
-          message: response?.data?.message,
-          data: response?.data?.data,
-          errors: response?.data?.errors,
-          debug: response?.data?.debug
-        },
-        debug: response?.debug
+        data: response,
+        debug: null
       },
-      debug: response?.debug
+      debug: null
     },
-    errorType: isSuccess ? "success" : "api_response",
+    errorType: "unknown",
     timestamp: new Date().toISOString()
   };
 }
