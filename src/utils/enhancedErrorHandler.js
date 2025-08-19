@@ -11,10 +11,11 @@
 export function handleApiError(error) {
   // Extract API response data - note: error.response is the actual API response
   const apiResponse = error.response;
-  const apiMessage =
-    apiResponse?.message ||
-    apiResponse?.response?.data?.message ||
-    error.message;
+  // Note: apiMessage calculated but not used in this function
+  // const apiMessage =
+  //   apiResponse?.message ||
+  //   apiResponse?.response?.data?.message ||
+  //   error.message;
 
   // Determine error type
   let errorType = "unknown";
@@ -112,10 +113,10 @@ export function logErrorForDebug(error, label = "API Error") {
   }
 
   const apiResponse = error.response;
-  const apiMessage =
-    apiResponse?.message ||
-    apiResponse?.response?.data?.message ||
-    error.message;
+  // Note: apiMessage calculated but not used in this function
+  // const apiMessage =
+  //   apiResponse?.response?.data?.message ||
+  //   error.message;
 
   console.group(`🚨 ${label}`);
   console.log("Status:", error.status);

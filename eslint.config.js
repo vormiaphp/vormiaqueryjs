@@ -8,9 +8,37 @@ export default defineConfig([
     plugins: { js },
     extends: ["js/recommended"],
   },
-  { files: ["**/*.js"], languageOptions: { sourceType: "module" } },
   {
-    files: ["**/*.{js,mjs,cjs}"],
-    languageOptions: { globals: globals.browser },
+    files: ["**/*.{jsx,tsx}"],
+    languageOptions: {
+      parserOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
+        ecmaFeatures: {
+          jsx: true
+        }
+      },
+      globals: {
+        ...globals.browser,
+        React: "readonly"
+      }
+    }
+  },
+  { 
+    files: ["**/*.js"], 
+    languageOptions: { 
+      sourceType: "module",
+      globals: globals.browser
+    } 
+  },
+  {
+    files: ["**/*.{js,jsx,mjs,cjs}"],
+    languageOptions: { 
+      globals: globals.browser 
+    },
+    rules: {
+      "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+      "no-undef": "error"
+    }
   },
 ]);
