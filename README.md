@@ -195,6 +195,7 @@ VITE_VORMIA_WITH_CREDENTIALS=false            # Include credentials in requests
 **⚠️ Important**: All environment variables must start with `VITE_` prefix to be accessible in the browser.
 
 **🎯 Environment Variable Simplification**: We removed the redundant `VITE_VORMIA_ENV` variable. Now `VITE_VORMIA_DEBUG` serves as both the debug toggle and environment indicator:
+
 - `VITE_VORMIA_DEBUG=true` = Development mode (show debug info)
 - `VITE_VORMIA_DEBUG=false` = Production mode (hide debug info)
 
