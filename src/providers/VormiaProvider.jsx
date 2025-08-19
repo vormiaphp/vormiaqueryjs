@@ -1,93 +1,61 @@
-import React, { useEffect } from "react";
-import {
-  createVormiaClient,
-  setGlobalVormiaClient,
-} from "../client/createVormiaClient.js";
+import React, { useEffect, useState } from "react";
+import { createVormiaClient, setGlobalVormiaClient } from "../client/createVormiaClient";
 
 /**
- * VormiaProvider - A React provider component for VormiaQueryJS
- * Automatically initializes the VormiaClient and makes it available globally
- *
- * @param {Object} props - Component props
- * @param {React.ReactNode} props.children - Child components
- * @param {Object} props.config - Configuration object for VormiaClient
- * @param {string} props.config.baseURL - Base URL for API requests
- * @param {Object} [props.config.defaultFormdata] - Default form data transformation configuration
- * @param {Object} [props.config.enableNotifications] - Notification system configuration
- * @param {boolean} [props.config.enableDebugPanel] - Whether to enable debug panel
- * @param {string} [props.config.debugEnvVar] - Environment variable name for debug mode
- * @param {number} [props.config.notificationDuration] - Default notification duration
- * @param {number} [props.config.timeout] - Request timeout in milliseconds (optional)
- * @param {boolean} [props.config.withCredentials] - Whether to include credentials (optional)
- * @param {string} [props.config.authTokenKey] - Key for storing auth token (optional)
- *
- * @example
- * ```jsx
- * import { VormiaProvider } from 'vormiaqueryjs';
- *
- * function App() {
- *   return (
- *     <VormiaProvider config={{ 
- *       baseURL: 'https://api.example.com',
- *       defaultFormdata: {
- *         confirmPassword: "password_confirmation",
- *         add: { terms: true },
- *         remove: ["confirmPassword"]
- *       },
- *       enableNotifications: { toast: true, panel: true },
- *       enableDebugPanel: true,
- *       debugEnvVar: "VITE_VORMIA_DEBUG"
- *     }}>
- *       <YourApp />
- *     </VormiaProvider>
- *   );
- * }
- * ```
+ * VormiaProvider - Simple configuration provider for VormiaQueryJS
+ * Only handles essential configuration like baseURL
+ * Feature flags are controlled by environment variables
  */
 export const VormiaProvider = ({ children, config }) => {
-  useEffect(() => {
-    if (!config || !config.baseURL) {
-      console.warn("VormiaProvider: baseURL is required in config");
-      return;
-    }
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [error, setError] = useState(null);
 
+  useEffect(() => {
     try {
-      const client = createVormiaClient(config);
+      // Create and set global client
+      const client = createVormiaClient({
+        baseURL: config.baseURL,
+        timeout: config.timeout || 30000,
+        withCredentials: config.withCredentials || false,
+        authTokenKey: config.authTokenKey || "vormia_auth_token",
+      });
+
       setGlobalVormiaClient(client);
-      
-      // Store global configuration for hooks to access
-      if (typeof window !== 'undefined') {
+
+      // Store minimal configuration for hooks to access
+      if (typeof window !== "undefined") {
         window.__VORMIA_CONFIG__ = {
           baseURL: config.baseURL,
-          defaultFormdata: config.defaultFormdata || {
-            rename: {
-              confirmPassword: "password_confirmation"
-            },
-            add: {
-              terms: true
-            },
-            remove: ["confirmPassword"]
-          },
-          enableNotifications: config.enableNotifications || {
-            toast: true,
-            panel: true
-          },
-          enableDebugPanel: config.enableDebugPanel !== false,
-          debugEnvVar: config.debugEnvVar || "VITE_VORMIA_DEBUG",
-          notificationDuration: config.notificationDuration || 5000,
-          timeout: config.timeout,
-          withCredentials: config.withCredentials,
-          authTokenKey: config.authTokenKey
+          timeout: config.timeout || 30000,
+          withCredentials: config.withCredentials || false,
+          authTokenKey: config.authTokenKey || "vormia_auth_token",
         };
       }
-      
-      console.log("VormiaProvider: Client initialized successfully with configuration:", window.__VORMIA_CONFIG__);
-    } catch (error) {
-      console.error("VormiaProvider: Failed to initialize client:", error);
+
+      console.log("VormiaProvider: Client initialized successfully with baseURL:", config.baseURL);
+      setIsInitialized(true);
+    } catch (err) {
+      console.error("VormiaProvider: Failed to initialize client:", err);
+      setError(err.message);
     }
   }, [config]);
 
+  if (error) {
+    return (
+      <div className="p-4 bg-red-50 border border-red-200 rounded-md">
+        <h3 className="text-red-800 font-semibold">VormiaQuery Initialization Failed</h3>
+        <p className="text-red-600 text-sm mt-1">{error}</p>
+      </div>
+    );
+  }
+
+  if (!isInitialized) {
+    return (
+      <div className="p-4 bg-blue-50 border border-blue-200 rounded-md">
+        <p className="text-blue-800 text-sm">Initializing VormiaQuery...</p>
+      </div>
+    );
+  }
+
   return children;
 };
-
-export default VormiaProvider;

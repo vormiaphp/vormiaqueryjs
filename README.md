@@ -95,38 +95,9 @@ import { VormiaProvider } from "vormiaqueryjs";
 
 function App() {
   return (
-    <VormiaProvider
-      config={{
-        baseURL: "https://api.example.com",
-
-        // Default form data transformation
-        defaultFormdata: {
-          rename: {
-            confirmPassword: "password_confirmation",
-            user_name: "name",
-          },
-          add: {
-            terms: true,
-            source: "web",
-          },
-          remove: ["confirmPassword", "tempField"],
-        },
-
-        // Notification system configuration
-        enableNotifications: {
-          toast: true, // Enable toast notifications
-          panel: true, // Enable notification panel
-        },
-
-        // Debug panel configuration
-        enableDebugPanel: true,
-        debugEnvVar: "VITE_VORMIA_DEBUG",
-
-        // Other options
-        notificationDuration: 5000,
-        timeout: 30000,
-      }}
-    >
+    <VormiaProvider config={{ 
+      baseURL: import.meta.env.VITE_VORMIA_API_URL 
+    }}>
       <YourApp />
     </VormiaProvider>
   );
@@ -135,17 +106,32 @@ function App() {
 
 ### Configuration Options
 
-The `VormiaProvider` accepts these configuration options:
+The `VormiaProvider` accepts these essential configuration options:
 
 - **`baseURL`** (required): Your API base URL
-- **`defaultFormdata`** (optional): Default form data transformation configuration
-- **`enableNotifications`** (optional): Notification system configuration
-- **`enableDebugPanel`** (optional): Whether to enable debug panel
-- **`debugEnvVar`** (optional): Environment variable name for debug mode
-- **`notificationDuration`** (optional): Default notification duration in milliseconds
-- **`timeout`** (optional): Request timeout in milliseconds
-- **`withCredentials`** (optional): Whether to include credentials
-- **`authTokenKey`** (optional): Key for storing auth token
+- **`timeout`** (optional): Request timeout in milliseconds (default: 30000)
+- **`withCredentials`** (optional): Whether to include credentials (default: false)
+- **`authTokenKey`** (optional): Key for storing auth token (default: "vormia_auth_token")
+
+### Environment Variables
+
+Configure features using environment variables in your `.env` file:
+
+```bash
+# API Configuration
+VITE_VORMIA_API_URL=https://api.example.com
+
+# Notification System (enabled by default)
+VITE_VORMIA_NOTIFICATION_TOAST=true      # Enable toast notifications
+VITE_VORMIA_NOTIFICATION_PANEL=true      # Enable notification panels
+VITE_VORMIA_NOTIFICATION_DURATION=5000   # Toast duration in milliseconds
+
+# Debug System (disabled by default)
+VITE_VORMIA_DEBUG=false                  # Enable debug panel
+VITE_VORMIA_ENV=local                   # Environment (local/production)
+```
+
+**Note**: All feature flags are controlled by environment variables, not through the provider configuration. This keeps the setup simple and allows per-environment control.
 
 ---
 

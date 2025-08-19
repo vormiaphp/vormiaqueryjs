@@ -112,11 +112,11 @@ export const useVormiaQueryAuth = (options) => {
  * @param {Function} [options.onLoginSuccess] - Callback on successful login
  * @param {Object} [options.formdata] - Form data transformation configuration
  * @param {boolean} [options.manualTransformation=false] - Whether to use manual transformation
- * @param {Object} [options.enableNotifications] - Notification configuration
- * @param {boolean} [options.showDebug] - Whether to show debug panel
+ * @param {Object} [options.enableNotifications] - Override notification settings
+ * @param {boolean} [options.showDebug] - Override debug panel visibility
  * @param {Function} [options.onSuccess] - Success callback
  * @param {Function} [options.onError] - Error callback
- * @returns {Object} Mutation result and auth utilities
+ * @returns {Object} Mutation result with additional utilities
  */
 export const useVormiaQueryAuthMutation = (options) => {
   const client = getGlobalVormiaClient();
@@ -128,72 +128,55 @@ export const useVormiaQueryAuthMutation = (options) => {
     transform,
     storeToken = true,
     onLoginSuccess,
-    onSuccess,
-    onError,
     formdata,
     manualTransformation = false,
     enableNotifications,
     showDebug,
+    onSuccess,
+    onError,
     ...mutationOptions
   } = options;
 
   // Get global configuration
-  const globalConfig =
-    typeof window !== "undefined" ? window.__VORMIA_CONFIG__ : {};
-
-  // Determine if debug should be shown
-  const shouldShowDebugPanel =
-    showDebug !== undefined ? showDebug : shouldShowDebug();
+  const globalConfig = typeof window !== "undefined" ? window.__VORMIA_CONFIG__ : {};
+  
+  // Determine if debug should be shown (respects VITE_VORMIA_DEBUG)
+  const shouldShowDebugPanel = showDebug !== undefined ? showDebug : shouldShowDebug();
 
   const mutation = useMutation({
     mutationFn: async (variables) => {
-      try {
-        let requestData = variables;
-
-        // Handle form data transformation unless manual transformation is requested
-        if (!manualTransformation && formdata) {
-          // Merge global and local formdata configurations
-          const mergedFormdata = mergeFormdataConfig(
-            globalConfig.defaultFormdata,
-            formdata
-          );
-          requestData = transformFormData(variables, mergedFormdata);
-        }
-
-        const config = {
-          method,
-          url: endpoint,
-          data: requestData,
-          headers: {
-            "Content-Type": "application/json",
-            ...headers,
-          },
-        };
-
-        const response = await client.request(config);
-
-        // Store token if present in response
-        if (storeToken && response.data?.token) {
-          client.setAuthToken(response.data.token);
-        }
-
-        if (transform && typeof transform === "function") {
-          return {
-            ...response,
-            data: transform(response.data),
-          };
-        }
-
-        return response;
-      } catch (error) {
-        // Clear token on 401
-        if (error.status === 401) {
-          client.removeAuthToken();
-        }
-        throw error instanceof Error
-          ? error
-          : new Error("Authentication failed");
+      let requestData = variables;
+      
+      // Apply form data transformation if configured
+      if (!manualTransformation && formdata) {
+        requestData = transformFormData(variables, formdata);
       }
+
+      const config = {
+        method,
+        url: endpoint,
+        data: requestData,
+        headers: {
+          "Content-Type": "application/json",
+          ...headers,
+        },
+      };
+
+      const response = await client.request(config);
+
+      // Store token if present in response
+      if (storeToken && response.data?.token) {
+        client.setAuthToken(response.data.token);
+      }
+
+      if (transform && typeof transform === "function") {
+        return {
+          ...response,
+          data: transform(response.data),
+        };
+      }
+
+      return response;
     },
     onSuccess: (data, variables, context) => {
       // Log success for debugging
@@ -202,21 +185,17 @@ export const useVormiaQueryAuthMutation = (options) => {
       }
 
       // Show success notification if enabled
-      const notificationConfig =
-        enableNotifications || globalConfig.enableNotifications;
-      if (notificationConfig?.toast || notificationConfig?.panel) {
-        const message =
-          data?.data?.message || "Operation completed successfully";
-        if (notificationConfig.toast) {
-          showSuccessNotification(message, "Success");
-        }
+      if (enableNotifications?.toast !== false) {
+        const message = data?.data?.message || "Operation completed successfully";
+        showSuccessNotification(message, "Success");
       }
 
-      // Call original onSuccess callback
+      // Call custom success handler
       if (onSuccess) {
         onSuccess(data, variables, context);
       }
 
+      // Handle login success
       if (onLoginSuccess && data.data?.token) {
         onLoginSuccess(data);
       }
@@ -224,26 +203,19 @@ export const useVormiaQueryAuthMutation = (options) => {
     onError: (error, variables, context) => {
       // Get clean error info
       const errorInfo = handleApiError(error);
-
+      
       // Log for debugging
       if (shouldShowDebugPanel) {
         logErrorForDebug(error, "Mutation Error");
       }
 
       // Show error notification if enabled
-      const notificationConfig =
-        enableNotifications || globalConfig.enableNotifications;
-      if (notificationConfig?.toast || notificationConfig?.panel) {
-        const message =
-          error.response?.message ||
-          error.response?.response?.data?.message ||
-          "An error occurred. Please try again.";
-        if (notificationConfig.toast) {
-          showErrorNotification(message, "Error");
-        }
+      if (enableNotifications?.toast !== false) {
+        const message = error.response?.message || error.response?.response?.data?.message || "An error occurred. Please try again.";
+        showErrorNotification(message, "Error");
       }
 
-      // Call original onError callback
+      // Call custom error handler
       if (onError) {
         onError(error, variables, context);
       }
@@ -251,62 +223,53 @@ export const useVormiaQueryAuthMutation = (options) => {
     ...mutationOptions,
   });
 
-  // Login helper
+  // Authentication methods
   const login = async (credentials) => {
     return mutation.mutateAsync(credentials);
   };
 
-  // Logout helper
   const logout = () => {
     client.removeAuthToken();
+    mutation.reset();
   };
 
-  // Check if user is authenticated
-  const isAuthenticated = !!client.getAuthToken();
+  const isAuthenticated = () => {
+    return !!client.getAuthToken();
+  };
 
-  // Enhanced return object with additional utilities
   return {
     ...mutation,
     login,
     logout,
     isAuthenticated,
-
+    
     // Form data transformation utilities
     transformFormData: (data) => {
       if (!manualTransformation && formdata) {
-        const mergedFormdata = mergeFormdataConfig(
-          globalConfig.defaultFormdata,
-          formdata
-        );
-        return transformFormData(data, mergedFormdata);
+        return transformFormData(data, formdata);
       }
       return data;
     },
-
+    
     // Update formdata configuration
     updateFormdata: (newFormdata) => {
       if (formdata) {
         Object.assign(formdata, newFormdata);
       }
     },
-
+    
     // Get notification HTML (framework agnostic)
     getNotificationHtml: (type, title, message) => {
-      const notification = {
-        type,
-        title,
-        message,
-        key: `${type}-${Date.now()}`,
-      };
+      const notification = { type, title, message, key: `${type}-${Date.now()}` };
       return createNotificationHtml(notification);
     },
-
+    
     // Get debug panel HTML (framework agnostic)
     getDebugHtml: (response, isSuccess = true) => {
       if (!shouldShowDebugPanel) return "";
       const debugInfo = createDebugInfo(response);
       return createErrorDebugHtml(debugInfo);
-    },
+    }
   };
 };
 

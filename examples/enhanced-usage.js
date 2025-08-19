@@ -12,63 +12,64 @@ import {
 } from "vormiaqueryjs";
 
 // ============================================================================
-// 1. PROVIDER CONFIGURATION WITH NEW FEATURES
+// Enhanced Usage Examples for VormiaQueryJS
+// ============================================================================
+
+import {
+  VormiaProvider,
+  useVormiaQuery,
+  useVormiaQueryAuth,
+  useVormiaQueryAuthMutation,
+  useVormiaQuerySimple,
+} from "vormiaqueryjs";
+
+// ============================================================================
+// SIMPLIFIED PROVIDER SETUP
 // ============================================================================
 
 function App() {
   return (
-    <VormiaProvider
-      config={{
-        baseURL: "https://api.example.com",
-
-        // Default form data transformation
-        defaultFormdata: {
-          rename: {
-            confirmPassword: "password_confirmation",
-            user_name: "name",
-          },
-          add: {
-            terms: true,
-            source: "web",
-          },
-          remove: ["confirmPassword", "tempField"],
-        },
-
-        // Notification system configuration
-        enableNotifications: {
-          toast: true, // Enable toast notifications
-          panel: true, // Enable notification panel
-        },
-
-        // Debug panel configuration
-        enableDebugPanel: true,
-        debugEnvVar: "VITE_VORMIA_DEBUG",
-
-        // Other options
-        notificationDuration: 5000,
-        timeout: 30000,
-      }}
-    >
+    <VormiaProvider config={{ 
+      baseURL: import.meta.env.VITE_VORMIA_API_URL 
+    }}>
       <YourApp />
     </VormiaProvider>
   );
 }
 
 // ============================================================================
-// 2. BASIC QUERY (NO AUTH) WITH ENHANCED FEATURES
+// ENVIRONMENT VARIABLES (.env file)
+// ============================================================================
+
+/*
+# API Configuration
+VITE_VORMIA_API_URL=https://api.example.com
+
+# Notification System (enabled by default)
+VITE_VORMIA_NOTIFICATION_TOAST=true      # Enable toast notifications
+VITE_VORMIA_NOTIFICATION_PANEL=true      # Enable notification panels
+VITE_VORMIA_NOTIFICATION_DURATION=5000   # Toast duration in milliseconds
+
+# Debug System (disabled by default)
+VITE_VORMIA_DEBUG=false                  # Enable debug panel
+VITE_VORMIA_ENV=local                   # Environment (local/production)
+*/
+
+// ============================================================================
+// BASIC QUERY (No Auth)
 // ============================================================================
 
 function PublicDataComponent() {
   const query = useVormiaQuery({
     endpoint: "/public/data",
     method: "GET",
-
-    // Override global notification settings
+    
+    // Override notification settings per-query
     enableNotifications: { toast: true, panel: false },
-
-    // Override global debug settings
+    
+    // Override debug settings per-query
     showDebug: true,
-
+    
     // Cache configuration
     retry: 3,
     cacheTime: 10 * 60 * 1000, // 10 minutes
@@ -79,17 +80,17 @@ function PublicDataComponent() {
   const handleSuccess = () => {
     // Show custom notification
     query.showSuccessNotification("Data loaded successfully!", "Success");
-
+    
     // Get notification HTML for other frameworks
     const notificationHtml = query.getNotificationHtml(
       "success",
       "Success",
       "Data loaded!"
     );
-
+    
     // Get debug panel HTML
     const debugHtml = query.getDebugHtml(query.data);
-
+    
     // Log for debugging
     query.logForDebug(query.data, "Public Data Loaded");
   };
@@ -110,15 +111,15 @@ function PublicDataComponent() {
 }
 
 // ============================================================================
-// 3. AUTHENTICATED QUERY WITH ENHANCED FEATURES
+// AUTHENTICATED QUERY
 // ============================================================================
 
 function UserProfileComponent() {
   const query = useVormiaQueryAuth({
     endpoint: "/user/profile",
     method: "GET",
-
-    // Override global settings
+    
+    // Override global settings per-query
     enableNotifications: { toast: false, panel: true },
     showDebug: false,
   });
@@ -138,7 +139,7 @@ function UserProfileComponent() {
 }
 
 // ============================================================================
-// 4. AUTHENTICATED MUTATION WITH AUTOMATIC FORM DATA TRANSFORMATION
+// AUTHENTICATED MUTATION WITH FORM TRANSFORMATION
 // ============================================================================
 
 function RegistrationForm() {
@@ -152,38 +153,40 @@ function RegistrationForm() {
   const [fieldErrors, setFieldErrors] = useState({});
   const [generalError, setGeneralError] = useState("");
 
-  // AUTOMATIC FORM DATA TRANSFORMATION (NEW FEATURE!)
+  // PER-QUERY FORM DATA TRANSFORMATION (not global)
   const mutation = useVormiaQueryAuthMutation({
     endpoint: "/register",
     method: "POST",
-
-    // Automatic form data transformation
+    
+    // Form data transformation per-query
     formdata: {
-      // Override global rename mappings
+      // Rename fields
       rename: {
         confirmPassword: "password_confirmation",
         user_name: "name",
       },
-      // Add additional fields
+      
+      // Add fields
       add: {
         terms: true,
         source: "registration_form",
       },
+      
       // Remove fields
       remove: ["confirmPassword", "tempField"],
     },
-
-    // Override global settings
+    
+    // Override global settings per-query
     enableNotifications: { toast: true, panel: true },
     showDebug: true,
-
+    
     // Custom success/error handlers
     onSuccess: (data) => {
       console.log("Registration successful:", data);
       // Navigate to login
       navigate("/login");
     },
-
+    
     onError: (error) => {
       console.log("Registration failed:", error);
       // Handle field errors automatically
@@ -198,20 +201,13 @@ function RegistrationForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+    
     // Clear previous errors
     setFieldErrors({});
     setGeneralError("");
-
+    
     // Just pass formData - package handles transformation automatically!
     mutation.mutate(formData);
-
-    // The package will automatically:
-    // 1. Rename confirmPassword → password_confirmation
-    // 2. Add terms: true and source: "registration_form"
-    // 3. Remove confirmPassword from final payload
-    // 4. Handle all error parsing and notifications
-    // 5. Show debug panel if VITE_VORMIA_DEBUG=true
   };
 
   return (
@@ -225,7 +221,7 @@ function RegistrationForm() {
         placeholder="Full Name"
       />
       {fieldErrors.name && <span className="error">{fieldErrors.name}</span>}
-
+      
       <input
         name="email"
         type="email"
@@ -236,7 +232,7 @@ function RegistrationForm() {
         placeholder="Email"
       />
       {fieldErrors.email && <span className="error">{fieldErrors.email}</span>}
-
+      
       <input
         name="password"
         type="password"
@@ -249,7 +245,7 @@ function RegistrationForm() {
       {fieldErrors.password && (
         <span className="error">{fieldErrors.password}</span>
       )}
-
+      
       <input
         name="confirmPassword"
         type="password"
@@ -262,18 +258,18 @@ function RegistrationForm() {
       {fieldErrors.confirmPassword && (
         <span className="error">{fieldErrors.confirmPassword}</span>
       )}
-
+      
       <button type="submit" disabled={mutation.isPending}>
         {mutation.isPending ? "Creating Account..." : "Create Account"}
       </button>
-
+      
       {generalError && <p className="error">{generalError}</p>}
     </form>
   );
 }
 
 // ============================================================================
-// 5. MANUAL TRANSFORMATION OVERRIDE
+// MANUAL TRANSFORMATION EXAMPLE
 // ============================================================================
 
 function ManualTransformationForm() {
@@ -284,22 +280,21 @@ function ManualTransformationForm() {
     confirmPassword: "",
   });
 
-  // MANUAL TRANSFORMATION (OVERRIDE AUTOMATIC)
   const mutation = useVormiaQueryAuthMutation({
     endpoint: "/register",
     method: "POST",
-
+    
     // Disable automatic transformation
     manualTransformation: true,
-
-    // Override global settings
+    
+    // Override global settings per-query
     enableNotifications: { toast: false, panel: true },
     showDebug: false,
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+    
     // Manual transformation (your current way)
     const registrationData = {
       ...formData,
@@ -307,35 +302,37 @@ function ManualTransformationForm() {
       confirmPassword: undefined,
       terms: true,
     };
-
+    
     mutation.mutate(registrationData);
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      {/* Same form fields as above */}
-      <button type="submit">Create Account (Manual)</button>
+      {/* Form fields */}
+      <button type="submit" disabled={mutation.isPending}>
+        {mutation.isPending ? "Creating Account..." : "Create Account"}
+      </button>
     </form>
   );
 }
 
 // ============================================================================
-// 6. SIMPLE QUERY FOR TESTING
+// SIMPLE TEST QUERY
 // ============================================================================
 
 function TestComponent() {
   const testQuery = useVormiaQuerySimple({
     endpoint: "/test",
     method: "POST", // or GET, PATCH, PUT, DELETE
-
-    // Override global settings
+    
+    // Override global settings per-query
     enableNotifications: { toast: true, panel: false },
     showDebug: true,
-
+    
     onSuccess: (data) => {
       console.log("Test successful:", data);
     },
-
+    
     onError: (error) => {
       console.log("Test failed:", error);
     },
@@ -344,7 +341,7 @@ function TestComponent() {
   const handleTest = () => {
     // Execute with data
     testQuery.execute({ test: "data" });
-
+    
     // Or execute asynchronously
     // testQuery.executeAsync({ test: "data" }).then(result => {
     //   console.log("Async result:", result);
@@ -356,14 +353,14 @@ function TestComponent() {
       <button onClick={handleTest} disabled={testQuery.isPending}>
         {testQuery.isPending ? "Testing..." : "Run Test"}
       </button>
-
+      
       {testQuery.data && (
         <div>
           <h3>Test Result</h3>
           <pre>{JSON.stringify(testQuery.data, null, 2)}</pre>
         </div>
       )}
-
+      
       {testQuery.error && (
         <div>
           <h3>Test Error</h3>
@@ -375,11 +372,11 @@ function TestComponent() {
 }
 
 // ============================================================================
-// 7. FRAMEWORK AGNOSTIC USAGE (Vue, Svelte, Vanilla JS, etc.)
+// FRAMEWORK AGNOSTIC USAGE
 // ============================================================================
 
-// Get HTML strings for other frameworks
 function getFrameworkAgnosticContent() {
+  // Example mutation with form transformation
   const mutation = useVormiaQueryAuthMutation({
     endpoint: "/register",
     formdata: {
@@ -396,44 +393,27 @@ function getFrameworkAgnosticContent() {
     "Account created successfully!"
   );
 
-  // Get debug panel HTML for any framework
-  const debugPanelHtml = mutation.getDebugHtml(
-    { data: { success: true, message: "Success" } },
-    true
-  );
-
   // Usage in different frameworks:
-
+  
   // Vue
   // <div v-html="successNotificationHtml"></div>
-
+  
   // Svelte
   // {@html successNotificationHtml}
-
+  
   // Vanilla JS
   // document.getElementById('notifications').innerHTML = successNotificationHtml;
-
+  
   // Angular
   // <div [innerHTML]="successNotificationHtml"></div>
-
+  
   // SolidJS
   // <div innerHTML={successNotificationHtml}></div>
 }
 
 // ============================================================================
-// 8. ENVIRONMENT VARIABLE CONFIGURATION
+// EXPORTS
 // ============================================================================
-
-// .env file:
-// VITE_VORMIA_DEBUG=true
-// VITE_VORMIA_ENV=local
-// VITE_VORMIA_API_URL=https://api.example.com
-
-// The package automatically:
-// 1. Shows debug panel when VITE_VORMIA_DEBUG=true
-// 2. Hides debug panel when VITE_VORMIA_DEBUG=false
-// 3. Hides debug panel in production builds
-// 4. Respects VITE_VORMIA_ENV for environment detection
 
 export {
   App,

@@ -16,26 +16,24 @@ import {
 } from "../components/ErrorDebugPanel.jsx";
 
 /**
- * Simple VormiaQuery hook for testing and maximum flexibility
+ * Simple query hook for testing and flexible API calls
  * @param {Object} options - Query options
  * @param {string} options.endpoint - API endpoint
- * @param {string} options.method - HTTP method (GET, POST, PATCH, PUT, DELETE)
+ * @param {string} [options.method='POST'] - HTTP method
  * @param {Object} [options.headers] - Custom headers
- * @param {Function} [options.transform] - Transform function for response data
- * @param {Object} [options.enableNotifications] - Notification configuration
- * @param {boolean} [options.showDebug] - Whether to show debug panel
+ * @param {Object} [options.enableNotifications] - Override notification settings
+ * @param {boolean} [options.showDebug] - Override debug panel visibility
  * @param {Function} [options.onSuccess] - Success callback
  * @param {Function} [options.onError] - Error callback
- * @returns {Object} Mutation result with additional utilities
+ * @returns {Object} Mutation result with enhanced utilities
  */
 export const useVormiaQuerySimple = (options) => {
   const client = getGlobalVormiaClient();
 
   const {
     endpoint,
-    method,
+    method = "POST",
     headers = {},
-    transform,
     enableNotifications,
     showDebug,
     onSuccess,
@@ -43,22 +41,16 @@ export const useVormiaQuerySimple = (options) => {
     ...mutationOptions
   } = options;
 
-  // Get global configuration
-  const globalConfig =
-    typeof window !== "undefined" ? window.__VORMIA_CONFIG__ : {};
-
-  // Determine if debug should be shown
-  const shouldShowDebugPanel =
-    showDebug !== undefined ? showDebug : shouldShowDebug();
+  // Determine if debug should be shown (respects VITE_VORMIA_DEBUG)
+  const shouldShowDebugPanel = showDebug !== undefined ? showDebug : shouldShowDebug();
 
   const mutation = useMutation({
-    mutationFn: async (variables) => {
+    mutationFn: async (data) => {
       try {
         const config = {
-          method: method.toUpperCase(),
+          method,
           url: endpoint,
-          params: method.toUpperCase() === "GET" ? variables : undefined,
-          data: method.toUpperCase() !== "GET" ? variables : undefined,
+          data,
           headers: {
             "Content-Type": "application/json",
             ...headers,
@@ -66,14 +58,6 @@ export const useVormiaQuerySimple = (options) => {
         };
 
         const response = await client.request(config);
-
-        if (transform && typeof transform === "function") {
-          return {
-            ...response,
-            data: transform(response.data),
-          };
-        }
-
         return response;
       } catch (error) {
         throw error instanceof Error ? error : new Error("Request failed");
@@ -86,15 +70,12 @@ export const useVormiaQuerySimple = (options) => {
       }
 
       // Show success notification if enabled
-      const notificationConfig =
-        enableNotifications || globalConfig.enableNotifications;
-      if (notificationConfig?.toast) {
-        const message =
-          data?.data?.message || "Operation completed successfully";
+      if (enableNotifications?.toast !== false) {
+        const message = data?.data?.message || "Operation completed successfully";
         showSuccessNotification(message, "Success");
       }
 
-      // Call original onSuccess callback
+      // Call custom success handler
       if (onSuccess) {
         onSuccess(data, variables, context);
       }
@@ -106,17 +87,12 @@ export const useVormiaQuerySimple = (options) => {
       }
 
       // Show error notification if enabled
-      const notificationConfig =
-        enableNotifications || globalConfig.enableNotifications;
-      if (notificationConfig?.toast) {
-        const message =
-          error.response?.message ||
-          error.response?.response?.data?.message ||
-          "An error occurred. Please try again.";
+      if (enableNotifications?.toast !== false) {
+        const message = error.response?.message || error.response?.response?.data?.message || "An error occurred. Please try again.";
         showErrorNotification(message, "Error");
       }
 
-      // Call original onError callback
+      // Call custom error handler
       if (onError) {
         onError(error, variables, context);
       }
@@ -124,7 +100,6 @@ export const useVormiaQuerySimple = (options) => {
     ...mutationOptions,
   });
 
-  // Enhanced return object with additional utilities
   return {
     ...mutation,
 
@@ -158,18 +133,14 @@ export const useVormiaQuerySimple = (options) => {
 
     // Show success notification
     showSuccessNotification: (message, title = "Success") => {
-      const notificationConfig =
-        enableNotifications || globalConfig.enableNotifications;
-      if (notificationConfig?.toast) {
+      if (enableNotifications?.toast !== false) {
         showSuccessNotification(message, title);
       }
     },
 
     // Show error notification
     showErrorNotification: (message, title = "Error") => {
-      const notificationConfig =
-        enableNotifications || globalConfig.enableNotifications;
-      if (notificationConfig?.toast) {
+      if (enableNotifications?.toast !== false) {
         showErrorNotification(message, title);
       }
     },

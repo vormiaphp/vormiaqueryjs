@@ -243,6 +243,66 @@ function getDebugFlag() {
 }
 
 /**
+ * Get notification settings from environment variables
+ * @returns {Object} Notification configuration
+ */
+export function getNotificationConfig() {
+  const toastEnabled = getEnvVar("VITE_VORMIA_NOTIFICATION_TOAST", "true") === "true";
+  const panelEnabled = getEnvVar("VITE_VORMIA_NOTIFICATION_PANEL", "true") === "true";
+  const duration = parseInt(getEnvVar("VITE_VORMIA_NOTIFICATION_DURATION", "5000"));
+
+  return {
+    toast: toastEnabled,
+    panel: panelEnabled,
+    duration: duration || 5000
+  };
+}
+
+/**
+ * Get debug settings from environment variables
+ * @returns {Object} Debug configuration
+ */
+export function getDebugConfig() {
+  const debugEnabled = getEnvVar("VITE_VORMIA_DEBUG", "false") === "true";
+  const env = getEnvVar("VITE_VORMIA_ENV", "local");
+  
+  return {
+    enabled: debugEnabled,
+    environment: env,
+    isProduction: env === "production"
+  };
+}
+
+/**
+ * Helper function to get environment variable value
+ * @param {string} key - Environment variable key
+ * @param {string} defaultValue - Default value if not set
+ * @returns {string} Environment variable value
+ */
+function getEnvVar(key, defaultValue = "") {
+  // Vite
+  if (typeof import.meta !== "undefined" && import.meta.env?.[key]) {
+    return import.meta.env[key];
+  }
+  
+  // Next.js - safely check for process
+  try {
+    if (typeof process !== "undefined" && process?.env?.[key]) {
+      return process.env[key];
+    }
+  } catch (e) {
+    // process not available, continue
+  }
+  
+  // Astro
+  if (typeof import.meta !== "undefined" && import.meta.env?.[key]) {
+    return import.meta.env[key];
+  }
+  
+  return defaultValue;
+}
+
+/**
  * Get environment type
  * @returns {string} Environment type (local, production, staging)
  */
