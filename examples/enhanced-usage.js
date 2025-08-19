@@ -45,10 +45,8 @@ function App() {
 # API Configuration
 VITE_VORMIA_API_URL=https://api.example.com
 
-# Notification System (enabled by default)
-VITE_VORMIA_NOTIFICATION_TOAST=true      # Enable toast notifications
-VITE_VORMIA_NOTIFICATION_PANEL=true      # Enable notification panels
-VITE_VORMIA_NOTIFICATION_DURATION=5000   # Toast duration in milliseconds
+# Note: Notification settings are controlled per-query via enableNotifications option
+# No environment variables needed for notifications
 
 # Debug System (disabled by default)
 VITE_VORMIA_DEBUG=false                  # Enable debug panel (true = development, false = production)

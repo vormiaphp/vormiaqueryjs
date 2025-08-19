@@ -255,23 +255,13 @@ function getDebugFlag() {
   return false;
 }
 
-/**
- * Get notification settings from environment variables
- * @returns {Object} Notification configuration
- */
+// Note: Notification settings are controlled per-query via enableNotifications option
+// This function is kept for backward compatibility but not actively used
 export function getNotificationConfig() {
-  const toastEnabled =
-    getEnvVar("VITE_VORMIA_NOTIFICATION_TOAST", "true") === "true";
-  const panelEnabled =
-    getEnvVar("VITE_VORMIA_NOTIFICATION_PANEL", "true") === "true";
-  const duration = parseInt(
-    getEnvVar("VITE_VORMIA_NOTIFICATION_DURATION", "5000")
-  );
-
   return {
-    toast: toastEnabled,
-    panel: panelEnabled,
-    duration: duration || 5000,
+    toast: true,  // Default to enabled, can be overridden per-query
+    panel: true,  // Default to enabled, can be overridden per-query
+    duration: 5000, // Default duration
   };
 }
 
