@@ -212,38 +212,38 @@ export function transformApiResponse(response) {
  * @returns {boolean} Whether debug mode is enabled
  */
 export function getDebugFlag() {
-  // Support Vite environment variables (browser compatible)
-  if (
-    typeof import.meta !== "undefined" &&
-    import.meta.env?.VITE_VORMIA_DEBUG
-  ) {
-    const debugValue = import.meta.env.VITE_VORMIA_DEBUG;
-    console.log("🔍 VormiaQuery Debug: VITE_VORMIA_DEBUG =", debugValue);
-    return debugValue === "true";
-  }
+  try {
+    // Check for Vite environment variables first
+    if (typeof import.meta !== "undefined" && import.meta.env) {
+      // Check both VITE_ and PUBLIC_ prefixed variables
+      const debugValue =
+        import.meta.env.VITE_VORMIA_DEBUG ||
+        import.meta.env.PUBLIC_VORMIA_DEBUG;
 
-  // Support Astro environment variables (browser compatible)
-  if (
-    typeof import.meta !== "undefined" &&
-    import.meta.env?.PUBLIC_VORMIA_DEBUG
-  ) {
-    const debugValue = import.meta.env.PUBLIC_VORMIA_DEBUG;
-    console.log("🔍 VormiaQuery Debug: PUBLIC_VORMIA_DEBUG =", debugValue);
-    return debugValue === "true";
-  }
+      if (debugValue !== undefined) {
+        const isEnabled = String(debugValue).toLowerCase() === "true";
+        console.log(
+          `🔍 VormiaQuery Debug: Debug mode ${
+            isEnabled ? "enabled" : "disabled"
+          } via environment variable`
+        );
+        console.log(`🔍 VormiaQuery Debug: Raw value: "${debugValue}"`);
+        return isEnabled;
+      }
 
-  // Additional debugging information for browser environments
-  console.log("🔍 VormiaQuery Debug: Environment variable detection:");
-  console.log("  - import.meta available:", typeof import.meta !== "undefined");
-  if (typeof import.meta !== "undefined") {
-    console.log(
-      "  - import.meta.env available:",
-      typeof import.meta.env !== "undefined"
-    );
-    if (import.meta.env) {
+      // Debug logging to see what's available
+      console.log("🔍 VormiaQuery Debug: Environment variable detection:");
+      console.log(
+        "  - import.meta.env available:",
+        typeof import.meta.env !== "undefined"
+      );
       console.log(
         "  - VITE_VORMIA_DEBUG value:",
         import.meta.env.VITE_VORMIA_DEBUG
+      );
+      console.log(
+        "  - PUBLIC_VORMIA_DEBUG value:",
+        import.meta.env.PUBLIC_VORMIA_DEBUG
       );
       console.log(
         "  - All VITE_ variables:",
@@ -254,12 +254,29 @@ export function getDebugFlag() {
         Object.keys(import.meta.env).filter((key) => key.startsWith("PUBLIC_"))
       );
     }
-  }
 
-  console.log(
-    "🔍 VormiaQuery Debug: No debug environment variable found, debug disabled"
-  );
-  return false;
+    // Check for global variable (as a fallback)
+    if (
+      typeof window !== "undefined" &&
+      window.__VORMIA_DEBUG__ !== undefined
+    ) {
+      const isEnabled = Boolean(window.__VORMIA_DEBUG__);
+      console.log(
+        `🔍 VormiaQuery Debug: Debug mode ${
+          isEnabled ? "enabled" : "disabled"
+        } via window.__VORMIA_DEBUG__`
+      );
+      return isEnabled;
+    }
+
+    console.log(
+      "🔍 VormiaQuery Debug: Debug mode disabled - no debug environment variable found"
+    );
+    return false;
+  } catch (error) {
+    console.error("🔍 VormiaQuery Debug: Error checking debug flag:", error);
+    return false;
+  }
 }
 
 // Note: Notification settings are controlled per-query via enableNotifications option
