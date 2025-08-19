@@ -1,6 +1,10 @@
 // Main entry point
 export * from "./client/createVormiaClient.js";
+
+// Core hooks
 export { useVrmQuery } from "./hooks/useVrmQuery.js";
+export { useVormiaQuery } from "./hooks/useVormiaQuery.js";
+export { useVormiaQuerySimple } from "./hooks/useVormiaQuerySimple.js";
 export {
   useVormiaQueryAuth,
   useVormiaQueryAuthMutation,
@@ -15,6 +19,12 @@ export { useVormiaConfig } from "./hooks/useVormiaConfig.js";
 
 // Debug & Notification System Components
 export * from "./components/index.js";
+
+// Form Data Transformation Utilities
+export * from "./utils/formDataTransformer.js";
+
+// Enhanced Error Handling
+export * from "./utils/enhancedErrorHandler.js";
 
 // Export types as plain objects for documentation purposes
 export const VormiaError = {};

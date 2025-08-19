@@ -1,5 +1,26 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { getGlobalVormiaClient } from "../client/createVormiaClient";
+import {
+  transformFormData,
+  mergeFormdataConfig,
+} from "../utils/formDataTransformer.js";
+import {
+  handleApiError,
+  handleFieldErrors,
+  handleGeneralError,
+  logErrorForDebug,
+  logSuccessForDebug,
+} from "../utils/enhancedErrorHandler.js";
+import {
+  showSuccessNotification,
+  showErrorNotification,
+  createNotificationHtml,
+} from "../components/NotificationPanel.jsx";
+import {
+  createErrorDebugHtml,
+  shouldShowDebug,
+  createDebugInfo,
+} from "../components/ErrorDebugPanel.jsx";
 
 /**
  * Hook for authenticated queries
@@ -89,6 +110,12 @@ export const useVormiaQueryAuth = (options) => {
  * @param {Function} [options.transform] - Transform function for response data
  * @param {boolean} [options.storeToken=true] - Whether to store the auth token
  * @param {Function} [options.onLoginSuccess] - Callback on successful login
+ * @param {Object} [options.formdata] - Form data transformation configuration
+ * @param {boolean} [options.manualTransformation=false] - Whether to use manual transformation
+ * @param {Object} [options.enableNotifications] - Notification configuration
+ * @param {boolean} [options.showDebug] - Whether to show debug panel
+ * @param {Function} [options.onSuccess] - Success callback
+ * @param {Function} [options.onError] - Error callback
  * @returns {Object} Mutation result and auth utilities
  */
 export const useVormiaQueryAuthMutation = (options) => {
@@ -103,21 +130,44 @@ export const useVormiaQueryAuthMutation = (options) => {
     onLoginSuccess,
     onSuccess,
     onError,
+    formdata,
+    manualTransformation = false,
+    enableNotifications,
+    showDebug,
     ...mutationOptions
   } = options;
+
+  // Get global configuration
+  const globalConfig =
+    typeof window !== "undefined" ? window.__VORMIA_CONFIG__ : {};
+
+  // Determine if debug should be shown
+  const shouldShowDebugPanel =
+    showDebug !== undefined ? showDebug : shouldShowDebug();
 
   const mutation = useMutation({
     mutationFn: async (variables) => {
       try {
+        let requestData = variables;
+
+        // Handle form data transformation unless manual transformation is requested
+        if (!manualTransformation && formdata) {
+          // Merge global and local formdata configurations
+          const mergedFormdata = mergeFormdataConfig(
+            globalConfig.defaultFormdata,
+            formdata
+          );
+          requestData = transformFormData(variables, mergedFormdata);
+        }
+
         const config = {
           method,
           url: endpoint,
-          data: variables,
+          data: requestData,
           headers: {
             "Content-Type": "application/json",
             ...headers,
           },
-  
         };
 
         const response = await client.request(config);
@@ -146,14 +196,54 @@ export const useVormiaQueryAuthMutation = (options) => {
       }
     },
     onSuccess: (data, variables, context) => {
+      // Log success for debugging
+      if (shouldShowDebugPanel) {
+        logSuccessForDebug(data, "Mutation Success");
+      }
+
+      // Show success notification if enabled
+      const notificationConfig =
+        enableNotifications || globalConfig.enableNotifications;
+      if (notificationConfig?.toast || notificationConfig?.panel) {
+        const message =
+          data?.data?.message || "Operation completed successfully";
+        if (notificationConfig.toast) {
+          showSuccessNotification(message, "Success");
+        }
+      }
+
+      // Call original onSuccess callback
       if (onSuccess) {
         onSuccess(data, variables, context);
       }
+
       if (onLoginSuccess && data.data?.token) {
         onLoginSuccess(data);
       }
     },
     onError: (error, variables, context) => {
+      // Get clean error info
+      const errorInfo = handleApiError(error);
+
+      // Log for debugging
+      if (shouldShowDebugPanel) {
+        logErrorForDebug(error, "Mutation Error");
+      }
+
+      // Show error notification if enabled
+      const notificationConfig =
+        enableNotifications || globalConfig.enableNotifications;
+      if (notificationConfig?.toast || notificationConfig?.panel) {
+        const message =
+          error.response?.message ||
+          error.response?.response?.data?.message ||
+          "An error occurred. Please try again.";
+        if (notificationConfig.toast) {
+          showErrorNotification(message, "Error");
+        }
+      }
+
+      // Call original onError callback
       if (onError) {
         onError(error, variables, context);
       }
@@ -174,11 +264,49 @@ export const useVormiaQueryAuthMutation = (options) => {
   // Check if user is authenticated
   const isAuthenticated = !!client.getAuthToken();
 
+  // Enhanced return object with additional utilities
   return {
     ...mutation,
     login,
     logout,
     isAuthenticated,
+
+    // Form data transformation utilities
+    transformFormData: (data) => {
+      if (!manualTransformation && formdata) {
+        const mergedFormdata = mergeFormdataConfig(
+          globalConfig.defaultFormdata,
+          formdata
+        );
+        return transformFormData(data, mergedFormdata);
+      }
+      return data;
+    },
+
+    // Update formdata configuration
+    updateFormdata: (newFormdata) => {
+      if (formdata) {
+        Object.assign(formdata, newFormdata);
+      }
+    },
+
+    // Get notification HTML (framework agnostic)
+    getNotificationHtml: (type, title, message) => {
+      const notification = {
+        type,
+        title,
+        message,
+        key: `${type}-${Date.now()}`,
+      };
+      return createNotificationHtml(notification);
+    },
+
+    // Get debug panel HTML (framework agnostic)
+    getDebugHtml: (response, isSuccess = true) => {
+      if (!shouldShowDebugPanel) return "";
+      const debugInfo = createDebugInfo(response);
+      return createErrorDebugHtml(debugInfo);
+    },
   };
 };
 

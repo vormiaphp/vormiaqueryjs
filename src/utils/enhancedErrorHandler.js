@@ -1,501 +1,272 @@
 /**
  * Enhanced Error Handler for VormiaQueryJS
- * Integrates with ErrorDebugPanel, NotificationPanel, and fieldErrors
- * Framework-agnostic and provides comprehensive error handling
+ * Based on the working implementation from code_usage project
  */
-
-import { createErrorHandler } from "./errorHandler.js";
-import {
-  createErrorDebugPanel,
-  removeErrorDebugPanel,
-} from "../components/ErrorDebugPanel.js";
-import {
-  showNotification,
-  showSuccessNotification,
-  showErrorNotification,
-  showWarningNotification,
-  showInfoNotification,
-} from "../components/NotificationPanel.js";
-import {
-  createFieldErrorManager,
-  processApiFieldErrors,
-} from "./fieldErrors.js";
 
 /**
- * Enhanced error handler that integrates all components
+ * Handle API errors and extract useful information
+ * @param {Object} error - Vormia error object
+ * @returns {Object} Structured error information
  */
-export class EnhancedErrorHandler {
-  constructor(options = {}) {
-    this.options = {
-      debugEnabled: this.isDebugEnabled(),
-      showNotifications: true,
-      showDebugPanel: true,
-      autoHideNotifications: true,
-      notificationTarget: "body",
-      debugTarget: null,
-      ...options,
-    };
+export function handleApiError(error) {
+  // Extract API response data - note: error.response is the actual API response
+  const apiResponse = error.response;
+  const apiMessage =
+    apiResponse?.message ||
+    apiResponse?.response?.data?.message ||
+    error.message;
 
-    this.debugPanel = null;
-    this.fieldErrorManager = createFieldErrorManager();
-    this.notificationHistory = [];
-    this.errorHistory = [];
-  }
+  // Determine error type
+  let errorType = "unknown";
+  if (error.isValidationError?.()) errorType = "Api Response";
+  else if (error.isUnauthenticated?.()) errorType = "unauthenticated";
+  else if (error.isServerError?.()) errorType = "server";
+  else if (error.isNetworkError?.()) errorType = "network";
 
-  /**
-   * Check if debug mode is enabled via environment variable
-   * @returns {boolean} True if debug is enabled
-   */
-  isDebugEnabled() {
-    // Check for Vite environment variable
-    if (typeof import.meta !== "undefined" && import.meta.env) {
-      return import.meta.env.VITE_VORMIA_DEBUG === "true";
-    }
-
-    // Check for Node.js environment variable
-    if (typeof process !== "undefined" && process.env) {
-      return process.env.VITE_VORMIA_DEBUG === "true";
-    }
-
-    // Check for browser environment variable
-    if (typeof window !== "undefined" && window.VITE_VORMIA_DEBUG) {
-      return window.VITE_VORMIA_DEBUG === "true";
-    }
-
-    return false;
-  }
-
-  /**
-   * Handle API success response
-   * @param {Object} response - API response data
-   * @param {Object} options - Additional options
-   */
-  handleSuccess(response, options = {}) {
-    const {
-      showNotification: showNotif = this.options.showNotifications,
-      showDebugPanel: showDebug = this.options.showDebugPanel,
-      notificationMessage = null,
-      debugLabel = "API Success",
-    } = options;
-
-    // Log success for debugging
-    this.logSuccessForDebug(response, debugLabel);
-
-    // Show success notification
-    if (showNotif) {
-      const message =
-        notificationMessage ||
-        response?.data?.message ||
-        "Operation completed successfully.";
-
-      showSuccessNotification(
-        message,
-        "Success!",
-        this.options.notificationTarget,
-        this.options.autoHideNotifications ? 3000 : 0
-      );
-    }
-
-    // Show debug panel if enabled
-    if (showDebug && this.options.debugEnabled) {
-      this.showDebugPanel({
-        status: 200,
-        message: "Operation successful",
-        response: {
-          response: {
-            data: {
-              success: true,
-              message:
-                response?.data?.message || "Operation completed successfully",
-              data: response?.data,
-              debug: response?.debug,
-            },
-          },
-          debug: response?.debug,
-        },
-        errorType: "success",
-        timestamp: new Date().toISOString(),
-      });
-    }
-
-    // Clear any existing errors
-    this.fieldErrorManager.clearAllFieldErrors();
-    this.removeDebugPanel();
-
-    return response;
-  }
-
-  /**
-   * Handle API error response
-   * @param {Object} error - VormiaQueryJS error object
-   * @param {Object} options - Additional options
-   */
-  handleError(error, options = {}) {
-    const {
-      showNotification: showNotif = this.options.showNotifications,
-      showDebugPanel: showDebug = this.options.showDebugPanel,
-      handleFieldErrors = true,
-      fieldMapping = {},
-      customErrorHandler = null,
-    } = options;
-
-    // Get clean error info
-    const errorInfo = this.createErrorInfo(error);
-    this.errorHistory.push(errorInfo);
-
-    // Log for debugging
-    this.logErrorForDebug(error, "API Error");
-
-    // Show debug panel if enabled
-    if (showDebug && this.options.debugEnabled) {
-      this.showDebugPanel(errorInfo);
-    }
-
-    // Handle field errors if requested
-    if (handleFieldErrors) {
-      this.handleFieldErrors(error, fieldMapping);
-    }
-
-    // Show error notification
-    if (showNotif) {
-      const message =
-        errorInfo.message || "An error occurred. Please try again.";
-      const title = this.getErrorTitle(error);
-
-      showErrorNotification(
-        message,
-        title,
-        this.options.notificationTarget,
-        0 // Don't auto-hide error notifications
-      );
-    }
-
-    // Call custom error handler if provided
-    if (customErrorHandler && typeof customErrorHandler === "function") {
-      customErrorHandler(error, errorInfo);
-    }
-
-    return errorInfo;
-  }
-
-  /**
-   * Create standardized error info object
-   * @param {Object} error - VormiaQueryJS error object
-   * @returns {Object} Standardized error info
-   */
-  createErrorInfo(error) {
-    const apiResponse = error.response;
-    const apiMessage =
-      apiResponse?.message ||
-      apiResponse?.response?.data?.message ||
-      error.message;
-
-    // Determine error type
-    let errorType = "unknown";
-    if (error.isValidationError && error.isValidationError())
-      errorType = "validation";
-    else if (error.isUnauthenticated && error.isUnauthenticated())
-      errorType = "unauthenticated";
-    else if (error.isServerError && error.isServerError()) errorType = "server";
-    else if (error.isNetworkError && error.isNetworkError())
-      errorType = "network";
-    else if (error.isNotFound && error.isNotFound()) errorType = "not_found";
-    else if (error.isDatabaseError && error.isDatabaseError())
-      errorType = "database";
-
-    return {
-      status: error.status || 0,
-      message: error.message || "Unknown error",
-      response: apiResponse || {},
-      errorType,
-      timestamp: new Date().toISOString(),
-      originalError: error,
-    };
-  }
-
-  /**
-   * Get appropriate error title based on error type
-   * @param {Object} error - VormiaQueryJS error object
-   * @returns {string} Error title
-   */
-  getErrorTitle(error) {
-    if (error.isUnauthenticated && error.isUnauthenticated())
-      return "Authentication Error";
-    if (error.isServerError && error.isServerError()) return "Server Error";
-    if (error.isNetworkError && error.isNetworkError()) return "Network Error";
-    if (error.isValidationError && error.isValidationError())
-      return "Validation Error";
-    if (error.isNotFound && error.isNotFound()) return "Not Found";
-    if (error.isDatabaseError && error.isDatabaseError())
-      return "Database Error";
-    return "Error";
-  }
-
-  /**
-   * Handle field-level errors
-   * @param {Object} error - VormiaQueryJS error object
-   * @param {Object} fieldMapping - Mapping of API field names to form field names
-   */
-  handleFieldErrors(error, fieldMapping = {}) {
-    const fieldErrors = processApiFieldErrors(error, fieldMapping);
-
-    if (Object.keys(fieldErrors).length > 0) {
-      this.fieldErrorManager.setFieldErrors(fieldErrors);
-
-      // Show field error notification
-      if (this.options.showNotifications) {
-        const message =
-          error.response?.message ||
-          error.response?.response?.data?.message ||
-          "Please check the form fields below.";
-
-        showWarningNotification(
-          message,
-          "Field Errors",
-          this.options.notificationTarget,
-          5000
-        );
-      }
-    }
-  }
-
-  /**
-   * Show debug panel
-   * @param {Object} debugInfo - Debug information
-   */
-  showDebugPanel(debugInfo) {
-    if (!this.options.debugEnabled) return;
-
-    // Remove existing debug panel
-    this.removeDebugPanel();
-
-    // Create new debug panel
-    this.debugPanel = createErrorDebugPanel({
-      debugInfo,
-      showDebug: true,
-      onClose: () => this.removeDebugPanel(),
-      targetSelector: this.options.debugTarget,
-    });
-  }
-
-  /**
-   * Remove debug panel
-   */
-  removeDebugPanel() {
-    if (this.debugPanel) {
-      removeErrorDebugPanel(this.debugPanel);
-      this.debugPanel = null;
-    }
-  }
-
-  /**
-   * Log error for debugging
-   * @param {Object} error - VormiaQueryJS error object
-   * @param {string} label - Label for the log
-   */
-  logErrorForDebug(error, label = "API Error") {
-    if (!this.options.debugEnabled) return;
-
-    const apiResponse = error.response;
-    const apiMessage =
-      apiResponse?.message ||
-      apiResponse?.response?.data?.message ||
-      error.message;
-
-    console.group(`🚨 ${label}`);
-    console.log("Status:", error.status);
-    console.log("Message:", error.message);
-
-    // Format output to match API JSON structure
-    if (apiResponse?.response?.data) {
-      const apiData = apiResponse.response.data;
-      console.log("Success:", apiData.success);
-      if (apiData.errors) {
-        console.log("Errors:", apiData.errors);
-      }
-      if (apiData.data) {
-        console.log("Data:", apiData.data);
-      }
-      if (apiData.debug) {
-        console.log("Debug:", apiData.debug);
-      }
-    }
-
-    // Full API Response dump
-    console.log("Full API Response:", apiResponse);
-    console.groupEnd();
-  }
-
-  /**
-   * Log success for debugging
-   * @param {Object} response - API response
-   * @param {string} label - Label for the log
-   */
-  logSuccessForDebug(response, label = "API Success") {
-    if (!this.options.debugEnabled) return;
-
-    console.group(`✅ ${label}`);
-
-    // Format output to match API JSON structure
-    if (response?.data) {
-      const apiData = response.data;
-      console.log("Success:", apiData.success);
-      console.log("Message:", apiData.message);
-      if (apiData.data) {
-        console.log("Data:", apiData.data);
-      }
-      if (apiData.debug) {
-        console.log("Debug:", apiData.debug);
-      }
-    }
-
-    // Full API Response dump
-    console.log("Full API Response:", response);
-    console.groupEnd();
-  }
-
-  /**
-   * Get field error manager
-   * @returns {FieldErrorManager} Field error manager instance
-   */
-  getFieldErrorManager() {
-    return this.fieldErrorManager;
-  }
-
-  /**
-   * Get error history
-   * @returns {Array} Array of error history entries
-   */
-  getErrorHistory() {
-    return [...this.errorHistory];
-  }
-
-  /**
-   * Get notification history
-   * @returns {Array} Array of notification history entries
-   */
-  getNotificationHistory() {
-    return [...this.notificationHistory];
-  }
-
-  /**
-   * Clear error history
-   */
-  clearErrorHistory() {
-    this.errorHistory = [];
-  }
-
-  /**
-   * Clear notification history
-   */
-  clearNotificationHistory() {
-    this.notificationHistory = [];
-  }
-
-  /**
-   * Update configuration options
-   * @param {Object} newOptions - New options to merge
-   */
-  updateOptions(newOptions) {
-    this.options = { ...this.options, ...newOptions };
-  }
-
-  /**
-   * Reset handler state
-   */
-  reset() {
-    this.removeDebugPanel();
-    this.fieldErrorManager.clearAllFieldErrors();
-    this.clearErrorHistory();
-    this.clearNotificationHistory();
-  }
+  return {
+    status: error.status || 0,
+    message: error.message || "Unknown error",
+    response: apiResponse || {},
+    errorType,
+    timestamp: new Date().toISOString(),
+  };
 }
 
 /**
- * Create an enhanced error handler instance
- * @param {Object} options - Configuration options
- * @returns {EnhancedErrorHandler} Enhanced error handler instance
+ * Handle field-specific errors from API response
+ * @param {Object} error - Vormia error object
+ * @param {Function} setFieldErrors - Function to set field errors
+ * @param {Object} fieldMappings - Custom field name mappings
  */
-export function createEnhancedErrorHandler(options = {}) {
-  return new EnhancedErrorHandler(options);
+export function handleFieldErrors(error, setFieldErrors, fieldMappings = {}) {
+  // Extract field errors from API response
+  const apiResponse = error.response;
+  // Check both direct access and nested access for field errors
+  const fieldErrors =
+    apiResponse?.errors || apiResponse?.response?.data?.errors || {};
+  const apiMessage =
+    apiResponse?.message ||
+    apiResponse?.response?.data?.message ||
+    "Please check the form fields below.";
+
+  // Map field errors to form fields - combine all error messages
+  const newFieldErrors = {};
+  Object.keys(fieldErrors).forEach((field) => {
+    // Use custom field mapping if available
+    const mappedField = fieldMappings[field] || field;
+
+    if (mappedField === "password_confirmation") {
+      // Join all error messages for password_confirmation field
+      newFieldErrors.confirmPassword = fieldErrors[field].join("; ");
+    } else {
+      // Join all error messages for other fields
+      newFieldErrors[mappedField] = fieldErrors[field].join("; ");
+    }
+  });
+
+  setFieldErrors(newFieldErrors);
+
+  return {
+    fieldErrors: newFieldErrors,
+    message: apiMessage,
+  };
 }
 
 /**
- * Utility functions for common error handling patterns
+ * Handle general (non-field-specific) errors
+ * @param {Object} error - Vormia error object
+ * @param {Function} setGeneralError - Function to set general error
  */
-export const errorHandlerUtils = {
-  /**
-   * Create a simple error handler for basic use cases
-   * @param {Object} options - Handler options
-   * @returns {Object} Simple error handler object
-   */
-  createSimple: (options = {}) => {
-    const handler = createEnhancedErrorHandler({
-      showDebugPanel: false,
-      ...options,
-    });
+export function handleGeneralError(error, setGeneralError) {
+  const apiResponse = error.response;
+  const apiMessage =
+    apiResponse?.message ||
+    apiResponse?.response?.data?.message ||
+    "An error occurred. Please try again.";
 
-    return {
-      handleSuccess: (response, opts) => handler.handleSuccess(response, opts),
-      handleError: (error, opts) => handler.handleError(error, opts),
-      getFieldErrors: () => handler.getFieldErrorManager().getAllFieldErrors(),
-      clearErrors: () => handler.getFieldErrorManager().clearAllFieldErrors(),
-      reset: () => handler.reset(),
-    };
-  },
+  setGeneralError(apiMessage);
 
-  /**
-   * Create a form-focused error handler
-   * @param {Object} options - Handler options
-   * @returns {Object} Form error handler object
-   */
-  createFormHandler: (options = {}) => {
-    const handler = createEnhancedErrorHandler({
-      showDebugPanel: false,
-      handleFieldErrors: true,
-      ...options,
-    });
-
-    return {
-      handleSuccess: (response, opts) => handler.handleSuccess(response, opts),
-      handleError: (error, opts) => handler.handleError(error, opts),
-      fieldErrorManager: handler.getFieldErrorManager(),
-      getFieldErrors: () => handler.getFieldErrorManager().getAllFieldErrors(),
-      clearFieldErrors: () =>
-        handler.getFieldErrorManager().clearAllFieldErrors(),
-      validateField: (fieldName, value, validator) =>
-        handler
-          .getFieldErrorManager()
-          .validateField(fieldName, value, validator),
-      reset: () => handler.reset(),
-    };
-  },
-
-  /**
-   * Create a debug-focused error handler
-   * @param {Object} options - Handler options
-   * @returns {Object} Debug error handler object
-   */
-  createDebugHandler: (options = {}) => {
-    const handler = createEnhancedErrorHandler({
-      showDebugPanel: true,
-      showNotifications: false,
-      ...options,
-    });
-
-    return {
-      handleSuccess: (response, opts) => handler.handleSuccess(response, opts),
-      handleError: (error, opts) => handler.handleError(error, opts),
-      showDebugPanel: (debugInfo) => handler.showDebugPanel(debugInfo),
-      removeDebugPanel: () => handler.removeDebugPanel(),
-      getErrorHistory: () => handler.getErrorHistory(),
-      clearHistory: () => handler.clearErrorHistory(),
-      reset: () => handler.reset(),
-    };
-  },
-};
+  return {
+    message: apiMessage,
+    errorType: error.isUnauthenticated?.()
+      ? "Authentication Error"
+      : error.isServerError?.()
+      ? "Server Error"
+      : error.isNetworkError?.()
+      ? "Network Error"
+      : "Error",
+  };
+}
 
 /**
- * Default export for easy importing
+ * Log errors for debugging when debug mode is enabled
+ * @param {Object} error - Vormia error object
+ * @param {string} label - Label for the error log
  */
-export default createEnhancedErrorHandler;
+export function logErrorForDebug(error, label = "API Error") {
+  // Check if debug is enabled via environment variable
+  const isDebugEnabled = getDebugFlag();
+
+  if (!isDebugEnabled) {
+    return; // Exit early if debug is disabled
+  }
+
+  const apiResponse = error.response;
+  const apiMessage =
+    apiResponse?.message ||
+    apiResponse?.response?.data?.message ||
+    error.message;
+
+  console.group(`🚨 ${label}`);
+  console.log("Status:", error.status);
+  console.log("Message:", error.message);
+
+  // Format output to match API JSON structure
+  if (apiResponse?.response?.data) {
+    const apiData = apiResponse.response.data;
+    console.log("Success:", apiData.success);
+    if (apiData.errors) {
+      console.log("Errors:", apiData.errors);
+    }
+    if (apiData.data) {
+      console.log("Data:", apiData.data);
+    }
+    if (apiData.debug) {
+      console.log("Debug:", apiData.debug);
+    }
+  }
+
+  // Full API Response dump
+  console.log("Full API Response:", apiResponse);
+  console.groupEnd();
+}
+
+/**
+ * Log success responses for debugging when debug mode is enabled
+ * @param {Object} response - API response
+ * @param {string} label - Label for the success log
+ */
+export function logSuccessForDebug(response, label = "API Success") {
+  // Check if debug is enabled via environment variable
+  const isDebugEnabled = getDebugFlag();
+
+  if (!isDebugEnabled) {
+    return; // Exit early if debug is disabled
+  }
+
+  console.group(`✅ ${label}`);
+
+  // Format output to match API JSON structure
+  if (response?.data) {
+    const apiData = response.data;
+    console.log("Success:", apiData.success);
+    console.log("Message:", apiData.message);
+    if (apiData.data) {
+      console.log("Data:", apiData.data);
+    }
+    if (apiData.debug) {
+      console.log("Debug:", apiData.debug);
+    }
+  }
+
+  // Full API Response dump
+  console.log("Full API Response:", response);
+  console.groupEnd();
+}
+
+/**
+ * Transform API response data based on success/failure
+ * @param {Object} response - The API response
+ * @returns {Object} Transformed data with proper structure
+ */
+export function transformApiResponse(response) {
+  if (!response) return null;
+
+  // Handle success response
+  if (response.data?.success) {
+    return {
+      success: true,
+      message: response.data.message,
+      data: response.data.data,
+      debug: response.data.debug,
+    };
+  }
+
+  // Handle error response
+  if (response.data?.success === false) {
+    return {
+      success: false,
+      message: response.data.message,
+      errors: response.data.errors,
+      debug: response.data.debug,
+    };
+  }
+
+  // Fallback
+  return response;
+}
+
+/**
+ * Get debug flag from environment variables
+ * @returns {boolean} Whether debug mode is enabled
+ */
+function getDebugFlag() {
+  // Support multiple environment variable names for different frameworks
+  if (
+    typeof import.meta !== "undefined" &&
+    import.meta.env?.VITE_VORMIA_DEBUG
+  ) {
+    return import.meta.env.VITE_VORMIA_DEBUG === "true";
+  }
+
+  // Next.js - safely check for process
+  try {
+    if (
+      typeof process !== "undefined" &&
+      process?.env?.NEXT_PUBLIC_VORMIA_DEBUG
+    ) {
+      return process.env.NEXT_PUBLIC_VORMIA_DEBUG === "true";
+    }
+  } catch (e) {
+    // process not available, continue
+  }
+
+  // Astro
+  if (
+    typeof import.meta !== "undefined" &&
+    import.meta.env?.PUBLIC_VORMIA_DEBUG
+  ) {
+    return import.meta.env.PUBLIC_VORMIA_DEBUG === "true";
+  }
+
+  return false;
+}
+
+/**
+ * Get environment type
+ * @returns {string} Environment type (local, production, staging)
+ */
+export function getEnvironment() {
+  if (typeof import.meta !== "undefined" && import.meta.env?.VITE_VORMIA_ENV) {
+    return import.meta.env.VITE_VORMIA_ENV;
+  }
+
+  // Safely check for process
+  try {
+    if (typeof process !== "undefined" && process?.env?.NODE_ENV) {
+      return process.env.NODE_ENV;
+    }
+  } catch (e) {
+    // process not available, continue
+  }
+
+  return "local";
+}
+
+/**
+ * Check if current environment is production
+ * @returns {boolean} Whether current environment is production
+ */
+export function isProduction() {
+  return getEnvironment() === "production";
+}

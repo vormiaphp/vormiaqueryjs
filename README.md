@@ -1,4 +1,4 @@
-# VormiaQuery
+# VormiaQueryJS
 
 A universal query and mutation library for seamless data fetching and state management, designed for use with React, Vue, Svelte, Solid, Qwik, and Astro. Built for modern JavaScript projects and Laravel/VormiaPHP backends.
 
@@ -34,26 +34,6 @@ yarn add vormiaqueryjs
 
 > **🌐 Browser Compatibility**: VormiaQueryJS is designed for **browser environments** and uses ESM modules for optimal compatibility with modern bundlers like Vite, Webpack, and Rollup. It does not support Node.js environments.
 
-### **yarn**
-
-```bash
-yarn add vormiaqueryjs
-```
-
-### **pnpm**
-
-```bash
-pnpm add vormiaqueryjs
-```
-
-### **deno** (experimental, not fully supported)
-
-```ts
-import vormiaqueryjs from "npm:vormiaqueryjs";
-```
-
-> ⚠️ VormiaQueryJS is not fully Deno-compatible due to Node.js built-ins. Use with caution.
-
 ---
 
 ## 🚨 Required Peer Dependencies
@@ -82,37 +62,32 @@ After installing `vormiaqueryjs`, you must also install the correct peer depende
 - Common dependency for all frameworks:
   - `npm install axios`
 
-> **Note:** VormiaQuery no longer prompts you to install peer dependencies after installation. Please refer to the instructions above and install the required dependencies for your framework manually. This change improves compatibility with bun, pnpm, and other package managers.
-
 ---
 
-## 🌟 Features
+## 🌟 Enhanced Features
 
 - 🚀 **Easy to use**: Simple API for GET, POST, PUT, DELETE operations
 - 🔒 **Built-in Authentication**: Token-based auth with automatic handling
 - ⚡ **Framework Agnostic**: Works with React, Vue, Svelte, Solid, Qwik, **Astro**
-- 🛡️ **Error Handling**: Comprehensive error handling with custom error types
+- 🛡️ **Enhanced Error Handling**: Comprehensive error handling with smart response parsing
 - 🧪 **Tested with Vitest**: Modern, fast JavaScript testing
 - 🟩 **Pure JavaScript**: No TypeScript required
 - 🔥 **Astro Support**: VormiaQueryJS now works in Astro via `src/adapters/astro/useVormia.js`
-- 🔥 **Auth Hook Renaming**: `useVrmAuth` → `useVormiaQueryAuth`, etc. Update your imports and usage accordingly
 
-### 🆕 **Debug & Notification System**
+### 🆕 **New Enhanced Features**
 
-VormiaQueryJS now includes a comprehensive debugging and notification system:
-
-- **🔍 ErrorDebugPanel**: Technical debug information for developers
-- **🔔 NotificationPanel**: User-friendly success, error, warning, and info notifications
-- **📝 FieldErrors**: Comprehensive field-level validation error handling
-- **⚙️ EnhancedErrorHandler**: Unified error handling that integrates all components
-- **🌍 Framework-Agnostic**: Works with any framework or vanilla JavaScript
-- **🔧 Environment-Based**: Debug mode controlled by `VITE_VORMIA_DEBUG` environment variable
+- **🔄 Automatic Form Data Transformation**: Automatically rename, add, and remove fields before sending to API
+- **🔔 Dual Notification System**: Toast notifications + custom notification panels
+- **🐛 Smart Debug Panel**: Environment-aware debug information display
+- **🎯 Multiple Query Types**: Basic, authenticated, and simple test queries
+- **🌍 Cross-Framework Support**: React components + HTML strings for any framework
+- **⚙️ Smart Configuration**: Global defaults with per-query overrides
 
 ---
 
 ## 🚀 Quick Start with VormiaProvider
 
-The easiest way to get started with VormiaQueryJS is using the `VormiaProvider` component. This automatically handles client initialization and configuration with built-in loading states and error handling:
+The easiest way to get started with VormiaQueryJS is using the `VormiaProvider` component. This automatically handles client initialization and configuration with all the new enhanced features:
 
 ```jsx
 import React from "react";
@@ -120,7 +95,38 @@ import { VormiaProvider } from "vormiaqueryjs";
 
 function App() {
   return (
-    <VormiaProvider config={{ baseURL: "https://api.example.com" }}>
+    <VormiaProvider
+      config={{
+        baseURL: "https://api.example.com",
+
+        // Default form data transformation
+        defaultFormdata: {
+          rename: {
+            confirmPassword: "password_confirmation",
+            user_name: "name",
+          },
+          add: {
+            terms: true,
+            source: "web",
+          },
+          remove: ["confirmPassword", "tempField"],
+        },
+
+        // Notification system configuration
+        enableNotifications: {
+          toast: true, // Enable toast notifications
+          panel: true, // Enable notification panel
+        },
+
+        // Debug panel configuration
+        enableDebugPanel: true,
+        debugEnvVar: "VITE_VORMIA_DEBUG",
+
+        // Other options
+        notificationDuration: 5000,
+        timeout: 30000,
+      }}
+    >
       <YourApp />
     </VormiaProvider>
   );
@@ -132,695 +138,795 @@ function App() {
 The `VormiaProvider` accepts these configuration options:
 
 - **`baseURL`** (required): Your API base URL
+- **`defaultFormdata`** (optional): Default form data transformation configuration
+- **`enableNotifications`** (optional): Notification system configuration
+- **`enableDebugPanel`** (optional): Whether to enable debug panel
+- **`debugEnvVar`** (optional): Environment variable name for debug mode
+- **`notificationDuration`** (optional): Default notification duration in milliseconds
 - **`timeout`** (optional): Request timeout in milliseconds
 - **`withCredentials`** (optional): Whether to include credentials
 - **`authTokenKey`** (optional): Key for storing auth token
 
-### Initialization Behavior
+---
 
-The `VormiaProvider` includes intelligent initialization handling:
+## 🔄 Form Data Transformation
 
-- **Loading State**: Shows "Initializing VormiaQuery..." while setting up the client
-- **Error Handling**: Displays clear error messages if initialization fails
-- **Safety**: Children only render after successful client initialization
-- **Direct Navigation**: Handles direct route access without "client not initialized" errors
+### Automatic Transformation (Default)
 
-### Alternative Setup Methods
+VormiaQueryJS automatically transforms your form data before sending it to the API:
 
-If you prefer manual setup or need more control, you can also:
+```jsx
+import { useVormiaQueryAuthMutation } from "vormiaqueryjs";
 
-1. **Manual Initialization**: Use `createVormiaClient()` and `setGlobalVormiaClient()` directly
-2. **Configuration Hook**: Use `useVormiaConfig()` hook for dynamic configuration
-3. **Auto-Initialization**: Let hooks auto-initialize with default values
+function RegistrationForm() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  // AUTOMATIC FORM DATA TRANSFORMATION
+  const mutation = useVormiaQueryAuthMutation({
+    endpoint: "/register",
+    formdata: {
+      // Rename fields
+      rename: {
+        confirmPassword: "password_confirmation",
+        user_name: "name",
+      },
+
+      // Add fields
+      add: {
+        terms: true,
+        source: "registration_form",
+      },
+
+      // Remove fields
+      remove: ["confirmPassword", "tempField"],
+    },
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Just pass formData - package handles transformation automatically!
+    mutation.mutate(formData);
+
+    // The package automatically transforms:
+    // { name, email, password, confirmPassword }
+    // To: { name, email, password, password_confirmation, terms: true, source: "registration_form" }
+    // And removes: confirmPassword, tempField
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        name="name"
+        value={formData.name}
+        onChange={(e) =>
+          setFormData((prev) => ({ ...prev, name: e.target.value }))
+        }
+        placeholder="Full Name"
+      />
+
+      <input
+        name="email"
+        type="email"
+        value={formData.email}
+        onChange={(e) =>
+          setFormData((prev) => ({ ...prev, email: e.target.value }))
+        }
+        placeholder="Email"
+      />
+
+      <input
+        name="password"
+        type="password"
+        value={formData.password}
+        onChange={(e) =>
+          setFormData((prev) => ({ ...prev, password: e.target.value }))
+        }
+        placeholder="Password"
+      />
+
+      <input
+        name="confirmPassword"
+        type="password"
+        value={formData.confirmPassword}
+        onChange={(e) =>
+          setFormData((prev) => ({ ...prev, confirmPassword: e.target.value }))
+        }
+        placeholder="Confirm Password"
+      />
+
+      <button type="submit" disabled={mutation.isPending}>
+        {mutation.isPending ? "Creating Account..." : "Create Account"}
+      </button>
+    </form>
+  );
+}
+```
+
+### Manual Transformation Override
+
+If you prefer to handle transformation manually (your current way):
+
+```jsx
+const mutation = useVormiaQueryAuthMutation({
+  endpoint: "/register",
+  manualTransformation: true, // Disable automatic transformation
+});
+
+const handleSubmit = (e) => {
+  e.preventDefault();
+
+  // Manual transformation (your current way)
+  const registrationData = {
+    ...formData,
+    password_confirmation: formData.confirmPassword,
+    confirmPassword: undefined,
+    terms: true,
+  };
+
+  mutation.mutate(registrationData);
+};
+```
+
+### Global vs Per-Query Configuration
+
+```jsx
+// Global configuration in VormiaProvider
+<VormiaProvider config={{
+  defaultFormdata: {
+    rename: { confirmPassword: "password_confirmation" },
+    add: { terms: true },
+    remove: ["confirmPassword"]
+  }
+}}>
+
+// Per-query override (completely replaces global)
+const mutation = useVormiaQueryAuthMutation({
+  endpoint: "/register",
+  formdata: {
+    rename: { email: "email_address" },
+    add: { source: "mobile" }
+  }
+});
+
+// Per-query merge (combines with global)
+const mutation2 = useVormiaQueryAuthMutation({
+  endpoint: "/profile",
+  formdata: {
+    mergeWithGlobal: true,  // This merges with global mappings
+    add: { updated: true }  // Additional fields
+  }
+});
+```
 
 ---
 
-### Package Structure
+## 🔔 Notification System
 
-VormiaQueryJS is organized for optimal browser compatibility:
-
-```
-vormiaqueryjs/
-├── dist/esm/                    # ESM build (recommended for Vite/React)
-│   ├── index.mjs               # Main exports
-│   ├── adapters/               # Framework-specific adapters
-│   │   ├── react/             # React-specific components
-│   │   │   ├── VormiaProvider.mjs
-│   │   │   └── useVormiaQuery.mjs
-│   │   ├── vue/               # Vue adapters
-│   │   ├── svelte/            # Svelte adapters
-│   │   └── ...
-│   ├── hooks/                  # React hooks
-│   │   ├── useVormiaConfig.mjs
-│   │   ├── useVrmAuth.mjs
-│   │   └── ...
-│   └── client/                 # Core client functionality
-└── package.json                 # ESM-only configuration
-```
-
-**Note**: This package is designed for **browser environments** and uses ESM modules for optimal compatibility with modern bundlers like Vite.
-
-## Usage Examples
-
-## 🔧 How It Works
-
-VormiaQueryJS provides a simple, provider-based approach to API management:
-
-### 1. **Provider Setup** (Recommended)
+### Toast Notifications
 
 ```jsx
-<VormiaProvider config={{ baseURL: "https://api.example.com" }}>
-  <YourApp />
-</VormiaProvider>
-```
-
-### 2. **Hook Usage**
-
-Once the provider is set up, use hooks anywhere in your component tree:
-
-```jsx
-const { mutate: registerUser, isPending } = useVormiaQueryAuthMutation({
-  endpoint: "/auth/register",
-  onSuccess: (data) => console.log("Success:", data),
-  onError: (error) => console.error("Error:", error),
+const query = useVormiaQuery({
+  endpoint: "/users",
+  enableNotifications: { toast: true, panel: false },
 });
 
-// Use the mutation
-registerUser({ name: "John", email: "john@example.com" });
+// Notifications are automatically shown on success/error
+// Or manually trigger:
+query.showSuccessNotification("Data loaded!", "Success");
+query.showErrorNotification("Failed to load data", "Error");
 ```
 
-### 3. **Automatic Client Management**
+### Custom Notification Panels
 
-- **Global Client**: Automatically initialized and managed by VormiaProvider
-- **Loading States**: Built-in loading indicators during initialization
-- **Configuration**: Centralized in one place
-- **Error Handling**: Built-in error handling and retry logic
-- **Type Safety**: Full TypeScript support (when using TypeScript)
+```jsx
+import { NotificationPanel } from "vormiaqueryjs";
 
-## 📦 Available Exports
+function MyComponent() {
+  const [notification, setNotification] = useState(null);
 
-### **Core Components**
+  return (
+    <div>
+      {notification && (
+        <NotificationPanel
+          notification={notification}
+          onClose={() => setNotification(null)}
+        />
+      )}
+    </div>
+  );
+}
+```
 
-- **`VormiaProvider`** - React provider for easy setup and configuration
-- **`useVormiaConfig`** - Hook for dynamic configuration management
+### Framework-Agnostic HTML
 
-### **Query Hooks**
+```jsx
+// Get HTML strings for other frameworks
+const notificationHtml = query.getNotificationHtml('success', 'Success', 'Data loaded!');
 
-- **`useVrmQuery`** - General purpose query hook for data fetching
-- **`useVormiaQueryAuth`** - Authentication query hook
-- **`useVormiaQueryAuthMutation`** - Authentication mutation hook (login, register, etc.)
-- **`useVrmMutation`** - General purpose mutation hook
+// Vue
+<div v-html="notificationHtml"></div>
 
-### **Client Management**
+// Svelte
+{@html notificationHtml}
 
-- **`createVormiaClient`** - Create a new VormiaClient instance
-- **`setGlobalVormiaClient`** - Set the global client instance
-- **`getGlobalVormiaClient`** - Get the current global client instance
+// Vanilla JS
+document.getElementById('notifications').innerHTML = notificationHtml;
 
-### **Utilities**
+// Angular
+<div [innerHTML]="notificationHtml"></div>
 
-- **`HttpMethod`** - Enum of HTTP methods (GET, POST, PUT, DELETE, etc.)
-- **`VormiaError`** - Error handling utilities
+// SolidJS
+<div innerHTML={notificationHtml}></div>
+```
+
+---
+
+## 🐛 Debug Panel System
+
+### Automatic Visibility
+
+The debug panel automatically:
+
+- Shows when `VITE_VORMIA_DEBUG=true`
+- Hides when `VITE_VORMIA_DEBUG=false`
+- Hides in production builds
+- Respects environment variable settings
+
+### React Component
+
+```jsx
+import { ErrorDebugPanel } from "vormiaqueryjs";
+
+function MyComponent() {
+  const [debugInfo, setDebugInfo] = useState(null);
+
+  return (
+    <div>
+      <ErrorDebugPanel
+        debugInfo={debugInfo}
+        showDebug={true}
+        onClose={() => setDebugInfo(null)}
+      />
+    </div>
+  );
+}
+```
+
+### Framework-Agnostic HTML
+
+```jsx
+// Get debug panel HTML for other frameworks
+const debugHtml = query.getDebugHtml(response, true);
+
+// Use in any framework
+document.getElementById("debug").innerHTML = debugHtml;
+```
+
+### Environment Configuration
+
+```bash
+# .env
+VITE_VORMIA_DEBUG=true          # Show debug panel
+VITE_VORMIA_DEBUG=false         # Hide debug panel
+VITE_VORMIA_ENV=local          # Environment type
+VITE_VORMIA_ENV=production     # Production environment
+```
+
+---
+
+## 🎯 Query Types
+
+### 1. Basic Query (No Auth)
+
+```jsx
+import { useVormiaQuery } from "vormiaqueryjs";
+
+function PublicDataComponent() {
+  const query = useVormiaQuery({
+    endpoint: "/public/data",
+    method: "GET",
+
+    // Override global notification settings
+    enableNotifications: { toast: true, panel: false },
+
+    // Override global debug settings
+    showDebug: true,
+
+    // Cache configuration
+    retry: 3,
+    cacheTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
+  // Use enhanced utilities
+  const handleSuccess = () => {
+    // Show custom notification
+    query.showSuccessNotification("Data loaded successfully!", "Success");
+
+    // Get notification HTML for other frameworks
+    const notificationHtml = query.getNotificationHtml(
+      "success",
+      "Success",
+      "Data loaded!"
+    );
+
+    // Get debug panel HTML
+    const debugHtml = query.getDebugHtml(query.data);
+
+    // Log for debugging
+    query.logForDebug(query.data, "Public Data Loaded");
+  };
+
+  return (
+    <div>
+      {query.isLoading && <p>Loading...</p>}
+      {query.error && <p>Error: {query.error.message}</p>}
+      {query.data && (
+        <div>
+          <h3>Public Data</h3>
+          <pre>{JSON.stringify(query.data, null, 2)}</pre>
+          <button onClick={handleSuccess}>Show Notifications</button>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+### 2. Authenticated Query
+
+```jsx
+import { useVormiaQueryAuth } from "vormiaqueryjs";
+
+function UserProfileComponent() {
+  const query = useVormiaQueryAuth({
+    endpoint: "/user/profile",
+    method: "GET",
+
+    // Override global settings
+    enableNotifications: { toast: false, panel: true },
+    showDebug: false,
+  });
+
+  return (
+    <div>
+      {query.isLoading && <p>Loading profile...</p>}
+      {query.error && <p>Error: {query.error.message}</p>}
+      {query.data && (
+        <div>
+          <h3>User Profile</h3>
+          <pre>{JSON.stringify(query.data, null, 2)}</pre>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+### 3. Authenticated Mutation
+
+```jsx
+import { useVormiaQueryAuthMutation } from "vormiaqueryjs";
+
+function RegistrationForm() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [generalError, setGeneralError] = useState("");
+
+  const mutation = useVormiaQueryAuthMutation({
+    endpoint: "/register",
+    method: "POST",
+
+    // Automatic form data transformation
+    formdata: {
+      confirmPassword: "password_confirmation",
+      add: { terms: true },
+      remove: ["confirmPassword"],
+    },
+
+    // Override global settings
+    enableNotifications: { toast: true, panel: true },
+    showDebug: true,
+
+    // Custom success/error handlers
+    onSuccess: (data) => {
+      console.log("Registration successful:", data);
+      // Navigate to login
+      navigate("/login");
+    },
+
+    onError: (error) => {
+      console.log("Registration failed:", error);
+      // Handle field errors automatically
+      const hasFieldErrors =
+        error.response?.errors || error.response?.response?.data?.errors;
+      if (hasFieldErrors) {
+        // Package automatically handles field error mapping
+        // based on the formdata configuration
+      }
+    },
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Clear previous errors
+    setFieldErrors({});
+    setGeneralError("");
+
+    // Just pass formData - package handles transformation automatically!
+    mutation.mutate(formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        name="name"
+        value={formData.name}
+        onChange={(e) =>
+          setFormData((prev) => ({ ...prev, name: e.target.value }))
+        }
+        placeholder="Full Name"
+      />
+      {fieldErrors.name && <span className="error">{fieldErrors.name}</span>}
+
+      <input
+        name="email"
+        type="email"
+        value={formData.email}
+        onChange={(e) =>
+          setFormData((prev) => ({ ...prev, email: e.target.value }))
+        }
+        placeholder="Email"
+      />
+      {fieldErrors.email && <span className="error">{fieldErrors.email}</span>}
+
+      <input
+        name="password"
+        type="password"
+        value={formData.password}
+        onChange={(e) =>
+          setFormData((prev) => ({ ...prev, password: e.target.value }))
+        }
+        placeholder="Password"
+      />
+      {fieldErrors.password && (
+        <span className="error">{fieldErrors.password}</span>
+      )}
+
+      <input
+        name="confirmPassword"
+        type="password"
+        value={formData.confirmPassword}
+        onChange={(e) =>
+          setFormData((prev) => ({ ...prev, confirmPassword: e.target.value }))
+        }
+        placeholder="Confirm Password"
+      />
+      {fieldErrors.confirmPassword && (
+        <span className="error">{fieldErrors.confirmPassword}</span>
+      )}
+
+      <button type="submit" disabled={mutation.isPending}>
+        {mutation.isPending ? "Creating Account..." : "Create Account"}
+      </button>
+
+      {generalError && <p className="error">{generalError}</p>}
+    </form>
+  );
+}
+```
+
+### 4. Simple Test Query
+
+```jsx
+import { useVormiaQuerySimple } from "vormiaqueryjs";
+
+function TestComponent() {
+  const testQuery = useVormiaQuerySimple({
+    endpoint: "/test",
+    method: "POST", // or GET, PATCH, PUT, DELETE
+
+    // Override global settings
+    enableNotifications: { toast: true, panel: false },
+    showDebug: true,
+
+    onSuccess: (data) => {
+      console.log("Test successful:", data);
+    },
+
+    onError: (error) => {
+      console.log("Test failed:", error);
+    },
+  });
+
+  const handleTest = () => {
+    // Execute with data
+    testQuery.execute({ test: "data" });
+
+    // Or execute asynchronously
+    // testQuery.executeAsync({ test: "data" }).then(result => {
+    //   console.log("Async result:", result);
+    // });
+  };
+
+  return (
+    <div>
+      <button onClick={handleTest} disabled={testQuery.isPending}>
+        {testQuery.isPending ? "Testing..." : "Run Test"}
+      </button>
+
+      {testQuery.data && (
+        <div>
+          <h3>Test Result</h3>
+          <pre>{JSON.stringify(testQuery.data, null, 2)}</pre>
+        </div>
+      )}
+
+      {testQuery.error && (
+        <div>
+          <h3>Test Error</h3>
+          <pre>{JSON.stringify(testQuery.error, null, 2)}</pre>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+---
+
+## 🔧 Enhanced Utilities
+
+### Form Data Transformation
+
+```jsx
+// Update formdata configuration
+mutation.updateFormdata({
+  add: { newField: "value" },
+  remove: ["oldField"],
+});
+
+// Transform data manually
+const transformedData = mutation.transformFormData(formData);
+```
+
+### Debug Logging
+
+```jsx
+// Log for debugging
+query.logForDebug(query.data, "Custom Label");
+
+// Get debug HTML
+const debugHtml = query.getDebugHtml(response, true);
+```
+
+### Notification HTML
+
+```jsx
+// Get notification HTML
+const notificationHtml = query.getNotificationHtml(
+  "success",
+  "Title",
+  "Message"
+);
+```
+
+---
+
+## 🌐 Framework Support
 
 ### React
 
 ```jsx
-import React from "react";
-import {
-  VormiaProvider,
-  useVormiaQuery,
-  useVormiaQueryAuth,
-  useVormiaQueryAuthMutation,
-} from "vormiaqueryjs";
+import { NotificationPanel, ErrorDebugPanel } from "vormiaqueryjs";
 
-function App() {
-  return (
-    <VormiaProvider config={{ baseURL: "https://api.example.com" }}>
-      <CategoriesList />
-    </VormiaProvider>
-  );
-}
-
-function CategoriesList() {
-  const { data, isLoading, error, refetch } = useVormiaQuery({
-    endpoint: "/categories",
-    method: "GET",
-  });
-
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
-
-  return (
-    <ul>
-      {data?.response?.map((cat) => (
-        <li key={cat.id}>{cat.name}</li>
-      ))}
-    </ul>
-  );
-}
-```
-
-### Astro
-
-> Astro uses React Query under the hood for VormiaQueryJS hooks.
-
-```jsx
-import { useVormiaQuery } from "vormiaqueryjs/adapters/astro";
-
-export default function App() {
-  const { data, isLoading, error } = useVormiaQuery({
-    endpoint: "/categories",
-    method: "GET",
-  });
-
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
-
-  return (
-    <ul>
-      {data?.response?.map((cat) => (
-        <li key={cat.id}>{cat.name}</li>
-      ))}
-    </ul>
-  );
-}
+<NotificationPanel notification={notification} />
+<ErrorDebugPanel debugInfo={debugInfo} />
 ```
 
 ### Vue
 
-```js
+```vue
+<template>
+  <div v-html="notificationHtml"></div>
+  <div v-html="debugHtml"></div>
+</template>
+
 <script setup>
-import { useVormiaQuery } from 'vormiaqueryjs/adapters/vue';
+import { useVormiaQuery } from "vormiaqueryjs";
 
 const { data, error, isLoading, refetch } = useVormiaQuery({
-  endpoint: '/categories',
-  method: 'GET',
+  endpoint: "/categories",
+  method: "GET",
+});
+
+// Get HTML for Vue
+const notificationHtml = ref(null);
+const debugHtml = ref(null);
+
+onMounted(() => {
+  notificationHtml.value = data.value?.getNotificationHtml(
+    "success",
+    "Success",
+    "Data loaded!"
+  );
+  debugHtml.value = data.value?.getDebugHtml(data.value, true);
 });
 </script>
-
-<template>
-  <div v-if="isLoading">Loading...</div>
-  <div v-else-if="error">Error: {{ error.message }}</div>
-  <ul v-else>
-    <li v-for="cat in data?.response" :key="cat.id">{{ cat.name }}</li>
-  </ul>
-</template>
 ```
 
 ### Svelte
 
 ```svelte
 <script>
-  import { createVormiaStore } from 'vormiaqueryjs/adapters/svelte';
-  const store = createVormiaStore({ endpoint: '/categories', method: 'GET' });
+  import { useVormiaQuery } from 'vormiaqueryjs';
+
+  const { data, error, isLoading, refetch } = useVormiaQuery({
+    endpoint: '/categories',
+    method: 'GET',
+  });
+
+  let notificationHtml = '';
+  let debugHtml = '';
+
+  $: if (data) {
+    notificationHtml = data.getNotificationHtml('success', 'Success', 'Data loaded!');
+    debugHtml = data.getDebugHtml(data, true);
+  }
 </script>
 
-{#if $store.loading}
-  <p>Loading...</p>
-{:else if $store.error}
-  <p>Error: {$store.error.message}</p>
-{:else}
-  <ul>
-    {#each $store.data?.response as cat}
-      <li>{cat.name}</li>
-    {/each}
-  </ul>
-{/if}
+<div>{@html notificationHtml}</div>
+<div>{@html debugHtml}</div>
 ```
 
-### Solid
+### Vanilla JS
 
-```js
-import { createVormiaResource } from "vormiaqueryjs/adapters/solid";
+```javascript
+import { useVormiaQuery } from "vormiaqueryjs";
 
-const [categories] = createVormiaResource({
+const query = useVormiaQuery({
   endpoint: "/categories",
   method: "GET",
 });
 
-function CategoriesList() {
-  return (
-    <ul>
-      {categories()?.response?.map((cat) => (
-        <li>{cat.name}</li>
-      ))}
-    </ul>
-  );
-}
-```
+// Get HTML strings
+const notificationHtml = query.getNotificationHtml(
+  "success",
+  "Success",
+  "Data loaded!"
+);
+const debugHtml = query.getDebugHtml(query.data, true);
 
-### Qwik
-
-```js
-import { useVormiaQuery } from "vormiaqueryjs/adapters/qwik";
-
-export default function CategoriesList() {
-  const { data, isLoading, error } = useVormiaQuery({
-    endpoint: "/categories",
-    method: "GET",
-  });
-  // Render logic for Qwik
-}
+// Use in DOM
+document.getElementById("notifications").innerHTML = notificationHtml;
+document.getElementById("debug").innerHTML = debugHtml;
 ```
 
 ---
 
-## 🆕 Debug & Notification System
+## 📱 Migration Guide
 
-VormiaQueryJS includes a comprehensive debugging and notification system that works with any framework or vanilla JavaScript.
-
-### Quick Start
-
-```javascript
-import {
-  createEnhancedErrorHandler,
-  createFieldErrorManager,
-  showSuccessNotification,
-} from "vormiaqueryjs";
-
-// Initialize error handler
-const errorHandler = createEnhancedErrorHandler({
-  debugEnabled: true,
-  showNotifications: true,
-  showDebugPanel: true,
-});
-
-// Initialize field error manager
-const fieldErrorManager = createFieldErrorManager();
-
-// Handle API success
-errorHandler.handleSuccess(response, {
-  notificationMessage: "Operation completed successfully!",
-});
-
-// Handle API errors with field validation
-errorHandler.handleError(error, {
-  handleFieldErrors: true,
-  fieldMapping: { password_confirmation: "confirmPassword" },
-});
-
-// Show notifications
-showSuccessNotification("Welcome!", "Success", "#notifications", 3000);
-```
-
-### Framework Examples
-
-#### React
+### From Old Version
 
 ```jsx
-import {
-  createEnhancedErrorHandler,
-  createFieldErrorManager,
-} from "vormiaqueryjs";
-
-function MyComponent() {
-  const [errorHandler] = useState(() => createEnhancedErrorHandler());
-  const [fieldErrorManager] = useState(() => createFieldErrorManager());
-
-  useEffect(() => {
-    fieldErrorManager.addListener((errors) => {
-      setFieldErrors(errors);
-    });
-  }, []);
-
-  // Use in your component...
-}
-```
-
-#### Vue
-
-```vue
-<script setup>
-import {
-  createEnhancedErrorHandler,
-  createFieldErrorManager,
-} from "vormiaqueryjs";
-
-const errorHandler = createEnhancedErrorHandler();
-const fieldErrorManager = createFieldErrorManager();
-
-onMounted(() => {
-  fieldErrorManager.addListener((errors) => {
-    fieldErrors.value = errors;
-  });
+// Old way (still works)
+const mutation = useVormiaQueryAuthMutation({
+  endpoint: "/register",
+  onSuccess: (data) => {
+    /* complex logic */
+  },
+  onError: (error) => {
+    /* complex error handling */
+  },
 });
-</script>
+
+// Manual transformation
+const registrationData = {
+  ...formData,
+  password_confirmation: formData.confirmPassword,
+  confirmPassword: undefined,
+  terms: true,
+};
+mutation.mutate(registrationData);
 ```
 
-#### Svelte
-
-```svelte
-<script>
-import { createEnhancedErrorHandler, createFieldErrorManager } from 'vormiaqueryjs';
-
-let errorHandler = createEnhancedErrorHandler();
-let fieldErrorManager = createFieldErrorManager();
-
-onMount(() => {
-  fieldErrorManager.addListener((errors) => {
-    fieldErrors = errors;
-  });
-});
-</script>
-```
-
-#### Solid
+### To New Version
 
 ```jsx
-import {
-  createEnhancedErrorHandler,
-  createFieldErrorManager,
-} from "vormiaqueryjs";
-
-function MyComponent() {
-  const [errorHandler, setErrorHandler] = createSignal(null);
-  const [fieldErrorManager, setFieldErrorManager] = createSignal(null);
-
-  onMount(() => {
-    setErrorHandler(createEnhancedErrorHandler());
-    setFieldErrorManager(createFieldErrorManager());
-  });
-}
-```
-
-#### Qwik
-
-```jsx
-import {
-  createEnhancedErrorHandler,
-  createFieldErrorManager,
-} from "vormiaqueryjs";
-
-export default component$(() => {
-  const errorHandler = useSignal(null);
-  const fieldErrorManager = useSignal(null);
-
-  useVisibleTask$(() => {
-    errorHandler.value = createEnhancedErrorHandler();
-    fieldErrorManager.value = createFieldErrorManager();
-  });
+// New way (automatic)
+const mutation = useVormiaQueryAuthMutation({
+  endpoint: "/register",
+  formdata: {
+    confirmPassword: "password_confirmation",
+    add: { terms: true },
+    remove: ["confirmPassword"],
+  },
+  onSuccess: (data) => navigate("/login"), // Only custom logic
 });
+
+// Just pass formData
+mutation.mutate(formData);
 ```
 
-#### Astro
-
-```astro
----
-// Astro component script
 ---
 
-<script>
-import { createEnhancedErrorHandler, createFieldErrorManager } from 'vormiaqueryjs';
+## 🚨 Error Handling
 
-document.addEventListener('DOMContentLoaded', () => {
-  const errorHandler = createEnhancedErrorHandler();
-  const fieldErrorManager = createFieldErrorManager();
+### Automatic Field Error Mapping
 
-  // Use in your component...
+```jsx
+const mutation = useVormiaQueryAuthMutation({
+  endpoint: "/register",
+  formdata: {
+    rename: {
+      password_confirmation: "confirmPassword", // Map API field to form field
+    },
+  },
 });
-</script>
+
+// Package automatically maps API errors to form fields
+// API returns: { errors: { password_confirmation: ["Passwords don't match"] } }
+// Package maps to: { confirmPassword: "Passwords don't match" }
 ```
 
-### Environment Configuration
+### Custom Error Handlers
 
-Set `VITE_VORMIA_DEBUG=true` in your environment to enable debug mode:
+```jsx
+const mutation = useVormiaQueryAuthMutation({
+  endpoint: "/register",
+  onError: (error) => {
+    // Package already handled error parsing and notifications
+    // Add custom logic here
+    console.log("Custom error handling:", error);
+  },
+});
+```
+
+---
+
+## 🔍 Debug Information
+
+### Debug Panel Content
+
+The debug panel shows:
+
+- HTTP status code
+- Error type
+- API message
+- Response data/errors
+- Debug information
+- Timestamp
+
+### Environment Detection
 
 ```bash
-# .env
-VITE_VORMIA_DEBUG=true
+# Development
+VITE_VORMIA_DEBUG=true  → Debug panel visible
+VITE_VORMIA_ENV=local   → Local environment
+
+# Production
+VITE_VORMIA_DEBUG=false → Debug panel hidden
+VITE_VORMIA_ENV=production → Production environment
 ```
-
-### Key Components
-
-- **ErrorDebugPanel**: Shows technical debug information for developers
-- **NotificationPanel**: Displays user-friendly notifications
-- **FieldErrorManager**: Handles field-level validation errors
-- **EnhancedErrorHandler**: Orchestrates all error handling components
-
-For detailed API documentation and advanced usage examples, see the examples in the `examples/` directory.
-
-### Advanced Implementation Examples
-
-#### Comprehensive Error Handling with Debug & Notifications
-
-Here's an advanced example showing how to integrate the Debug & Notification System with VormiaQueryJS mutations:
-
-```jsx
-import { useVormiaQueryAuthMutation } from "vormiaqueryjs";
-import {
-  createEnhancedErrorHandler,
-  createFieldErrorManager,
-  showSuccessNotification,
-  showErrorNotification,
-} from "vormiaqueryjs";
-
-function RegistrationForm() {
-  const [fieldErrors, setFieldErrors] = useState({});
-  const [generalError, setGeneralError] = useState("");
-  const [debugInfo, setDebugInfo] = useState(null);
-  const [showDebug, setShowDebug] = useState(false);
-  const [notification, setNotification] = useState(null);
-
-  // Initialize error handler and field error manager
-  const errorHandler = createEnhancedErrorHandler({
-    debugEnabled: true,
-    showNotifications: true,
-    showDebugPanel: true,
-    notificationTarget: "#notifications",
-    debugTarget: "#debug-panel",
-  });
-
-  const fieldErrorManager = createFieldErrorManager();
-
-  const registerMutation = useVormiaQueryAuthMutation({
-    endpoint: "/register",
-
-    onSuccess: (data) => {
-      // Log success for debugging
-      errorHandler.logSuccessForDebug(data, "Registration Success");
-
-      // Show success notification
-      showSuccessNotification(
-        data?.data?.message ||
-          "Account created successfully. Please check your email to verify your account.",
-        "Account Created! 🎉",
-        "#notifications",
-        3000
-      );
-
-      // Clear all errors and notification info
-      setFieldErrors({
-        name: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-      });
-      setGeneralError("");
-
-      // Set debug info for debug panel
-      const debugInfo = {
-        status: 200,
-        message: "Registration successful",
-        response: {
-          response: {
-            data: {
-              success: true,
-              message: data?.data?.message || "Account created successfully",
-              data: data?.data,
-              debug: data?.debug,
-            },
-          },
-          debug: data?.debug,
-        },
-        errorType: "success",
-        timestamp: new Date().toISOString(),
-      };
-
-      setDebugInfo(debugInfo);
-
-      // Show debug panel if enabled (controlled by environment variable)
-      const isDebugEnabled = import.meta.env.VITE_VORMIA_DEBUG === "true";
-      console.log("Success - Debug enabled:", isDebugEnabled);
-      console.log("Success - Setting showDebug to:", isDebugEnabled);
-      setShowDebug(isDebugEnabled);
-
-      // Force show debug panel if we have debug info and debug is enabled
-      if (isDebugEnabled) {
-        setShowDebug(true);
-      }
-
-      // Navigate to login after a short delay to show success message
-      setTimeout(() => {
-        // navigate('/login');
-      }, 2000);
-    },
-
-    onError: (error) => {
-      // Get clean error info using enhanced error handler
-      const errorInfo = errorHandler.handleError(error, {
-        handleFieldErrors: true,
-        fieldMapping: {
-          password_confirmation: "confirmPassword",
-        },
-      });
-
-      setDebugInfo(errorInfo);
-
-      // Show debug panel if enabled (controlled by environment variable)
-      const isDebugEnabled = import.meta.env.VITE_VORMIA_DEBUG === "true";
-      console.log("Debug enabled (error):", isDebugEnabled);
-      console.log("Setting showNotification to (error):", isDebugEnabled);
-      setShowDebug(isDebugEnabled);
-
-      // Force show debug panel if we have debug info and debug is enabled
-      if (isDebugEnabled) {
-        setShowDebug(true);
-      }
-
-      // Log for debugging
-      errorHandler.logErrorForDebug(error, "Registration Error");
-
-      // Handle based on whether there are field-specific errors
-      const hasFieldErrors =
-        error.response?.errors || error.response?.response?.data?.errors;
-      if (hasFieldErrors) {
-        // Field errors are automatically handled by the enhanced error handler
-        // You can also manually access them through fieldErrorManager
-        const currentFieldErrors = fieldErrorManager.getAllFieldErrors();
-        setFieldErrors(currentFieldErrors);
-        setGeneralError("");
-      } else {
-        // General error handling
-        setGeneralError(errorInfo.message);
-        setFieldErrors({
-          name: "",
-          email: "",
-          password: "",
-          confirmPassword: "",
-        });
-      }
-
-      // Create error notification
-      showErrorNotification(
-        error.response?.message ||
-          error.response?.response?.data?.message ||
-          "An error occurred during registration.",
-        "Registration Failed",
-        "#notifications",
-        0 // No auto-hide for errors
-      );
-    },
-  });
-
-  // Handle form submission
-  const handleSubmit = async (formData) => {
-    // Clear previous errors
-    fieldErrorManager.clearAllFieldErrors();
-    setGeneralError("");
-
-    // Submit form
-    registerMutation.mutate(formData);
-  };
-
-  return (
-    <div>
-      {/* Your form JSX */}
-      <form onSubmit={handleSubmit}>{/* Form fields */}</form>
-
-      {/* Debug Panel */}
-      {showDebug && debugInfo && (
-        <div id="debug-panel">{/* Debug panel content */}</div>
-      )}
-
-      {/* Notifications Container */}
-      <div id="notifications"></div>
-    </div>
-  );
-}
-```
-
-#### Alternative: Using Enhanced Error Handler Directly
-
-You can also use the enhanced error handler more directly for cleaner code:
-
-```jsx
-import { createEnhancedErrorHandler } from "vormiaqueryjs";
-
-function RegistrationForm() {
-  const errorHandler = createEnhancedErrorHandler({
-    debugEnabled: true,
-    showNotifications: true,
-    showDebugPanel: true,
-    notificationTarget: "#notifications",
-    debugTarget: "#debug-panel",
-  });
-
-  const registerMutation = useVormiaQueryAuthMutation({
-    endpoint: "/register",
-
-    onSuccess: (data) => {
-      // Handle success with enhanced error handler
-      errorHandler.handleSuccess(data, {
-        notificationMessage:
-          "Account created successfully! Please check your email.",
-        debugLabel: "Registration Success",
-      });
-
-      // Additional success logic...
-    },
-
-    onError: (error) => {
-      // Handle error with enhanced error handler
-      errorHandler.handleError(error, {
-        handleFieldErrors: true,
-        fieldMapping: { password_confirmation: "confirmPassword" },
-        customErrorHandler: (error, errorInfo) => {
-          // Custom error handling logic
-          console.log("Custom error handling:", errorInfo);
-        },
-      });
-    },
-  });
-}
-```
-
-#### Environment Configuration
-
-Set up your environment variables for debug mode:
-
-```bash
-# .env
-VITE_VORMIA_DEBUG=true
-VITE_VORMIA_NOTIFICATION_TARGET=#notifications
-VITE_VORMIA_DEBUG_TARGET=#debug-panel
-```
-
-#### Key Benefits of This Approach
-
-1. **Centralized Error Handling**: All error logic is managed in one place
-2. **Automatic Debug Panel**: Debug information is automatically displayed when enabled
-3. **Field Error Mapping**: Automatically maps API field names to form field names
-4. **Environment-Based Control**: Debug features can be enabled/disabled per environment
-5. **Framework Agnostic**: Works with React, Vue, Svelte, Solid, Qwik, and Astro
-6. **Consistent Notifications**: Standardized notification system across your app
-7. **Developer Experience**: Rich debugging information during development
 
 ---
 
-### Next Steps
+## 📚 Examples
 
-1. **Configure your API base URL in your frontend environment.**
-2. **Set up proper HTTPS/SSL on your backend for secure communication.**
-3. **Use environment variables for configuration.**
-4. **Add `.env` to your `.gitignore` for sensitive configuration.**
-
-### Usage
-
-- VormiaQuery provides secure API communication through HTTPS/SSL.
-- Your Laravel backend should implement proper server-side security measures.
-- See the VormiaQuery and Laravel documentation for integration details.
-
-> **Note:** For production applications, always use HTTPS/SSL and implement proper server-side security measures.
+See `examples/enhanced-usage.js` for comprehensive examples of all features.
 
 ---
 
@@ -838,317 +944,6 @@ Follow the complete installation and usage instructions at:
 - [Packagist Package](https://packagist.org/packages/vormiaphp/vormiaqueryphp)
 
 The Laravel package provides middleware, helpers, and complete integration for API communication with VormiaQueryJS.
-
----
-
-## Quick Start
-
-### Environment Variables
-
-VormiaQuery supports configuration through environment variables. Create a `.env` file in your project root:
-
-```env
-VORMIA_API_URL=https://your-api.com/api/v1
-VORMIA_AUTH_TOKEN_KEY=auth_token
-VORMIA_TIMEOUT=30000
-VORMIA_WITH_CREDENTIALS=false
-```
-
----
-
-## Authentication Example (React)
-
-```jsx
-import { useVormiaQueryAuth } from "vormiaqueryjs";
-
-function LoginForm() {
-  const { login, isLoading, error, isAuthenticated } = useVormiaQueryAuth({
-    endpoint: "/auth/login",
-    storeToken: true,
-    onLoginSuccess: (data) => {
-      console.log("Login successful:", data.user);
-    },
-  });
-
-  const handleLogin = async (credentials) => {
-    try {
-      await login(credentials);
-    } catch (err) {
-      console.error("Login failed:", err);
-    }
-  };
-
-  if (isAuthenticated) return <div>Welcome back!</div>;
-
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        handleLogin({ email: "user@example.com", password: "password" });
-      }}
-    >
-      <button type="submit" disabled={isLoading}>
-        {isLoading ? "Logging in..." : "Login"}
-      </button>
-    </form>
-  );
-}
-```
-
----
-
-## Mutations Example (React)
-
-```jsx
-import { useVormiaQueryAuthMutation } from "vormiaqueryjs";
-
-function AddCategory() {
-  const mutation = useVormiaQueryAuthMutation({
-    endpoint: "/categories",
-    method: "POST",
-  });
-
-  const handleAdd = async () => {
-    await mutation.mutate({ name: "New Category" });
-  };
-
-  return <button onClick={handleAdd}>Add Category</button>;
-}
-```
-
----
-
-## Clean Error Handling
-
-VormiaQueryJS provides powerful error handling utilities that work with any API response format. The error handling focuses on the standard structure:
-
-```json
-{
-  "success": true,
-  "message": "Action was a success",
-  "data": {
-    /* optional data */
-  },
-  "debug": {
-    /* any debug information */
-  }
-}
-```
-
-```json
-{
-  "success": false,
-  "message": "Error message here",
-  "errors": {
-    /* optional data */
-  },
-  "debug": {
-    /* any debug information */
-  }
-}
-```
-
-### 1. Chainable Error Handler (`createErrorHandler`)
-
-Perfect for complex error handling logic:
-
-```javascript
-import { createErrorHandler } from "vormiaqueryjs";
-
-const handleError = (error) => {
-  createErrorHandler(error)
-    .ifValidationError((handler) => {
-      const validationErrors = handler.getValidationErrors();
-      const apiMessage = handler.getApiMessage();
-      console.log("Validation failed:", apiMessage);
-      console.log("Field errors:", validationErrors);
-    })
-    .ifServerError((handler) => {
-      const apiDebug = handler.getApiDebug();
-      console.log("Server error debug:", apiDebug);
-    })
-    .logDebug("Registration Error");
-};
-```
-
-**Key Methods:**
-
-- `getApiResponse()` - Gets the full API response data
-- `getApiMessage()` - Gets the API message (falls back to error.message)
-- `getApiData()` - Gets the API data field
-- `getApiDebug()` - Gets the API debug object
-- `getApiSuccess()` - Gets the API success boolean
-- `logDebug(label)` - Logs comprehensive error information
-
-### 2. Object-Based Handler (`handleError`)
-
-Simple, direct access to all error information:
-
-```javascript
-import { handleError } from "vormiaqueryjs";
-
-const handleError = (error) => {
-  const errorInfo = handleError(error);
-
-  console.log("Status:", errorInfo.status);
-  console.log("API Message:", errorInfo.apiMessage);
-  console.log("API Debug:", errorInfo.apiDebug);
-  console.log("Is Validation Error:", errorInfo.isValidationError);
-
-  // Log debug information
-  errorInfo.logDebug("Registration Error");
-};
-```
-
-**Available Properties:**
-
-- `status`, `code`, `message` - Basic error info
-- `apiResponse`, `apiMessage`, `apiData`, `apiDebug`, `apiSuccess` - API response data
-- `isValidationError`, `isServerError`, `isNetworkError` - Error type checks
-- `validationErrors` - Field validation errors
-- `userMessage`, `errorMessage` - User-friendly messages
-
-### 3. Toast Error Handler (`createToastErrorHandler`)
-
-Automatically displays appropriate toast messages:
-
-```javascript
-import { createToastErrorHandler } from "vormiaqueryjs";
-
-const handleError = createToastErrorHandler(toast, {
-  showValidationErrors: true,
-  showServerErrors: true,
-  defaultMessages: {
-    validationTitle: "Form Errors",
-    serverMessage: "Something went wrong on our end",
-  },
-});
-
-// Usage in mutation
-useVormiaQueryAuthMutation({
-  onError: handleError,
-});
-```
-
-### 4. Form Error Handler (`createFormErrorHandler`)
-
-Handles form-specific error scenarios:
-
-```javascript
-import { createFormErrorHandler } from "vormiaqueryjs";
-
-const handleFormError = createFormErrorHandler({
-  setFieldErrors,
-  setGeneralError,
-  fieldMapping: {
-    password_confirmation: "confirmPassword",
-  },
-  toast,
-  showToasts: true,
-});
-
-// Usage in mutation
-useVormiaQueryAuthMutation({
-  onError: handleFormError,
-});
-```
-
-### Error Handling Examples
-
-#### Basic Usage
-
-```javascript
-const handleError = (error) => {
-  const apiResponse = error.response?.data || error.data;
-  const apiMessage = apiResponse?.message || error.message;
-  const apiDebug = apiResponse?.debug;
-
-  console.log("API Message:", apiMessage);
-  console.log("API Debug:", apiDebug);
-
-  if (error.isValidationError()) {
-    // Handle validation errors
-    const validationErrors = error.getValidationErrors();
-    setFieldErrors(validationErrors);
-  } else if (error.isServerError()) {
-    // Handle server errors
-    setGeneralError(apiMessage);
-  }
-};
-```
-
-#### Advanced Usage with Chainable Handler
-
-```javascript
-const handleError = (error) => {
-  createErrorHandler(error)
-    .ifValidationError((handler) => {
-      const validationErrors = handler.getValidationErrors();
-      const apiMessage = handler.getApiMessage();
-
-      // Map validation errors to form fields
-      const fieldErrors = {};
-      Object.keys(validationErrors).forEach((field) => {
-        if (field === "password_confirmation") {
-          fieldErrors.confirmPassword = validationErrors[field];
-        } else {
-          fieldErrors[field] = validationErrors[field];
-        }
-      });
-
-      setFieldErrors(fieldErrors);
-      toast({
-        title: "Validation Error",
-        description: apiMessage,
-        variant: "destructive",
-      });
-    })
-    .ifServerError((handler) => {
-      const apiDebug = handler.getApiDebug();
-      console.log("Server error details:", apiDebug);
-
-      setGeneralError(handler.getApiMessage());
-      toast({
-        title: "Server Error",
-        description: handler.getApiMessage(),
-        variant: "destructive",
-      });
-    })
-    .logDebug("Registration Error");
-};
-```
-
-### Debug Information Access
-
-The error handling utilities provide easy access to any debug information your API returns:
-
-```javascript
-const handleError = (error) => {
-  const apiDebug = error.response?.data?.debug || error.data?.debug;
-
-  if (apiDebug) {
-    console.group("🐛 API Debug Information");
-    console.log("Full Debug Object:", apiDebug);
-
-    // Access any debug properties your API provides
-    if (apiDebug.execution_time !== undefined) {
-      console.log("Execution Time:", apiDebug.execution_time);
-    }
-    if (apiDebug.memory_usage !== undefined) {
-      console.log("Memory Usage:", apiDebug.memory_usage);
-    }
-    if (apiDebug.trace) {
-      console.log("Stack Trace:", apiDebug.trace);
-    }
-    if (apiDebug.custom_field) {
-      console.log("Custom Debug:", apiDebug.custom_field);
-    }
-    console.groupEnd();
-  }
-};
-```
-
-This approach works with **any** debug object structure your API returns, making it flexible for different backend implementations.
 
 ---
 
@@ -1178,96 +973,10 @@ MIT License. See [LICENSE](LICENSE) for details.
 
 ---
 
-## Extra Usage Examples
+## 🤝 Contributing
 
-### 1. Basic Mutation (React)
+This enhanced version maintains backward compatibility while adding powerful new features. All existing code will continue to work without changes.
 
-```jsx
-import { useVormiaQueryAuthMutation } from "vormiaqueryjs";
+## 📄 License
 
-function SendMessage() {
-  const mutation = useVormiaQueryAuthMutation({
-    endpoint: "/messages",
-    method: "POST",
-  });
-
-  const handleSend = async () => {
-    await mutation.mutate({ message: "Hello World" });
-  };
-
-  return <button onClick={handleSend}>Send Message</button>;
-}
-```
-
-### 2. Basic API Call (Node.js/SSR)
-
-```js
-import { VormiaClient } from "vormiaqueryjs";
-
-const client = new VormiaClient({
-  baseURL: "https://api.example.com",
-});
-
-async function getData() {
-  const response = await client.get("/data");
-  console.log(response.data);
-}
-```
-
-### 3. Using VormiaQuery with Custom Headers
-
-```js
-import { useVormiaQuery } from "vormiaqueryjs";
-
-const { data } = useVormiaQuery({
-  endpoint: "/profile",
-  method: "GET",
-  headers: {
-    "X-Requested-With": "VormiaQuery",
-    "X-Custom-Token": "abc123",
-  },
-});
-```
-
-### 4. Error Handling for Validation Errors
-
-```js
-import { useVormiaQueryAuthMutation } from "vormiaqueryjs";
-
-function RegisterForm() {
-  const mutation = useVormiaQueryAuthMutation({
-    endpoint: "/register",
-    method: "POST",
-  });
-
-  const handleRegister = async (formData) => {
-    try {
-      await mutation.mutateAsync(formData);
-    } catch (error) {
-      if (error.isValidationError()) {
-        // Show validation errors to the user
-        const errors = error.getValidationErrors();
-        alert(JSON.stringify(errors));
-      }
-    }
-  };
-
-  // ...form rendering
-}
-```
-
-### 5. VormiaQuery in a Next.js API Route (Node.js)
-
-```js
-// pages/api/proxy.js
-import { VormiaClient } from "vormiaqueryjs";
-
-const client = new VormiaClient({
-  baseURL: "https://api.example.com",
-});
-
-export default async function handler(req, res) {
-  const apiRes = await client.get("/data");
-  res.status(200).json(apiRes.data);
-}
-```
+Same as the original VormiaQueryJS package.
