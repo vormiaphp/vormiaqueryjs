@@ -2,11 +2,15 @@
 
 A universal query and mutation library for seamless data fetching and state management, designed for use with React, Vue, Svelte, Solid, Qwik, and Astro. Built for modern JavaScript projects and Laravel/VormiaPHP backends.
 
+> **📦 Latest Version**: `v1.4.2` - Enhanced error handling, comprehensive notifications, and improved debug system
+
 ---
 
 ## 🚀 Installation (JavaScript/Frontend)
 
 Install VormiaQueryJS using your favorite package manager:
+
+> **📦 Latest Version**: `v1.4.2` - Enhanced error handling, comprehensive notifications, and improved debug system
 
 ### **npm**
 
@@ -33,6 +37,34 @@ yarn add vormiaqueryjs
 ```
 
 > **🌐 Browser Compatibility**: VormiaQueryJS is designed for **browser environments** and uses ESM modules for optimal compatibility with modern bundlers like Vite, Webpack, and Rollup. It does not support Node.js environments.
+
+---
+
+## 📋 Changelog
+
+### **v1.4.2** - Enhanced Error Handling & Debug System
+- 🔧 **Fixed**: ErrorDebugPanel now properly displays API responses and debug information
+- 🔧 **Fixed**: Console logging now works correctly with comprehensive debug detection
+- 🔧 **Fixed**: NotificationPanel styling issues resolved for all notification types
+- 📝 **Updated**: Environment variable documentation with correct naming conventions
+- 🎯 **Improved**: Debug system now properly respects `VITE_VORMIA_DEBUG` environment variable
+- ✅ **Verified**: All components build successfully and maintain backward compatibility
+
+### **v1.4.1** - Comprehensive Notification System
+- 🆕 **Added**: Banner, in-app, and modal notification variants
+- 🆕 **Added**: Success, error, warning, and info notification types for all variants
+- 🎨 **Enhanced**: Notification styling with proper variant and type combinations
+- 🔧 **Fixed**: NotificationPanel component compatibility with existing code
+- 📚 **Added**: Comprehensive examples for all notification types
+
+### **v1.4.0** - Major Package Enhancement
+- 🆕 **Added**: Automatic form data transformation system
+- 🆕 **Added**: Dual notification system (toast + custom panels)
+- 🆕 **Added**: Smart debug panel with environment awareness
+- 🆕 **Added**: Multiple query types (basic, authenticated, simple)
+- 🆕 **Added**: Cross-framework support (React components + HTML strings)
+- 🔧 **Simplified**: VormiaProvider configuration (environment-based feature flags)
+- 📚 **Added**: Comprehensive documentation and examples
 
 ---
 
@@ -131,9 +163,52 @@ VITE_VORMIA_NOTIFICATION_DURATION=5000   # Toast duration in milliseconds
 # Debug System (disabled by default)
 VITE_VORMIA_DEBUG=false                  # Enable debug panel
 VITE_VORMIA_ENV=local                   # Environment (local/production)
+
+# Advanced Configuration (optional)
+VITE_VORMIA_AUTH_TOKEN_KEY=vormia_auth_token  # Custom auth token storage key
+VITE_VORMIA_TIMEOUT=30000                     # Request timeout in milliseconds
+VITE_VORMIA_WITH_CREDENTIALS=false            # Include credentials in requests
 ```
 
+**⚠️ Important**: All environment variables must start with `VITE_` prefix to be accessible in the browser.
+
 **Note**: All feature flags are controlled by environment variables, not through the provider configuration. This keeps the setup simple and allows per-environment control.
+
+---
+
+## 🔧 Troubleshooting
+
+### **Debug Panel Not Showing**
+If your debug panel isn't displaying API responses:
+
+1. **Check environment variable**:
+   ```bash
+   VITE_VORMIA_DEBUG=true
+   ```
+
+2. **Verify in console**: You should see logs like:
+   ```
+   🔍 VormiaQuery Debug: VITE_VORMIA_DEBUG = true
+   🔍 VormiaQuery Debug: Debug enabled = true
+   ```
+
+3. **Check browser console** for any JavaScript errors
+
+### **Environment Variables Not Working**
+If environment variables aren't being detected:
+
+1. **Ensure VITE_ prefix**: All variables must start with `VITE_`
+2. **Restart dev server** after changing `.env` file
+3. **Check variable names** match exactly (case-sensitive)
+
+> **🔧 Fixed in v1.4.2**: Environment variable documentation updated with correct naming conventions. All variables now properly documented with `VITE_` prefix.
+
+### **Notifications Not Styling Correctly**
+If notifications appear without proper colors:
+
+1. **Update to v1.4.2+**: Styling issues fixed in latest version
+2. **Check CSS classes**: Ensure Tailwind CSS is available if using default styles
+3. **Custom styling**: Override with your own CSS classes
 
 ---
 
@@ -296,6 +371,8 @@ const mutation2 = useVormiaQueryAuthMutation({
 
 ## 🔔 Notification System
 
+> **🔧 Fixed in v1.4.2**: Notification styling issues resolved. All notification types now display with proper colors and layout.
+
 ### Toast Notifications
 
 ```jsx
@@ -357,6 +434,8 @@ document.getElementById('notifications').innerHTML = notificationHtml;
 
 ## 🐛 Debug Panel System
 
+> **🔧 Fixed in v1.4.2**: Debug panel now properly displays API responses and debug information. Console logging works correctly with comprehensive debug detection.
+
 ### Automatic Visibility
 
 The debug panel automatically:
@@ -365,6 +444,7 @@ The debug panel automatically:
 - Hides when `VITE_VORMIA_DEBUG=false`
 - Hides in production builds
 - Respects environment variable settings
+- Provides detailed console logging for troubleshooting
 
 ### React Component
 
