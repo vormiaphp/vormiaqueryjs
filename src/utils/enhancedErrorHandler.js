@@ -212,7 +212,7 @@ export function transformApiResponse(response) {
  * @returns {boolean} Whether debug mode is enabled
  */
 export function getDebugFlag() {
-  // Support multiple environment variable names for different frameworks
+  // Support Vite environment variables (browser compatible)
   if (
     typeof import.meta !== "undefined" &&
     import.meta.env?.VITE_VORMIA_DEBUG
@@ -222,27 +222,7 @@ export function getDebugFlag() {
     return debugValue === "true";
   }
 
-  // Next.js - safely check for process
-  try {
-    // eslint-disable-next-line no-undef
-    if (
-      // eslint-disable-next-line no-undef
-      typeof process !== "undefined" &&
-      process?.env?.NEXT_PUBLIC_VORMIA_DEBUG
-    ) {
-      // eslint-disable-next-line no-undef
-      const debugValue = process.env.NEXT_PUBLIC_VORMIA_DEBUG;
-      console.log(
-        "🔍 VormiaQuery Debug: NEXT_PUBLIC_VORMIA_DEBUG =",
-        debugValue
-      );
-      return debugValue === "true";
-    }
-  } catch {
-    // process not available, continue
-  }
-
-  // Astro
+  // Support Astro environment variables (browser compatible)
   if (
     typeof import.meta !== "undefined" &&
     import.meta.env?.PUBLIC_VORMIA_DEBUG
@@ -252,26 +232,18 @@ export function getDebugFlag() {
     return debugValue === "true";
   }
 
-  // Additional debugging information
+  // Additional debugging information for browser environments
   console.log("🔍 VormiaQuery Debug: Environment variable detection:");
   console.log("  - import.meta available:", typeof import.meta !== "undefined");
   if (typeof import.meta !== "undefined") {
-    console.log(
-      "  - import.meta.env available:",
-      typeof import.meta.env !== "undefined"
-    );
+    console.log("  - import.meta.env available:", typeof import.meta.env !== "undefined");
     if (import.meta.env) {
-      console.log(
-        "  - VITE_VORMIA_DEBUG value:",
-        import.meta.env.VITE_VORMIA_DEBUG
-      );
-      console.log(
-        "  - All VITE_ variables:",
-        Object.keys(import.meta.env).filter((key) => key.startsWith("VITE_"))
-      );
+      console.log("  - VITE_VORMIA_DEBUG value:", import.meta.env.VITE_VORMIA_DEBUG);
+      console.log("  - All VITE_ variables:", Object.keys(import.meta.env).filter(key => key.startsWith('VITE_')));
+      console.log("  - All PUBLIC_ variables:", Object.keys(import.meta.env).filter(key => key.startsWith('PUBLIC_')));
     }
   }
-
+  
   console.log(
     "🔍 VormiaQuery Debug: No debug environment variable found, debug disabled"
   );
