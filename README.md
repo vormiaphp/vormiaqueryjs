@@ -52,6 +52,7 @@ After installing `vormiaqueryjs`, you must also install the correct peer depende
 ## 🎯 Available Hooks
 
 ### **1. useVormiaQuery** - Basic Query (No Auth)
+
 ```jsx
 import { useVormiaQuery } from "vormiaqueryjs";
 
@@ -59,11 +60,12 @@ const query = useVormiaQuery({
   endpoint: "/public/data",
   method: "GET",
   enableNotifications: { toast: true, panel: false },
-  showDebug: true
+  showDebug: true,
 });
 ```
 
 ### **2. useVormiaQueryAuth** - Authenticated Query
+
 ```jsx
 import { useVormiaQueryAuth } from "vormiaqueryjs";
 
@@ -71,11 +73,12 @@ const query = useVormiaQueryAuth({
   endpoint: "/user/profile",
   method: "GET",
   enableNotifications: { toast: false, panel: true },
-  showDebug: false
+  showDebug: false,
 });
 ```
 
 ### **3. useVormiaQueryAuthMutation** - Authenticated Mutation
+
 ```jsx
 import { useVormiaQueryAuthMutation } from "vormiaqueryjs";
 
@@ -85,14 +88,15 @@ const mutation = useVormiaQueryAuthMutation({
   formdata: {
     rename: { confirmPassword: "password_confirmation" },
     add: { terms: true },
-    remove: ["confirmPassword"]
+    remove: ["confirmPassword"],
   },
   enableNotifications: { toast: true, panel: true },
-  showDebug: true
+  showDebug: true,
 });
 ```
 
 ### **4. useVormiaQuerySimple** - Flexible Test Query
+
 ```jsx
 import { useVormiaQuerySimple } from "vormiaqueryjs";
 
@@ -100,7 +104,7 @@ const testQuery = useVormiaQuerySimple({
   endpoint: "/test",
   method: "POST",
   enableNotifications: { toast: true, panel: false },
-  showDebug: true
+  showDebug: true,
 });
 ```
 
@@ -109,14 +113,17 @@ const testQuery = useVormiaQuerySimple({
 ## 🏗️ Core Components
 
 ### **VormiaProvider** - Configuration Provider
+
 ```jsx
 import { VormiaProvider } from "vormiaqueryjs";
 
 function App() {
   return (
-    <VormiaProvider config={{ 
-      baseURL: import.meta.env.VITE_VORMIA_API_URL 
-    }}>
+    <VormiaProvider
+      config={{
+        baseURL: import.meta.env.VITE_VORMIA_API_URL,
+      }}
+    >
       <YourApp />
     </VormiaProvider>
   );
@@ -124,6 +131,7 @@ function App() {
 ```
 
 ### **NotificationPanel** - Notification Display
+
 ```jsx
 import { NotificationPanel } from "vormiaqueryjs";
 
@@ -144,6 +152,7 @@ function MyComponent() {
 ```
 
 ### **ErrorDebugPanel** - Debug Information
+
 ```jsx
 import { ErrorDebugPanel } from "vormiaqueryjs";
 
@@ -175,8 +184,7 @@ Configure your package using environment variables in your `.env` file:
 VITE_VORMIA_API_URL=https://api.example.com
 
 # Debug System
-VITE_VORMIA_DEBUG=true                  # Enable debug panel
-VITE_VORMIA_ENV=local                  # Environment (local/production)
+VITE_VORMIA_DEBUG=true                  # Enable debug panel (false = production mode)
 
 # Advanced Configuration (Optional)
 VITE_VORMIA_AUTH_TOKEN_KEY=vormia_auth_token  # Custom auth token storage key
@@ -193,32 +201,35 @@ VITE_VORMIA_WITH_CREDENTIALS=false            # Include credentials in requests
 VormiaQueryJS provides a comprehensive notification system with multiple display variants:
 
 ### **Notification Types**
+
 - **Toast**: Auto-dismissing popup notifications
 - **Banner**: Full-width at top of page
 - **In-App**: Inline above forms
 - **Modal**: Overlay centered on screen
 
 ### **Notification Variants**
+
 - **Success**: Green styling with ✅ icon
 - **Error**: Red styling with ❌ icon
 - **Warning**: Yellow styling with ⚠️ icon
 - **Info**: Blue styling with ℹ️ icon
 
 ### **Usage Example**
+
 ```jsx
 // Create notifications
 const successNotification = {
-  type: 'success',
-  title: 'Success',
-  message: 'Operation completed successfully!',
-  variant: 'banner' // or 'inapp', 'modal', 'toast'
+  type: "success",
+  title: "Success",
+  message: "Operation completed successfully!",
+  variant: "banner", // or 'inapp', 'modal', 'toast'
 };
 
 // Display with NotificationPanel
 <NotificationPanel
   notification={successNotification}
   onClose={() => setNotification(null)}
-/>
+/>;
 ```
 
 ---
@@ -226,13 +237,15 @@ const successNotification = {
 ## 🐛 Debug System
 
 ### **Automatic Visibility**
+
 The debug panel automatically:
+
 - Shows when `VITE_VORMIA_DEBUG=true`
-- Hides when `VITE_VORMIA_DEBUG=false`
-- Hides in production builds
+- Hides when `VITE_VORMIA_DEBUG=false` (production mode)
 - Provides detailed console logging for troubleshooting
 
 ### **Usage**
+
 ```jsx
 import { ErrorDebugPanel, createDebugInfo } from "vormiaqueryjs";
 
@@ -244,7 +257,7 @@ const debugInfo = createDebugInfo(response);
   debugInfo={debugInfo}
   showDebug={true}
   onClose={() => setDebugInfo(null)}
-/>
+/>;
 ```
 
 ---
@@ -260,18 +273,18 @@ const mutation = useVormiaQueryAuthMutation({
     // Rename fields
     rename: {
       confirmPassword: "password_confirmation",
-      user_name: "name"
+      user_name: "name",
     },
-    
+
     // Add fields
     add: {
       terms: true,
-      source: "web"
+      source: "web",
     },
-    
+
     // Remove fields
-    remove: ["confirmPassword", "tempField"]
-  }
+    remove: ["confirmPassword", "tempField"],
+  },
 });
 
 // Just pass formData - transformation happens automatically!
@@ -283,14 +296,20 @@ mutation.mutate(formData);
 ## 🌍 Framework Support
 
 ### **React Components**
+
 - `VormiaProvider`
 - `NotificationPanel`
 - `ErrorDebugPanel`
 
 ### **Framework-Agnostic HTML**
+
 ```jsx
 // Get HTML strings for other frameworks
-const notificationHtml = query.getNotificationHtml('success', 'Success', 'Data loaded!');
+const notificationHtml = query.getNotificationHtml(
+  "success",
+  "Success",
+  "Data loaded!"
+);
 const debugHtml = query.getDebugHtml(response, true);
 
 // Use in any framework
@@ -304,16 +323,19 @@ const debugHtml = query.getDebugHtml(response, true);
 ## 🔧 Troubleshooting
 
 ### **Debug Panel Not Showing**
+
 1. Check environment variable: `VITE_VORMIA_DEBUG=true`
 2. Verify console logs show: `🔍 VormiaQuery Debug: VITE_VORMIA_DEBUG = true`
 3. Check browser console for JavaScript errors
 
 ### **Environment Variables Not Working**
+
 1. Ensure `VITE_` prefix on all variables
 2. Restart dev server after changing `.env` file
 3. Check variable names match exactly (case-sensitive)
 
 ### **Notifications Not Styling Correctly**
+
 1. Update to v1.4.2+ (styling issues fixed)
 2. Ensure CSS classes are available
 3. Override with custom CSS if needed
@@ -323,6 +345,7 @@ const debugHtml = query.getDebugHtml(response, true);
 ## 📚 Examples
 
 See the `examples/` directory for comprehensive usage examples:
+
 - React SPA setup
 - Form data transformation
 - Notification system usage

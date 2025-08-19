@@ -51,8 +51,7 @@ VITE_VORMIA_NOTIFICATION_PANEL=true      # Enable notification panels
 VITE_VORMIA_NOTIFICATION_DURATION=5000   # Toast duration in milliseconds
 
 # Debug System (disabled by default)
-VITE_VORMIA_DEBUG=false                  # Enable debug panel
-VITE_VORMIA_ENV=local                   # Environment (local/production)
+VITE_VORMIA_DEBUG=false                  # Enable debug panel (true = development, false = production)
 */
 
 // ============================================================================

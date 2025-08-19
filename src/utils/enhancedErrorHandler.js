@@ -271,12 +271,10 @@ export function getNotificationConfig() {
  */
 export function getDebugConfig() {
   const debugEnabled = getEnvVar("VITE_VORMIA_DEBUG", "false") === "true";
-  const env = getEnvVar("VITE_VORMIA_ENV", "local");
   
   return {
     enabled: debugEnabled,
-    environment: env,
-    isProduction: env === "production"
+    isProduction: !debugEnabled // If debug is disabled, treat as production
   };
 }
 
@@ -310,30 +308,10 @@ function getEnvVar(key, defaultValue = "") {
 }
 
 /**
- * Get environment type
- * @returns {string} Environment type (local, production, staging)
- */
-export function getEnvironment() {
-  if (typeof import.meta !== "undefined" && import.meta.env?.VITE_VORMIA_ENV) {
-    return import.meta.env.VITE_VORMIA_ENV;
-  }
-
-  // Safely check for process
-  try {
-    if (typeof process !== "undefined" && process?.env?.NODE_ENV) {
-      return process.env.NODE_ENV;
-    }
-  } catch (e) {
-    // process not available, continue
-  }
-
-  return "local";
-}
-
-/**
  * Check if current environment is production
  * @returns {boolean} Whether current environment is production
  */
 export function isProduction() {
-  return getEnvironment() === "production";
+  // If debug is disabled, treat as production
+  return getDebugFlag() === false;
 }
