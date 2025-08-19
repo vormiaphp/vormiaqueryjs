@@ -2,609 +2,362 @@
 // Astro component script
 ---
 
-<div class="vormia-demo">
-  <h1>VormiaQueryJS Debug & Notification System - Astro</h1>
+<div class="max-w-2xl mx-auto p-6 space-y-6">
+  <h1 class="text-3xl font-bold text-center mb-8">
+    VormiaQueryJS Astro Example
+  </h1>
 
-  <!-- Notifications Container -->
-  <div id="notifications"></div>
+  <!-- Notification Display -->
+  <div id="notificationContainer"></div>
 
-  <!-- Form Section -->
-  <div class="form-section">
-    <h2>User Registration Form</h2>
-    <form id="registration-form">
-      <div class="form-group">
-        <label for="name">Name:</label>
+  <!-- Registration Form -->
+  <div class="bg-white shadow-md rounded-lg p-6">
+    <h2 class="text-2xl font-semibold mb-6">User Registration</h2>
+    
+    <form id="registration-form" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Full Name
+        </label>
         <input
           type="text"
           id="name"
           name="name"
-          class="form-input"
+          placeholder="Enter your full name"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
-        <div class="error-display" data-field="name"></div>
+        <div class="field-error mt-2" data-field="name"></div>
       </div>
 
-      <div class="form-group">
-        <label for="email">Email:</label>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Email
+        </label>
         <input
           type="email"
           id="email"
           name="email"
-          class="form-input"
+          placeholder="Enter your email"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
-        <div class="error-display" data-field="email"></div>
+        <div class="field-error mt-2" data-field="email"></div>
       </div>
 
-      <div class="form-group">
-        <label for="password">Password:</label>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Password
+        </label>
         <input
           type="password"
           id="password"
           name="password"
-          class="form-input"
+          placeholder="Enter your password"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
-        <div class="error-display" data-field="password"></div>
+        <div class="field-error mt-2" data-field="password"></div>
       </div>
 
-      <div class="form-group">
-        <label for="confirmPassword">Confirm Password:</label>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Confirm Password
+        </label>
         <input
           type="password"
           id="confirmPassword"
           name="confirmPassword"
-          class="form-input"
+          placeholder="Confirm your password"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
-        <div class="error-display" data-field="confirmPassword"></div>
       </div>
 
-      <div id="general-error" class="general-error" style="display: none;">
-        <p class="error-message"></p>
-      </div>
-
-      <div class="form-actions">
-        <button type="submit" id="submit-btn">Register</button>
-        <button type="button" id="clear-errors">Clear Errors</button>
-      </div>
+      <button
+        type="submit"
+        id="submit-btn"
+        class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Create Account
+      </button>
     </form>
+
+    <!-- General Error Display -->
+    <div id="general-error" class="mt-4"></div>
   </div>
 
-  <!-- Debug Section -->
-  <div class="debug-section">
-    <h2>Debug Panel</h2>
-    <div id="debug-panel"></div>
-  </div>
-
-  <!-- Controls -->
-  <div class="controls">
-    <button id="test-success">Test Success</button>
-    <button id="test-error">Test Error</button>
-    <button id="test-validation">Test Validation Error</button>
-    <button id="toggle-debug">Toggle Debug Panel</button>
+  <!-- Status Information -->
+  <div id="status-display" class="bg-gray-50 p-4 rounded-lg">
+    <h3 class="font-semibold mb-2">Form Status</h3>
+    <div class="space-y-1 text-sm text-gray-600">
+      <p>Loading: No</p>
+      <p>Has Data: No</p>
+      <p>Has Error: No</p>
+      <p>Field Errors: 0</p>
+      <p>General Error: No</p>
+    </div>
   </div>
 </div>
 
 <script>
-  import {
-    createEnhancedErrorHandler,
-    createFieldErrorManager,
-    showSuccessNotification,
-    showErrorNotification,
-    createErrorDebugPanel,
-  } from "vormiaqueryjs";
-
   // Initialize when DOM is ready
   document.addEventListener("DOMContentLoaded", () => {
     init();
   });
 
   function init() {
-    // Initialize error handler
-    const errorHandler = createEnhancedErrorHandler({
-      debugEnabled: true,
-      showNotifications: true,
-      showDebugPanel: true,
-      notificationTarget: "#notifications",
-      debugTarget: "#debug-panel",
-    });
-
-    // Initialize field error manager
-    const fieldErrorManager = createFieldErrorManager();
-
-    // Form data
-    let formData = {
-      name: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    };
-
-    // DOM elements
-    const form = document.getElementById("registration-form");
-    const nameInput = document.getElementById("name");
-    const emailInput = document.getElementById("email");
-    const passwordInput = document.getElementById("password");
-    const confirmPasswordInput = document.getElementById("confirmPassword");
-    const submitBtn = document.getElementById("submit-btn");
-    const generalError = document.getElementById("general-error");
-
-    // Set debug panel visibility
-    const isDebugEnabled = import.meta.env.VITE_VORMIA_DEBUG === "true";
-
     // Show welcome notification
-    showSuccessNotification(
-      "Welcome to VormiaQueryJS Debug & Notification System!",
-      "System Ready",
-      "#notifications",
-      3000
-    );
+    showNotification('success', 'Welcome to VormiaQueryJS Astro Example!', 'System Ready');
+    
+    // Bind form events
+    bindFormEvents();
+  }
 
-    // Setup field error listener
-    fieldErrorManager.addListener((fieldErrors) => {
-      updateFieldErrorDisplays(fieldErrors);
+  function bindFormEvents() {
+    const form = document.getElementById('registration-form');
+    const submitBtn = document.getElementById('submit-btn');
+    
+    if (form) {
+      form.addEventListener('submit', handleSubmit);
+    }
+    
+    // Input change events
+    const inputs = form.querySelectorAll('input');
+    inputs.forEach(input => {
+      input.addEventListener('input', () => {
+        clearFieldError(input.name);
+      });
     });
+  }
 
-    // Setup event listeners
-    form.addEventListener("submit", handleFormSubmit);
-    nameInput.addEventListener("input", () => handleInputChange("name"));
-    emailInput.addEventListener("input", () => handleInputChange("email"));
-    passwordInput.addEventListener("input", () => handleInputChange("password"));
-    confirmPasswordInput.addEventListener("input", () => handleInputChange("confirmPassword"));
-
-    document.getElementById("clear-errors").addEventListener("click", clearAllErrors);
-    document.getElementById("test-success").addEventListener("click", testSuccess);
-    document.getElementById("test-error").addEventListener("click", testError);
-    document.getElementById("test-validation").addEventListener("click", testValidationError);
-    document.getElementById("toggle-debug").addEventListener("click", toggleDebugPanel);
-
-    // Handle form submission
-    async function handleFormSubmit(event) {
-      event.preventDefault();
-
-      // Clear previous errors
-      fieldErrorManager.clearAllFieldErrors();
-      hideGeneralError();
-
-      // Get form data
-      formData = {
-        name: nameInput.value.trim(),
-        email: emailInput.value.trim(),
-        password: passwordInput.value,
-        confirmPassword: confirmPasswordInput.value,
-      };
-
-      // Validate form
-      if (!validateForm()) {
-        return;
-      }
-
-      // Disable submit button
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Registering...";
-
-      try {
-        // Simulate API call
-        const response = await simulateApiCall(formData);
-
-        // Handle success
-        errorHandler.handleSuccess(response, {
-          notificationMessage: "User registered successfully!",
-          debugLabel: "User Registration Success",
-        });
-
-        // Set debug info for debug panel
-        const debugInfo = {
-          status: 200,
-          message: "Operation successful",
-          response: {
-            response: {
-              data: {
-                success: true,
-                message: response?.data?.message || "Operation completed successfully",
-                data: response?.data,
-                debug: response?.debug,
-              },
-            },
-            debug: response?.debug,
-          },
-          errorType: "success",
-          timestamp: new Date().toISOString(),
-        };
-
-        // Show debug panel if enabled
-        if (isDebugEnabled) {
-          createErrorDebugPanel({
-            debugInfo,
-            showDebug: true,
-            onClose: null,
-            targetSelector: "#debug-panel",
-          });
-        }
-
-        // Reset form
-        form.reset();
-        formData = { name: "", email: "", password: "", confirmPassword: "" };
-      } catch (error) {
-        // Handle error
-        const errorInfo = errorHandler.handleError(error, {
-          handleFieldErrors: true,
-          fieldMapping: {
-            password_confirmation: "confirmPassword",
-          },
-        });
-
-        // Show debug panel if enabled
-        if (isDebugEnabled) {
-          createErrorDebugPanel({
-            debugInfo: errorInfo,
-            showDebug: true,
-            onClose: null,
-            targetSelector: "#debug-panel",
-          });
-        }
-
-        // Show general error if no field errors
-        if (Object.keys(fieldErrors).length === 0) {
-          showGeneralError(errorInfo.message);
-        }
-      } finally {
-        // Re-enable submit button
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Register";
-      }
-    }
-
-    // Handle input changes
-    function handleInputChange(fieldName) {
-      // Clear field error when user starts typing
-      if (fieldErrorManager.hasFieldError(fieldName)) {
-        fieldErrorManager.clearFieldError(fieldName);
-      }
-
-      // Clear general error
-      hideGeneralError();
-    }
-
-    // Validate form
-    function validateForm() {
-      let isValid = true;
-      const newFieldErrors = {};
-
-      // Required field validation
-      if (!formData.name) {
-        newFieldErrors.name = "Name is required";
-        isValid = false;
-      }
-
-      if (!formData.email) {
-        newFieldErrors.email = "Email is required";
-        isValid = false;
-      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-        newFieldErrors.email = "Please enter a valid email address";
-        isValid = false;
-      }
-
-      if (!formData.password) {
-        newFieldErrors.password = "Password is required";
-        isValid = false;
-      } else if (formData.password.length < 8) {
-        newFieldErrors.password = "Password must be at least 8 characters long";
-        isValid = false;
-      }
-
-      if (!formData.confirmPassword) {
-        newFieldErrors.confirmPassword = "Please confirm your password";
-        isValid = false;
-      } else if (formData.password !== formData.confirmPassword) {
-        newFieldErrors.confirmPassword = "Passwords do not match";
-        isValid = false;
-      }
-
-      // Set field errors
-      fieldErrorManager.setFieldErrors(newFieldErrors);
-
-      return isValid;
-    }
-
-    // Update field error displays
-    function updateFieldErrorDisplays(fieldErrors) {
-      // Clear all error displays
-      document.querySelectorAll(".error-display").forEach((el) => {
-        el.innerHTML = "";
-      });
-
-      // Show errors for fields that have them
-      Object.keys(fieldErrors).forEach((fieldName) => {
-        const errorElement = document.querySelector(`[data-field="${fieldName}"]`);
-        if (errorElement) {
-          errorElement.innerHTML = `<span class="error-message">${fieldErrors[fieldName]}</span>`;
-        }
-      });
-
-      // Update input field classes
-      updateFieldClasses();
-    }
-
-    // Update field classes based on error state
-    function updateFieldClasses() {
-      nameInput.className = `form-input ${fieldErrorManager.hasFieldError("name") ? "error" : ""}`;
-      emailInput.className = `form-input ${fieldErrorManager.hasFieldError("email") ? "error" : ""}`;
-      passwordInput.className = `form-input ${fieldErrorManager.hasFieldError("password") ? "error" : ""}`;
-      confirmPasswordInput.className = `form-input ${fieldErrorManager.hasFieldError("confirmPassword") ? "error" : ""}`;
-    }
-
-    // Clear all errors
-    function clearAllErrors() {
-      fieldErrorManager.clearAllFieldErrors();
-      hideGeneralError();
-    }
-
-    // Show general error
-    function showGeneralError(message) {
-      const errorElement = generalError.querySelector(".error-message");
-      errorElement.textContent = message;
-      generalError.style.display = "block";
-    }
-
-    // Hide general error
-    function hideGeneralError() {
-      generalError.style.display = "none";
-    }
-
-    // Test functions
-    function testSuccess() {
-      const mockResponse = {
-        data: {
-          success: true,
-          message: "Test operation completed successfully",
-          data: { id: 123, status: "active" },
-          debug: { timestamp: new Date().toISOString() },
-        },
-      };
-
-      errorHandler.handleSuccess(mockResponse, {
-        notificationMessage: "Test success operation completed!",
-        debugLabel: "Test Success",
-      });
-
-      if (isDebugEnabled) {
-        createErrorDebugPanel({
-          debugInfo: {
-            status: 200,
-            message: "Test operation successful",
-            response: {
-              response: {
-                data: {
-                  success: true,
-                  message: "Test operation completed successfully",
-                  data: { id: 123, status: "active" },
-                  debug: { timestamp: new Date().toISOString() },
-                },
-              },
-            },
-            errorType: "success",
-            timestamp: new Date().toISOString(),
-          },
-          showDebug: true,
-          onClose: null,
-          targetSelector: "#debug-panel",
-        });
-      }
-    }
-
-    function testError() {
-      const mockError = {
-        status: 500,
-        message: "Internal server error",
-        response: {
-          message: "Something went wrong on the server",
-          response: {
-            data: {
-              success: false,
-              message: "Server is experiencing issues",
-              debug: { errorCode: "INT_ERR_001" },
-            },
-          },
-        },
-        isServerError: () => true,
-      };
-
-      errorHandler.handleError(mockError, {
-        debugLabel: "Test Server Error",
-      });
-
-      if (isDebugEnabled) {
-        createErrorDebugPanel({
-          debugInfo: {
-            status: 500,
-            message: "Internal server error",
-            response: mockError.response,
-            errorType: "server",
-            timestamp: new Date().toISOString(),
-          },
-          showDebug: true,
-          onClose: null,
-          targetSelector: "#debug-panel",
-        });
-      }
-    }
-
-    function testValidationError() {
-      const mockValidationError = {
-        status: 422,
-        message: "Validation failed",
-        response: {
-          message: "Please check the form fields below",
-          errors: {
-            name: ["Name must be at least 2 characters"],
-            email: ["Email format is invalid"],
-            password: ["Password is too weak"],
-          },
-        },
-        isValidationError: () => true,
-      };
-
-      errorHandler.handleError(mockValidationError, {
-        handleFieldErrors: true,
-        fieldMapping: {},
-        debugLabel: "Test Validation Error",
-      });
-
-      if (isDebugEnabled) {
-        createErrorDebugPanel({
-          debugInfo: {
-            status: 422,
-            message: "Validation failed",
-            response: mockValidationError.response,
-            errorType: "validation",
-            timestamp: new Date().toISOString(),
-          },
-          showDebug: true,
-          onClose: null,
-          targetSelector: "#debug-panel",
-        });
-      }
-    }
-
-    function toggleDebugPanel() {
-      const debugPanel = document.getElementById("debug-panel");
-      if (debugPanel.style.display === "none") {
-        debugPanel.style.display = "block";
+  async function handleSubmit(event) {
+    event.preventDefault();
+    
+    const submitBtn = document.getElementById('submit-btn');
+    const form = event.target;
+    const formData = new FormData(form);
+    
+    // Clear previous errors
+    clearAllFieldErrors();
+    clearGeneralError();
+    
+    // Update button state
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Creating Account...';
+    
+    try {
+      // Simulate API call with form data transformation
+      const transformedData = transformFormData(Object.fromEntries(formData));
+      
+      // Simulate API response
+      await simulateApiCall(transformedData);
+      
+      // Success
+      showNotification('success', 'Account created successfully!', 'Success');
+      updateStatus(true, false);
+      
+      // Reset form
+      form.reset();
+      
+    } catch (error) {
+      // Error
+      showNotification('error', error.message || 'Registration failed', 'Error');
+      updateStatus(false, true);
+      
+      // Handle field errors if available
+      if (error.fieldErrors) {
+        setFieldErrors(error.fieldErrors);
+        clearGeneralError();
       } else {
-        debugPanel.style.display = "none";
+        setGeneralError(error.message || 'Registration failed');
+        clearAllFieldErrors();
       }
+    } finally {
+      // Reset button state
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Create Account';
     }
+  }
 
-    // Simulate API call
-    async function simulateApiCall(data) {
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          // Simulate random success/failure
-          if (Math.random() > 0.3) {
-            resolve({
-              data: {
-                success: true,
-                message: "User registered successfully",
-                data: { id: Math.floor(Math.random() * 1000), ...data },
-                debug: { timestamp: new Date().toISOString() },
-              },
-            });
-          } else {
-            reject({
-              status: 422,
-              message: "Validation failed",
-              response: {
-                message: "Please check the form fields below",
-                errors: {
-                  name: ["Name must be at least 2 characters"],
-                  email: ["Email format is invalid"],
-                  password: ["Password is too weak"],
-                },
-              },
-              isValidationError: () => true,
-            });
-          }
-        }, 1000);
-      });
+  function transformFormData(formData) {
+    // Simulate the form data transformation that VormiaQueryJS does
+    return {
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      password_confirmation: formData.confirmPassword, // Renamed
+      terms: true, // Added
+      source: 'web' // Added
+      // confirmPassword removed
+    };
+  }
+
+  async function simulateApiCall(data) {
+    // Simulate API call with random success/failure
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (Math.random() > 0.3) {
+          // Success
+          resolve({ success: true, data });
+        } else {
+          // Error - simulate validation errors
+          reject({
+            message: 'Validation failed',
+            fieldErrors: {
+              name: ['Name must be at least 2 characters'],
+              email: ['Email format is invalid'],
+              password: ['Password is too weak']
+            }
+          });
+        }
+      }, 1000);
+    });
+  }
+
+  function showNotification(type, message, title = '') {
+    const container = document.getElementById('notificationContainer');
+    if (!container) return;
+    
+    const classes = getNotificationClasses(type);
+    const icon = getNotificationIcon(type);
+    
+    container.innerHTML = `
+      <div class="notification-panel">
+        <div class="${classes}">
+          <div class="flex items-center">
+            <span class="text-lg mr-3">${icon}</span>
+            <div class="flex-1">
+              ${title ? `<h3 class="font-semibold text-sm">${title}</h3>` : ''}
+              <p class="text-sm">${message}</p>
+            </div>
+            <button onclick="closeNotification()" class="ml-3 hover:opacity-70 transition-opacity">
+              ✕
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function closeNotification() {
+    const container = document.getElementById('notificationContainer');
+    if (container) {
+      container.innerHTML = '';
+    }
+  }
+
+  function setFieldErrors(errors) {
+    Object.keys(errors).forEach(field => {
+      const errorContainer = document.querySelector(`[data-field="${field}"]`);
+      if (errorContainer) {
+        errorContainer.innerHTML = `
+          <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div class="flex items-center">
+              <svg class="h-5 w-5 text-red-400 mr-3" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+              </svg>
+              <p class="text-sm text-red-800">${errors[field]}</p>
+              <button onclick="clearFieldError('${field}')" class="ml-auto text-red-400 hover:text-red-600">
+                ✕
+              </button>
+            </div>
+          </div>
+        `;
+      }
+    });
+  }
+
+  function clearFieldError(field) {
+    const errorContainer = document.querySelector(`[data-field="${field}"]`);
+    if (errorContainer) {
+      errorContainer.innerHTML = '';
+    }
+  }
+
+  function clearAllFieldErrors() {
+    const errorContainers = document.querySelectorAll('.field-error');
+    errorContainers.forEach(container => {
+      container.innerHTML = '';
+    });
+  }
+
+  function setGeneralError(message) {
+    const container = document.getElementById('general-error');
+    if (container) {
+      container.innerHTML = `
+        <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div class="flex items-center">
+            <svg class="h-5 w-5 text-red-400 mr-3" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+            </svg>
+            <p class="text-sm text-red-800 flex-1">${message}</p>
+            <button onclick="clearGeneralError()" class="text-red-400 hover:text-red-600">
+              ✕
+            </button>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  function clearGeneralError() {
+    const container = document.getElementById('general-error');
+    if (container) {
+      container.innerHTML = '';
+    }
+  }
+
+  function updateStatus(hasData, hasError) {
+    const statusContainer = document.getElementById('status-display');
+    if (statusContainer) {
+      const fieldErrors = document.querySelectorAll('.field-error').length;
+      const generalError = document.getElementById('general-error').innerHTML !== '';
+      
+      statusContainer.innerHTML = `
+        <h3 class="font-semibold mb-2">Form Status</h3>
+        <div class="space-y-1 text-sm text-gray-600">
+          <p>Loading: No</p>
+          <p>Has Data: ${hasData ? 'Yes' : 'No'}</p>
+          <p>Has Error: ${hasError ? 'Yes' : 'No'}</p>
+          <p>Field Errors: ${fieldErrors}</p>
+          <p>General Error: ${generalError ? 'Yes' : 'No'}</p>
+        </div>
+      `;
+    }
+  }
+
+  function getNotificationClasses(type) {
+    const baseClasses = 'border rounded-lg p-4';
+    switch (type) {
+      case 'success':
+        return `${baseClasses} bg-green-50 border-green-200 text-green-800`;
+      case 'error':
+        return `${baseClasses} bg-red-50 border-red-200 text-red-800`;
+      case 'warning':
+        return `${baseClasses} bg-yellow-50 border-yellow-200 text-yellow-800`;
+      case 'info':
+        return `${baseClasses} bg-blue-50 border-blue-200 text-blue-800`;
+      default:
+        return `${baseClasses} bg-gray-50 border-gray-200 text-gray-800`;
+    }
+  }
+
+  function getNotificationIcon(type) {
+    switch (type) {
+      case 'success': return '✅';
+      case 'error': return '❌';
+      case 'warning': return '⚠️';
+      case 'info': return 'ℹ️';
+      default: return '📢';
     }
   }
 </script>
 
 <style>
-  .vormia-demo {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  }
-
-  .form-section {
-    margin: 20px 0;
-    padding: 20px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    background: #f9fafb;
-  }
-
-  .form-group {
-    margin-bottom: 15px;
-  }
-
-  .form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-  }
-
-  .form-input {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 4px;
-    font-size: 14px;
-  }
-
-  .form-input.error {
-    border-color: #dc2626;
-  }
-
-  .error-display {
-    min-height: 20px;
-    margin-top: 5px;
-  }
-
-  .error-message {
-    color: #dc2626;
-    font-size: 12px;
-  }
-
-  .general-error {
-    margin: 15px 0;
-    padding: 10px;
-    background-color: #fef2f2;
-    border: 1px solid #fecaca;
-    border-radius: 4px;
-  }
-
-  .form-actions {
-    margin-top: 20px;
-  }
-
-  button {
-    background: #3b82f6;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-right: 10px;
-    margin-bottom: 10px;
-  }
-
-  button:hover {
-    background: #2563eb;
-  }
-
-  button:disabled {
-    background: #9ca3af;
-    cursor: not-allowed;
-  }
-
-  .debug-section {
-    margin: 20px 0;
-    padding: 20px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    background: #f9fafb;
-  }
-
-  .controls {
-    margin: 20px 0;
-    padding: 20px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    background: #f9fafb;
+  .notification-panel {
+    position: sticky;
+    top: 0;
+    z-index: 50;
   }
 </style> 

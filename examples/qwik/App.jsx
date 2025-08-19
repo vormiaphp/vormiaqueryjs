@@ -1,11 +1,4 @@
 import { component$, useSignal, useVisibleTask$, $ } from "@builder.io/qwik";
-import {
-  createEnhancedErrorHandler,
-  createFieldErrorManager,
-  showSuccessNotification,
-  showErrorNotification,
-  createErrorDebugPanel,
-} from "vormiaqueryjs";
 
 export default component$(() => {
   // State management
@@ -17,514 +10,309 @@ export default component$(() => {
   });
   const fieldErrors = useSignal({});
   const generalError = useSignal("");
-  const debugInfo = useSignal(null);
-  const showDebug = useSignal(false);
-  const isSubmitting = useSignal(false);
-  const errorHandler = useSignal(null);
-  const fieldErrorManager = useSignal(null);
+  const notification = useSignal(null);
+  const isLoading = useSignal(false);
+  const hasData = useSignal(false);
+  const hasError = useSignal(false);
 
-  // Initialize components
+  // Initialize on mount
   useVisibleTask$(() => {
-    initializeComponents();
-    setupFieldErrorListener();
-    showWelcomeNotification();
-  });
-
-  const initializeComponents = $(() => {
-    // Initialize error handler
-    errorHandler.value = createEnhancedErrorHandler({
-      debugEnabled: true,
-      showNotifications: true,
-      showDebugPanel: true,
-      notificationTarget: "#notifications",
-      debugTarget: "#debug-panel",
-    });
-
-    // Initialize field error manager
-    fieldErrorManager.value = createFieldErrorManager();
-
-    // Set debug panel visibility
-    showDebug.value = import.meta.env.VITE_VORMIA_DEBUG === "true";
-  });
-
-  const setupFieldErrorListener = $(() => {
-    fieldErrorManager.value.addListener((errors) => {
-      fieldErrors.value = errors;
-    });
-  });
-
-  const showWelcomeNotification = $(() => {
-    showSuccessNotification(
-      "Welcome to VormiaQueryJS Debug & Notification System!",
-      "System Ready",
-      "#notifications",
-      3000
-    );
+    showNotification('success', 'Welcome to VormiaQueryJS Qwik Example!', 'System Ready');
   });
 
   const handleSubmit = $(async (event) => {
     event.preventDefault();
 
     // Clear previous errors
-    fieldErrorManager.value.clearAllFieldErrors();
+    fieldErrors.value = {};
     generalError.value = "";
-
-    // Validate form
-    if (!validateForm()) {
-      return;
-    }
-
-    isSubmitting.value = true;
+    isLoading.value = true;
 
     try {
-      // Simulate API call
-      const response = await simulateApiCall(formData.value);
-
-      // Handle success
-      errorHandler.value.handleSuccess(response, {
-        notificationMessage: "User registered successfully!",
-        debugLabel: "User Registration Success",
-      });
-
-      // Set debug info
-      debugInfo.value = {
-        status: 200,
-        message: "Operation successful",
-        response: {
-          response: {
-            data: {
-              success: true,
-              message: response?.data?.message || "Operation completed successfully",
-              data: response?.data,
-              debug: response?.debug,
-            },
-          },
-          debug: response?.debug,
-        },
-        errorType: "success",
-        timestamp: new Date().toISOString(),
-      };
-
-      showDebug.value = true;
-
+      // Simulate API call with form data transformation
+      const transformedData = transformFormData(formData.value);
+      
+      // Simulate API response
+      await simulateApiCall(transformedData);
+      
+      // Success
+      showNotification('success', 'Account created successfully!', 'Success');
+      hasData.value = true;
+      hasError.value = false;
+      
       // Reset form
       formData.value = { name: "", email: "", password: "", confirmPassword: "" };
+      
     } catch (error) {
-      // Handle error
-      const errorInfo = errorHandler.value.handleError(error, {
-        handleFieldErrors: true,
-        fieldMapping: {
-          password_confirmation: "confirmPassword",
-        },
-      });
-
-      // Set debug info
-      debugInfo.value = errorInfo;
-      showDebug.value = true;
-
-      // Set general error if no field errors
-      if (Object.keys(fieldErrors.value).length === 0) {
-        generalError.value = errorInfo.message;
+      // Error
+      showNotification('error', error.message || 'Registration failed', 'Error');
+      hasError.value = true;
+      hasData.value = false;
+      
+      // Handle field errors if available
+      if (error.fieldErrors) {
+        fieldErrors.value = error.fieldErrors;
+        generalError.value = "";
+      } else {
+        generalError.value = error.message || 'Registration failed';
+        fieldErrors.value = {};
       }
     } finally {
-      isSubmitting.value = false;
+      isLoading.value = false;
     }
   });
 
-  const handleInputChange = $((fieldName, event) => {
-    const value = event.target.value;
-    formData.value = { ...formData.value, [fieldName]: value };
-
-    // Clear field error when user starts typing
-    if (fieldErrors.value[fieldName]) {
-      fieldErrorManager.value.clearFieldError(fieldName);
-    }
-
-    // Clear general error
-    if (generalError.value) {
-      generalError.value = "";
-    }
-  });
-
-  const validateForm = $(() => {
-    let isValid = true;
-    const newFieldErrors = {};
-
-    // Required field validation
-    if (!formData.value.name.trim()) {
-      newFieldErrors.name = "Name is required";
-      isValid = false;
-    }
-
-    if (!formData.value.email.trim()) {
-      newFieldErrors.email = "Email is required";
-      isValid = false;
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.value.email)) {
-      newFieldErrors.email = "Please enter a valid email address";
-      isValid = false;
-    }
-
-    if (!formData.value.password) {
-      newFieldErrors.password = "Password is required";
-      isValid = false;
-    } else if (formData.value.password.length < 8) {
-      newFieldErrors.password = "Password must be at least 8 characters long";
-      isValid = false;
-    }
-
-    if (!formData.value.confirmPassword) {
-      newFieldErrors.confirmPassword = "Please confirm your password";
-      isValid = false;
-    } else if (formData.value.password !== formData.value.confirmPassword) {
-      newFieldErrors.confirmPassword = "Passwords do not match";
-      isValid = false;
-    }
-
-    // Set field errors
-    fieldErrorManager.value.setFieldErrors(newFieldErrors);
-
-    return isValid;
-  });
-
-  const clearAllErrors = $(() => {
-    fieldErrorManager.value.clearAllFieldErrors();
-    generalError.value = "";
-  });
-
-  const toggleDebug = $(() => {
-    showDebug.value = !showDebug.value;
-  });
-
-  const getFieldErrorClass = $((fieldName) => {
-    return fieldErrors.value[fieldName] ? "border-red-500" : "";
-  });
-
-  const testSuccess = $(() => {
-    const mockResponse = {
-      data: {
-        success: true,
-        message: "Test operation completed successfully",
-        data: { id: 123, status: "active" },
-        debug: { timestamp: new Date().toISOString() },
-      },
+  const transformFormData = $((formData) => {
+    // Simulate the form data transformation that VormiaQueryJS does
+    return {
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      password_confirmation: formData.confirmPassword, // Renamed
+      terms: true, // Added
+      source: 'web' // Added
+      // confirmPassword removed
     };
-
-    errorHandler.value.handleSuccess(mockResponse, {
-      notificationMessage: "Test success operation completed!",
-      debugLabel: "Test Success",
-    });
-
-    debugInfo.value = {
-      status: 200,
-      message: "Test operation successful",
-      response: {
-        response: {
-          data: {
-            success: true,
-            message: "Test operation completed successfully",
-            data: { id: 123, status: "active" },
-            debug: { timestamp: new Date().toISOString() },
-          },
-        },
-      },
-      errorType: "success",
-      timestamp: new Date().toISOString(),
-    };
-    showDebug.value = true;
   });
 
-  const testError = $(() => {
-    const mockError = {
-      status: 500,
-      message: "Internal server error",
-      response: {
-        message: "Something went wrong on the server",
-        response: {
-          data: {
-            success: false,
-            message: "Server is experiencing issues",
-            debug: { errorCode: "INT_ERR_001" },
-          },
-        },
-      },
-      isServerError: () => true,
-    };
-
-    errorHandler.value.handleError(mockError, {
-      debugLabel: "Test Server Error",
-    });
-
-    debugInfo.value = {
-      status: 500,
-      message: "Internal server error",
-      response: mockError.response,
-      errorType: "server",
-      timestamp: new Date().toISOString(),
-    };
-    showDebug.value = true;
-  });
-
-  const testValidationError = $(() => {
-    const mockValidationError = {
-      status: 422,
-      message: "Validation failed",
-      response: {
-        message: "Please check the form fields below",
-        errors: {
-          name: ["Name must be at least 2 characters"],
-          email: ["Email format is invalid"],
-          password: ["Password is too weak"],
-        },
-      },
-      isValidationError: () => true,
-    };
-
-    errorHandler.value.handleError(mockValidationError, {
-      handleFieldErrors: true,
-      fieldMapping: {},
-      debugLabel: "Test Validation Error",
-    });
-
-    debugInfo.value = {
-      status: 422,
-      message: "Validation failed",
-      response: mockValidationError.response,
-      errorType: "validation",
-      timestamp: new Date().toISOString(),
-    };
-    showDebug.value = true;
-  });
-
-  // Simulate API call
   const simulateApiCall = $(async (data) => {
+    // Simulate API call with random success/failure
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        // Simulate random success/failure
         if (Math.random() > 0.3) {
-          resolve({
-            data: {
-              success: true,
-              message: "User registered successfully",
-              data: { id: Math.floor(Math.random() * 1000), ...data },
-              debug: { timestamp: new Date().toISOString() },
-            },
-          });
+          // Success
+          resolve({ success: true, data });
         } else {
+          // Error - simulate validation errors
           reject({
-            status: 422,
-            message: "Validation failed",
-            response: {
-              message: "Please check the form fields below",
-              errors: {
-                name: ["Name must be at least 2 characters"],
-                email: ["Email format is invalid"],
-                password: ["Password is too weak"],
-              },
-            },
-            isValidationError: () => true,
+            message: 'Validation failed',
+            fieldErrors: {
+              name: ['Name must be at least 2 characters'],
+              email: ['Email format is invalid'],
+              password: ['Password is too weak']
+            }
           });
         }
       }, 1000);
     });
   });
 
+  const showNotification = $((type, message, title = '') => {
+    notification.value = { type, message, title };
+  });
+
+  const closeNotification = $(() => {
+    notification.value = null;
+  });
+
+  const clearFieldError = $((field) => {
+    fieldErrors.value = { ...fieldErrors.value, [field]: "" };
+  });
+
+  const clearGeneralError = $(() => {
+    generalError.value = "";
+  });
+
+  const getNotificationClasses = $((type) => {
+    const baseClasses = 'border rounded-lg p-4';
+    switch (type) {
+      case 'success':
+        return `${baseClasses} bg-green-50 border-green-200 text-green-800`;
+      case 'error':
+        return `${baseClasses} bg-red-50 border-red-200 text-red-800`;
+      case 'warning':
+        return `${baseClasses} bg-yellow-50 border-yellow-200 text-yellow-800`;
+      case 'info':
+        return `${baseClasses} bg-blue-50 border-blue-200 text-blue-800`;
+      default:
+        return `${baseClasses} bg-gray-50 border-gray-200 text-gray-800`;
+    }
+  });
+
+  const getNotificationIcon = $((type) => {
+    switch (type) {
+      case 'success': return '✅';
+      case 'error': return '❌';
+      case 'warning': return '⚠️';
+      case 'info': return 'ℹ️';
+      default: return '📢';
+    }
+  });
+
   return (
-    <div class="vormia-demo">
-      <h1>VormiaQueryJS Debug & Notification System - Qwik</h1>
+    <div class="max-w-2xl mx-auto p-6 space-y-6">
+      <h1 class="text-3xl font-bold text-center mb-8">
+        VormiaQueryJS Qwik Example
+      </h1>
 
-      {/* Notifications Container */}
-      <div id="notifications"></div>
+      {/* Notification Display */}
+      {notification.value && (
+        <div class="notification-panel">
+          <div class={getNotificationClasses(notification.value.type)}>
+            <div class="flex items-center">
+              <span class="text-lg mr-3">{getNotificationIcon(notification.value.type)}</span>
+              <div class="flex-1">
+                {notification.value.title && (
+                  <h3 class="font-semibold text-sm">{notification.value.title}</h3>
+                )}
+                <p class="text-sm">{notification.value.message}</p>
+              </div>
+              <button onClick$={closeNotification} class="ml-3 hover:opacity-70 transition-opacity">
+                ✕
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
-      {/* Form Section */}
-      <div class="form-section">
-        <h2>User Registration Form</h2>
-        <form onSubmit$={handleSubmit}>
-          <div class="form-group">
-            <label for="name">Name:</label>
+      {/* Registration Form */}
+      <div class="bg-white shadow-md rounded-lg p-6">
+        <h2 class="text-2xl font-semibold mb-6">User Registration</h2>
+        
+        <form onSubmit$={handleSubmit} class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Full Name
+            </label>
             <input
+              name="name"
               type="text"
-              id="name"
               value={formData.value.name}
-              onInput$={(event) => handleInputChange("name", event)}
-              class={`form-input ${getFieldErrorClass("name")}`}
+              onInput$={(e) => formData.value = { ...formData.value, name: e.target.value }}
+              placeholder="Enter your full name"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
             {fieldErrors.value.name && (
-              <p class="error-message">{fieldErrors.value.name}</p>
+              <div class="mt-2">
+                <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div class="flex items-center">
+                    <svg class="h-5 w-5 text-red-400 mr-3" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                    <p class="text-sm text-red-800">{fieldErrors.value.name}</p>
+                    <button onClick$={() => clearFieldError('name')} class="ml-auto text-red-400 hover:text-red-600">
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
 
-          <div class="form-group">
-            <label for="email">Email:</label>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Email
+            </label>
             <input
+              name="email"
               type="email"
-              id="email"
               value={formData.value.email}
-              onInput$={(event) => handleInputChange("email", event)}
-              class={`form-input ${getFieldErrorClass("email")}`}
+              onInput$={(e) => formData.value = { ...formData.value, email: e.target.value }}
+              placeholder="Enter your email"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
             {fieldErrors.value.email && (
-              <p class="error-message">{fieldErrors.value.email}</p>
+              <div class="mt-2">
+                <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div class="flex items-center">
+                    <svg class="h-5 w-5 text-red-400 mr-3" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                    <p class="text-sm text-red-800">{fieldErrors.value.email}</p>
+                    <button onClick$={() => clearFieldError('email')} class="ml-auto text-red-400 hover:text-red-600">
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
 
-          <div class="form-group">
-            <label for="password">Password:</label>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Password
+            </label>
             <input
+              name="password"
               type="password"
-              id="password"
               value={formData.value.password}
-              onInput$={(event) => handleInputChange("password", event)}
-              class={`form-input ${getFieldErrorClass("password")}`}
+              onInput$={(e) => formData.value = { ...formData.value, password: e.target.value }}
+              placeholder="Enter your password"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
             {fieldErrors.value.password && (
-              <p class="error-message">{fieldErrors.value.password}</p>
+              <div class="mt-2">
+                <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div class="flex items-center">
+                    <svg class="h-5 w-5 text-red-400 mr-3" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                    <p class="text-sm text-red-800">{fieldErrors.value.password}</p>
+                    <button onClick$={() => clearFieldError('password')} class="ml-auto text-red-400 hover:text-red-600">
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
 
-          <div class="form-group">
-            <label for="confirmPassword">Confirm Password:</label>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Confirm Password
+            </label>
             <input
+              name="confirmPassword"
               type="password"
-              id="confirmPassword"
               value={formData.value.confirmPassword}
-              onInput$={(event) => handleInputChange("confirmPassword", event)}
-              class={`form-input ${getFieldErrorClass("confirmPassword")}`}
+              onInput$={(e) => formData.value = { ...formData.value, confirmPassword: e.target.value }}
+              placeholder="Confirm your password"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
-            {fieldErrors.value.confirmPassword && (
-              <p class="error-message">{fieldErrors.value.confirmPassword}</p>
-            )}
           </div>
 
-          {generalError.value && (
-            <div class="general-error">
-              <p class="error-message">{generalError.value}</p>
-            </div>
-          )}
-
-          <div class="form-actions">
-            <button type="submit" disabled={isSubmitting.value}>
-              {isSubmitting.value ? "Registering..." : "Register"}
-            </button>
-            <button type="button" onClick$={clearAllErrors}>
-              Clear Errors
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={isLoading.value}
+            class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading.value ? 'Creating Account...' : 'Create Account'}
+          </button>
         </form>
+
+        {/* General Error Display */}
+        {generalError.value && (
+          <div class="mt-4">
+            <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div class="flex items-center">
+                <svg class="h-5 w-5 text-red-400 mr-3" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                </svg>
+                <p class="text-sm text-red-800 flex-1">{generalError.value}</p>
+                <button onClick$={clearGeneralError} class="text-red-400 hover:text-red-600">
+                  ✕
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Debug Section */}
-      <div class="debug-section">
-        <h2>Debug Panel</h2>
-        <div id="debug-panel"></div>
+      {/* Status Information */}
+      <div class="bg-gray-50 p-4 rounded-lg">
+        <h3 class="font-semibold mb-2">Form Status</h3>
+        <div class="space-y-1 text-sm text-gray-600">
+          <p>Loading: {isLoading.value ? 'Yes' : 'No'}</p>
+          <p>Has Data: {hasData.value ? 'Yes' : 'No'}</p>
+          <p>Has Error: {hasError.value ? 'Yes' : 'No'}</p>
+          <p>Field Errors: {Object.keys(fieldErrors.value).length}</p>
+          <p>General Error: {generalError.value ? 'Yes' : 'No'}</p>
+        </div>
       </div>
-
-      {/* Controls */}
-      <div class="controls">
-        <button onClick$={testSuccess}>Test Success</button>
-        <button onClick$={testError}>Test Error</button>
-        <button onClick$={testValidationError}>Test Validation Error</button>
-        <button onClick$={toggleDebug}>
-          {showDebug.value ? "Hide Debug Panel" : "Show Debug Panel"}
-        </button>
-      </div>
-
-      {/* Styles */}
-      <style>{`
-        .vormia-demo {
-          max-width: 800px;
-          margin: 0 auto;
-          padding: 20px;
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-
-        .form-section {
-          margin: 20px 0;
-          padding: 20px;
-          border: 1px solid #e5e7eb;
-          border-radius: 8px;
-          background: #f9fafb;
-        }
-
-        .form-group {
-          margin-bottom: 15px;
-        }
-
-        .form-group label {
-          display: block;
-          margin-bottom: 5px;
-          font-weight: 500;
-        }
-
-        .form-input {
-          width: 100%;
-          padding: 8px 12px;
-          border: 1px solid #d1d5db;
-          border-radius: 4px;
-          font-size: 14px;
-        }
-
-        .form-input.border-red-500 {
-          border-color: #dc2626;
-        }
-
-        .error-message {
-          color: #dc2626;
-          font-size: 12px;
-          margin-top: 5px;
-        }
-
-        .general-error {
-          margin: 15px 0;
-          padding: 10px;
-          background-color: #fef2f2;
-          border: 1px solid #fecaca;
-          border-radius: 4px;
-        }
-
-        .form-actions {
-          margin-top: 20px;
-        }
-
-        button {
-          background: #3b82f6;
-          color: white;
-          border: none;
-          padding: 10px 20px;
-          border-radius: 4px;
-          cursor: pointer;
-          margin-right: 10px;
-          margin-bottom: 10px;
-        }
-
-        button:hover {
-          background: #2563eb;
-        }
-
-        button:disabled {
-          background: #9ca3af;
-          cursor: not-allowed;
-        }
-
-        .debug-section {
-          margin: 20px 0;
-          padding: 20px;
-          border: 1px solid #e5e7eb;
-          border-radius: 8px;
-          background: #f9fafb;
-        }
-
-        .controls {
-          margin: 20px 0;
-          padding: 20px;
-          border: 1px solid #e5e7eb;
-          border-radius: 8px;
-          background: #f9fafb;
-        }
-      `}</style>
     </div>
   );
 }); 
