@@ -43,6 +43,7 @@ yarn add vormiaqueryjs
 ## 📋 Changelog
 
 ### **v1.4.2** - Enhanced Error Handling & Debug System
+
 - 🔧 **Fixed**: ErrorDebugPanel now properly displays API responses and debug information
 - 🔧 **Fixed**: Console logging now works correctly with comprehensive debug detection
 - 🔧 **Fixed**: NotificationPanel styling issues resolved for all notification types
@@ -51,6 +52,7 @@ yarn add vormiaqueryjs
 - ✅ **Verified**: All components build successfully and maintain backward compatibility
 
 ### **v1.4.1** - Comprehensive Notification System
+
 - 🆕 **Added**: Banner, in-app, and modal notification variants
 - 🆕 **Added**: Success, error, warning, and info notification types for all variants
 - 🎨 **Enhanced**: Notification styling with proper variant and type combinations
@@ -58,6 +60,7 @@ yarn add vormiaqueryjs
 - 📚 **Added**: Comprehensive examples for all notification types
 
 ### **v1.4.0** - Major Package Enhancement
+
 - 🆕 **Added**: Automatic form data transformation system
 - 🆕 **Added**: Dual notification system (toast + custom panels)
 - 🆕 **Added**: Smart debug panel with environment awareness
@@ -179,14 +182,17 @@ VITE_VORMIA_WITH_CREDENTIALS=false            # Include credentials in requests
 ## 🔧 Troubleshooting
 
 ### **Debug Panel Not Showing**
+
 If your debug panel isn't displaying API responses:
 
 1. **Check environment variable**:
+
    ```bash
    VITE_VORMIA_DEBUG=true
    ```
 
 2. **Verify in console**: You should see logs like:
+
    ```
    🔍 VormiaQuery Debug: VITE_VORMIA_DEBUG = true
    🔍 VormiaQuery Debug: Debug enabled = true
@@ -195,15 +201,17 @@ If your debug panel isn't displaying API responses:
 3. **Check browser console** for any JavaScript errors
 
 ### **Environment Variables Not Working**
+
 If environment variables aren't being detected:
 
-1. **Ensure VITE_ prefix**: All variables must start with `VITE_`
+1. **Ensure VITE\_ prefix**: All variables must start with `VITE_`
 2. **Restart dev server** after changing `.env` file
 3. **Check variable names** match exactly (case-sensitive)
 
 > **🔧 Fixed in v1.4.2**: Environment variable documentation updated with correct naming conventions. All variables now properly documented with `VITE_` prefix.
 
 ### **Notifications Not Styling Correctly**
+
 If notifications appear without proper colors:
 
 1. **Update to v1.4.2+**: Styling issues fixed in latest version
