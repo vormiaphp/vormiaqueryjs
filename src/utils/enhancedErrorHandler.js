@@ -112,34 +112,8 @@ export function logErrorForDebug(error, label = "API Error") {
     return; // Exit early if debug is disabled
   }
 
-  const apiResponse = error.response;
-  // Note: apiMessage calculated but not used in this function
-  // const apiMessage =
-  //   apiResponse?.response?.data?.message ||
-  //   error.message;
-
-  console.group(`🚨 ${label}`);
-  console.log("Status:", error.status);
-  console.log("Message:", error.message);
-
-  // Format output to match API JSON structure
-  if (apiResponse?.response?.data) {
-    const apiData = apiResponse.response.data;
-    console.log("Success:", apiData.success);
-    if (apiData.errors) {
-      console.log("Errors:", apiData.errors);
-    }
-    if (apiData.data) {
-      console.log("Data:", apiData.data);
-    }
-    if (apiData.debug) {
-      console.log("Debug:", apiData.debug);
-    }
-  }
-
-  // Full API Response dump
-  console.log("Full API Response:", apiResponse);
-  console.groupEnd();
+  // Only log essential error information
+  console.log(`🚨 ${label}:`, error.message || "Unknown error");
 }
 
 /**
@@ -155,24 +129,8 @@ export function logSuccessForDebug(response, label = "API Success") {
     return; // Exit early if debug is disabled
   }
 
-  console.group(`✅ ${label}`);
-
-  // Format output to match API JSON structure
-  if (response?.data) {
-    const apiData = response.data;
-    console.log("Success:", apiData.success);
-    console.log("Message:", apiData.message);
-    if (apiData.data) {
-      console.log("Data:", apiData.data);
-    }
-    if (apiData.debug) {
-      console.log("Debug:", apiData.debug);
-    }
-  }
-
-  // Full API Response dump
-  console.log("Full API Response:", response);
-  console.groupEnd();
+  // Only log essential success information
+  console.log(`✅ ${label}:`, response?.data?.message || "Success");
 }
 
 /**
@@ -232,37 +190,8 @@ export function getDebugFlag() {
         // If set to true or any other value, enable debug
         const isEnabled =
           String(debugValue).toLowerCase() === "true" || debugValue !== "";
-        console.log(
-          `🔍 VormiaQuery Debug: Debug mode ${
-            isEnabled ? "enabled" : "enabled (default)"
-          } via environment variable`
-        );
-        console.log(`🔍 VormiaQuery Debug: Raw value: "${debugValue}"`);
         return isEnabled;
       }
-
-      // Debug logging to see what's available
-      console.log("🔍 VormiaQuery Debug: Environment variable detection:");
-      console.log(
-        "  - import.meta.env available:",
-        typeof import.meta.env !== "undefined"
-      );
-      console.log(
-        "  - VITE_VORMIA_DEBUG value:",
-        import.meta.env.VITE_VORMIA_DEBUG
-      );
-      console.log(
-        "  - PUBLIC_VORMIA_DEBUG value:",
-        import.meta.env.PUBLIC_VORMIA_DEBUG
-      );
-      console.log(
-        "  - All VITE_ variables:",
-        Object.keys(import.meta.env).filter((key) => key.startsWith("VITE_"))
-      );
-      console.log(
-        "  - All PUBLIC_ variables:",
-        Object.keys(import.meta.env).filter((key) => key.startsWith("PUBLIC_"))
-      );
     }
 
     // Check for global variable (as a fallback)
@@ -271,18 +200,10 @@ export function getDebugFlag() {
       window.__VORMIA_DEBUG__ !== undefined
     ) {
       const isEnabled = Boolean(window.__VORMIA_DEBUG__);
-      console.log(
-        `🔍 VormiaQuery Debug: Debug mode ${
-          isEnabled ? "enabled" : "disabled"
-        } via window.__VORMIA_DEBUG__`
-      );
       return isEnabled;
     }
 
     // Default: Debug is ENABLED unless explicitly disabled
-    console.log(
-      "🔍 VormiaQuery Debug: Debug mode enabled by default (no environment variable found)"
-    );
     return true;
   } catch (error) {
     console.error("🔍 VormiaQuery Debug: Error checking debug flag:", error);
