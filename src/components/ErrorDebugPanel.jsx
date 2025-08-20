@@ -225,6 +225,12 @@ export function createDebugInfo(response) {
     
     console.log("🔍 createDebugInfo - Found errors:", errors);
     
+    // Handle nested response structure (like error.response.response.data.errors)
+    if (!errors && errorResponse.response?.data?.errors) {
+      errors = errorResponse.response.data.errors;
+      console.log("🔍 createDebugInfo - Found nested errors:", errors);
+    }
+    
     return {
       status: errorResponse.status || 0,
       message: errorData.message || errorResponse.message || "Error occurred",
