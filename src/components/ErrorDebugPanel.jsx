@@ -1,4 +1,4 @@
-import "./NotificationPanel.css";
+
 
 /**
  * Error Debug Info Interface
@@ -162,20 +162,21 @@ export function shouldShowDebug() {
     return result;
   }
 
-  // Next.js - safely check for process
-  try {
-    if (
-      typeof process !== "undefined" &&
-      process?.env?.NEXT_PUBLIC_VORMIA_DEBUG
-    ) {
-      const debugValue = process.env.NEXT_PUBLIC_VORMIA_DEBUG;
-      console.log("🔍 ErrorDebugPanel: NEXT_PUBLIC_VORMIA_DEBUG =", debugValue);
-      const result = debugValue === "true";
-      console.log("🔍 ErrorDebugPanel: Debug enabled =", result);
-      return result;
+  // Next.js - safely check for process (only in Node.js environment)
+  if (typeof window === "undefined" && typeof process !== "undefined") {
+    try {
+      // eslint-disable-next-line no-undef
+      if (process?.env?.NEXT_PUBLIC_VORMIA_DEBUG) {
+        // eslint-disable-next-line no-undef
+        const debugValue = process.env.NEXT_PUBLIC_VORMIA_DEBUG;
+        console.log("🔍 ErrorDebugPanel: NEXT_PUBLIC_VORMIA_DEBUG =", debugValue);
+        const result = debugValue === "true";
+        console.log("🔍 ErrorDebugPanel: Debug enabled =", result);
+        return result;
+      }
+    } catch {
+      // process not available, continue
     }
-  } catch {
-    // process not available, continue
   }
 
   // Astro
