@@ -18,11 +18,11 @@ export function SimpleNotification({
     const baseStyles = "p-4 border rounded-lg";
     
     const typeStyles = {
-      success: "bg-green-50 border-green-200 text-green-800",
+      success: "bg-green-500 border-green-200 text-green-800",
       error: "bg-red-500 border-red-200 text-white",
-      warning: "bg-yellow-50 border-yellow-200 text-yellow-800",
-      info: "bg-blue-50 border-blue-200 text-blue-800",
-      announce: "bg-gray-50 border-gray-200 text-gray-800"
+      warning: "bg-yellow-500 border-yellow-200 text-yellow-800",
+      info: "bg-blue-500 border-blue-200 text-blue-800",
+      announce: "bg-gray-500 border-gray-200 text-gray-800"
     };
     
     return `${baseStyles} ${typeStyles[type] || typeStyles.announce}`;
@@ -80,7 +80,7 @@ export function SimpleNotification({
   return (
     <div className={`${getStyles()} ${className}`}>
       <div className="flex items-center">
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 hidden">
           {getIcon()}
         </div>
         <div className="ml-3 flex-1">
@@ -157,19 +157,19 @@ export function NotificationPanel({ notification, onClose, className = "" }) {
     let typeStyles = "";
     switch (type) {
       case "success":
-        typeStyles = "bg-green-50 border-green-200 text-green-800";
+        typeStyles = "bg-green-500 border-green-200 text-green-800";
         break;
       case "error":
-        typeStyles = "bg-red-50 border-red-200 text-red-800";
+        typeStyles = "bg-red-500 border-red-200 text-red-800";
         break;
       case "warning":
-        typeStyles = "bg-yellow-50 border-yellow-200 text-yellow-800";
+        typeStyles = "bg-yellow-500 border-yellow-200 text-yellow-800";
         break;
       case "info":
-        typeStyles = "bg-blue-50 border-blue-200 text-blue-800";
+        typeStyles = "bg-blue-500 border-blue-200 text-blue-800";
         break;
       default:
-        typeStyles = "bg-gray-50 border-gray-200 text-gray-800";
+        typeStyles = "bg-gray-500 border-gray-200 text-gray-800";
         break;
     }
 
@@ -195,7 +195,7 @@ export function NotificationPanel({ notification, onClose, className = "" }) {
   // Banner variant - spans full width at top
   if (variant === "banner") {
     return (
-      <div className={`${getNotificationStyles()} ${className} sticky top-0 z-50`}>
+      <div className={`${getNotificationStyles()} ${className} sticky top-0 z-500`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <span className="text-lg">{getIcon()}</span>
@@ -219,7 +219,7 @@ export function NotificationPanel({ notification, onClose, className = "" }) {
   // Modal variant - centered overlay
   if (variant === "modal") {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-black bg-opacity-500 flex items-center justify-center z-500">
         <div className={`${getNotificationStyles()} ${className} relative`}>
           <div className="flex items-start justify-between">
             <div className="flex items-start space-x-3">
@@ -347,7 +347,7 @@ export function showNotificationToast(notification, options = {}) {
   }
 
   // Fallback to console
-  console.log(`[${type.toUpperCase()}] ${title}: ${message}`);
+  // console.log(`[${type.toUpperCase()}] ${title}: ${message}`);
 }
 
 /**
