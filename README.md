@@ -2,10 +2,14 @@
 
 A powerful, framework-agnostic query and mutation library with built-in error handling, notifications, and debug capabilities.
 
-## ✨ **What's New in v1.4.10**
+## ✨ **What's New in v1.4.11**
 
 ### 🚀 **Major Improvements**
 
+- **🔐 Comprehensive Authentication System**: New `useVormiaAuth` hook with permission and role checking
+- **🔑 Permission Management**: `hasPermission()`, `hasAnyPermission()`, and resource access control
+- **👤 Role-Based Access**: `isUser()`, `isAdmin()`, `isModerator()` and more role helpers
+- **📋 Resource Access Control**: `canCreate()`, `canRead()`, `canUpdate()`, `canDelete()` helpers
 - **Notifications Always Enabled**: Notifications are automatically shown for all queries and mutations
 - **Enhanced Debug Panel**: Better error/success response display with improved structure detection
 - **Cleaner API**: Simplified hook usage with sensible defaults
@@ -43,6 +47,10 @@ const mutation = useVormiaQueryAuthMutation({
 ### ⚠️ **Breaking Changes in v1.4.10**
 
 **The `enableNotifications` parameter has been removed from all hooks.** Notifications are now always enabled by default, simplifying the API and reducing configuration overhead.
+
+### 🆕 **New Features in v1.4.11**
+
+**Authentication and Authorization System**: Added comprehensive permission and role checking with the new `useVormiaAuth` hook. This is a **non-breaking addition** that enhances your existing authentication capabilities.
 
 **Migration Guide:**
 ```javascript
