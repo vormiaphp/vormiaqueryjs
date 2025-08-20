@@ -35,7 +35,7 @@
 
 /* Announce notification */
 .vormia-notify-announce {
-  background-color: #6b7280 !important; /* bg-gray-500 */
+  background-color: #000000 !important; /* Pure black for maximum contrast */
   border-color: #e5e7eb !important; /* border-gray-200 */
   color: white !important;
 }

@@ -23,7 +23,7 @@ export function SimpleNotification({
       error: "bg-red-500 border-red-200 text-white vormia-notify-error",
       warning: "bg-yellow-500 border-yellow-200 text-white vormia-notify-warning",
       info: "bg-blue-500 border-blue-200 text-white vormia-notify-info",
-      announce: "bg-gray-500 border-gray-200 text-white vormia-notify-announce"
+      announce: "bg-black border-gray-200 text-white vormia-notify-announce"
     };
     
     return `${baseStyles} ${typeStyles[type] || typeStyles.announce}`;
@@ -170,7 +170,7 @@ export function NotificationPanel({ notification, onClose, className = "" }) {
         typeStyles = "bg-blue-500 border-blue-200 text-white vormia-notify-info";
         break;
       default:
-        typeStyles = "bg-gray-500 border-gray-200 text-white vormia-notify-announce";
+        typeStyles = "bg-black border-gray-200 text-white vormia-notify-announce";
         break;
     }
 
