@@ -91,14 +91,14 @@ export function ErrorDebugPanel({
         )}
         
         {/* Response Errors - Only show the errors key content for error responses */}
-        {isError && response.response?.data?.errors && (
+        {/* {isError && response.response?.data?.errors && ( */}
           <div>
             <span className="font-medium text-gray-600">🚨 Response Errors:</span>
             <pre className="ml-2 mt-1 p-2 rounded text-xs overflow-x-auto bg-red-50 text-red-700 border border-red-200">
-              {JSON.stringify(response.response.data.errors, null, 2)}
+              {JSON.stringify(response.response)}
             </pre>
           </div>
-        )}
+        {/* )} */}
         
         {/* Special handling for validation errors - Formatted display */}
         {response.response?.data?.errors && (
