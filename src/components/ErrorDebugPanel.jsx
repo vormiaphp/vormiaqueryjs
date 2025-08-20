@@ -91,14 +91,14 @@ export function ErrorDebugPanel({
         )}
         
         {/* Response Errors - Only show the errors key content for error responses */}
-        {/* {isError && response.response?.data?.errors && ( */}
+        {response.response?.data?.errors && (
           <div>
             <span className="font-medium text-gray-600">🚨 Response Errors:</span>
             <pre className="ml-2 mt-1 p-2 rounded text-xs overflow-x-auto bg-red-500 text-white border border-red-200">
-              {JSON.stringify(response.response)}
+              {JSON.stringify(response.response.data.errors, null, 2)}
             </pre>
           </div>
-        {/* )} */}
+        )}
         
         {/* Special handling for validation errors - Formatted display */}
         {response.response?.data?.errors && (
@@ -207,25 +207,12 @@ export function createDebugInfo(response) {
     const errorResponse = response.response;
     const errorData = errorResponse.data || {};
     
-    // Preserve the COMPLETE original error response structure
-    const responseData = {
-      success: errorData.success,
-      message: errorData.message || errorResponse.message || "Error occurred"
-    };
-    
-    // Always preserve ALL keys from the original response
-    Object.keys(errorData).forEach(key => {
-      if (key !== 'success' && key !== 'message') {
-        responseData[key] = errorData[key];
-      }
-    });
-    
     return {
       status: errorResponse.status || 0,
       message: errorData.message || errorResponse.message || "Error occurred",
       response: {
         response: {
-          data: responseData,
+          data: errorData, // Use the ORIGINAL errorData directly - no copying needed!
           debug: errorResponse.debug
         },
         debug: errorResponse.debug
@@ -239,19 +226,6 @@ export function createDebugInfo(response) {
   if (response?.data) {
     const isSuccess = response.data.success === true;
     
-    // Preserve the COMPLETE original response structure
-    const responseData = {
-      success: response.data.success,
-      message: response.data.message
-    };
-    
-    // Always preserve ALL keys from the original response
-    Object.keys(response.data).forEach(key => {
-      if (key !== 'success' && key !== 'message') {
-        responseData[key] = response.data[key];
-      }
-    });
-    
     return {
       status: isSuccess ? 200 : response.status || 0,
       message: isSuccess
@@ -259,7 +233,7 @@ export function createDebugInfo(response) {
         : response.data.message || "Unknown response",
       response: {
         response: {
-          data: responseData,
+          data: response.data, // Use the ORIGINAL response.data directly - no copying needed!
           debug: response.debug
         },
         debug: response.debug
