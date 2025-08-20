@@ -2,11 +2,11 @@
 
 A powerful, framework-agnostic query and mutation library with built-in error handling, notifications, and debug capabilities.
 
-## ✨ **What's New in v1.4.29**
+## ✨ **Features Overview (v1.4.31)**
 
-### 🚀 **Major Improvements**
+### 🚀 **Core Features**
 
-- **🔐 Comprehensive Authentication System**: New `useVormiaAuth` hook with permission and role checking
+- **🔐 Comprehensive Authentication System**: `useVormiaAuth` hook with permission and role checking
 - **🔑 Permission Management**: `hasPermission()`, `hasAnyPermission()`, and resource access control
 - **👤 Role-Based Access**: `isUser()`, `isAdmin()`, `isModerator()` and more role helpers
 - **📋 Resource Access Control**: `canCreate()`, `canRead()`, `canUpdate()`, `canDelete()` helpers
@@ -16,66 +16,37 @@ A powerful, framework-agnostic query and mutation library with built-in error ha
 - **Form Data Transformation**: Automatic field mapping and transformation for API requests
 - **📘 Full TypeScript Support**: Complete type definitions for all functions, hooks, and components
 
-### 🔧 **Bug Fixes**
+### 🎨 **Notification System**
 
-- Fixed ErrorDebugPanel not showing API responses correctly
-- Improved environment variable detection for debug mode
-- Better handling of different response structures (success vs error)
-- Resolved linting issues and improved code quality
+- **Solid Background Colors**: Professional appearance with `bg-*-500` colors for maximum visibility
+- **Perfect Contrast**: Pure black/white combinations for optimal readability
+- **CSS Fallback**: Guaranteed styling even when Tailwind JIT compilation fails
+- **Hidden Icons**: Clean, minimalist design without visual clutter
+- **Multiple Variants**: Toast, banner, modal, and in-app notification styles
+- **Auto-dismiss**: Configurable duration and manual close options
 
-### 📝 **Usage Changes**
+### 🔧 **Advanced Features**
 
-```javascript
-// Before (v1.4.5 and earlier):
-const mutation = useVormiaQueryAuthMutation({
-  endpoint: "/register",
-  showDebug: true,
-  formdata: {
-    /* ... */
-  },
-});
+- **Custom Error Labels**: Personalized error logging with `errorLabel` option
+- **Environment Detection**: Automatic debug mode based on `VITE_VORMIA_DEBUG`
+- **Error Handling**: Comprehensive error management with field-specific validation
+- **Debug Logging**: Detailed console output for development and troubleshooting
+- **Framework Support**: React, Vue, Svelte, Solid, Qwik, and Astro adapters
 
-// After (v1.4.10+):
-const mutation = useVormiaQueryAuthMutation({
-  endpoint: "/register",
-  showDebug: true, // ← Override debug panel visibility
-  formdata: {
-    /* ... */
-  },
-});
-```
+### 🏷️ **Custom Error Labels**
 
-### ⚠️ **Breaking Changes in v1.4.10**
-
-**The `enableNotifications` parameter has been removed from all hooks.** Notifications are now always enabled by default, simplifying the API and reducing configuration overhead.
-
-### 🆕 **New Features in v1.4.11**
-
-**Authentication and Authorization System**: Added comprehensive permission and role checking with the new `useVormiaAuth` hook. This is a **non-breaking addition** that enhances your existing authentication capabilities.
-
-### 🆕 **New Features in v1.4.27**
-
-**Custom Error Labels**: Added `errorLabel` option to `useVormiaQueryAuthMutation` for personalized error logging:
+Personalize your error logging with custom labels for better debugging:
 
 ```javascript
 const mutation = useVormiaQueryAuthMutation({
   endpoint: "/register",
-  errorLabel: "Registration Error", // 🆕 Custom error label!
+  errorLabel: "Registration Error", // 🏷️ Custom error label!
   showDebug: true,
   // ... rest of config
 });
 ```
 
-**Console Output**: Now shows " Registration Error" instead of generic " Mutation Error" for better debugging.
-
-### 🆕 **New Features in v1.4.29**
-
-**Enhanced Notification Styling**: Improved notification appearance with solid backgrounds and better visual hierarchy:
-
-- **Solid Backgrounds**: Changed from light (`bg-*-50`) to solid (`bg-*-500`) colors for better visibility
-- **Hidden Icons**: Cleaner notification appearance without icons
-- **Better Z-Index**: Increased layering for proper positioning
-- **Reduced Console Clutter**: Less fallback logging for cleaner console output
+**Console Output**: Shows " Registration Error" instead of generic " Mutation Error" for better identification.
 
 **Migration Guide:**
 
@@ -124,7 +95,7 @@ The `SimpleNotification` component provides a clean, consistent way to display n
 
 **Available Types**: `success`, `error`, `warning`, `info`, `announce`
 
-**🎨 Notification Styling**: All notification types now use solid background colors (`bg-*-500`) for better visibility and modern appearance. Icons are hidden by default for a cleaner look.
+**🎨 Notification Styling**: All notification types use solid background colors (`bg-*-500`) with perfect contrast. Pure black/white combinations ensure maximum readability. CSS fallback classes guarantee styling works even when Tailwind JIT compilation fails.
 
 ## 📦 **Required Peer Dependencies**
 
