@@ -1,4 +1,3 @@
-import React from "react";
 import "./NotificationPanel.css";
 
 /**
@@ -169,7 +168,7 @@ export function shouldShowDebug() {
       console.log("🔍 ErrorDebugPanel: Debug enabled =", result);
       return result;
     }
-  } catch (e) {
+  } catch {
     // process not available, continue
   }
 
