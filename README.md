@@ -735,9 +735,10 @@ const debugHtml = query.getDebugHtml(response, true);
 
 ### **Notifications Not Styling Correctly**
 
-1. Update to v1.4.4+ (styling issues fixed)
-2. Ensure CSS classes are available
-3. Override with custom CSS if needed
+1. Ensure CSS classes are available
+2. Check if Tailwind JIT compilation is working
+3. CSS fallback classes should provide guaranteed styling
+4. Override with custom CSS if needed
 
 ---
 
