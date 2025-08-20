@@ -8,6 +8,7 @@ export { useVormiaQuerySimple } from "./hooks/useVormiaQuerySimple.js";
 export {
   useVormiaQueryAuth,
   useVormiaQueryAuthMutation,
+  useVormiaAuth,
 } from "./hooks/useVrmAuth.js";
 export { useVrmMutation } from "./hooks/useVrmMutation.js";
 

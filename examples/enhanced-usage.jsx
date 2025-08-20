@@ -561,6 +561,147 @@ function TestComponent() {
 }
 
 // ============================================================================
+// AUTHENTICATION & AUTHORIZATION HELPERS
+// ============================================================================
+
+function AuthHelpersExample() {
+  const auth = useVormiaAuth();
+
+  // Basic authentication
+  const isLoggedIn = auth.isAuthenticated();
+  const user = auth.getUser();
+
+  // Permission checking
+  const canViewReports = auth.hasPermission('view_reports');
+  const canManageUsers = auth.hasPermission(['manage_users', 'user_management']);
+  const hasAnyPermission = auth.hasAnyPermission(['view_reports', 'add_users']);
+
+  // Role checking
+  const isAdmin = auth.isUser('Admin');
+  const isModerator = auth.isUser(['moderator', 'Mod']);
+  const hasAllRoles = auth.hasAllRoles(['user', 'verified']);
+
+  // Resource access
+  const canCreateUsers = auth.canCreate('users');
+  const canReadReports = auth.canRead('reports');
+  const canUpdateProfile = auth.canUpdate('profile');
+  const canDeletePosts = auth.canDelete('posts');
+
+  // Common permission checks
+  const canManageUsers = auth.canManageUsers();
+  const canViewReports = auth.canViewReports();
+  const canAddUsers = auth.canAddUsers();
+
+  return (
+    <div className="space-y-4">
+      <h3>Authentication & Authorization Status</h3>
+      
+      {/* Basic Auth */}
+      <div>
+        <h4>Basic Authentication</h4>
+        <p>Logged in: {isLoggedIn ? 'Yes' : 'No'}</p>
+        {user && <p>User: {JSON.stringify(user, null, 2)}</p>}
+      </div>
+
+      {/* Permissions */}
+      <div>
+        <h4>Permissions</h4>
+        <p>Can view reports: {canViewReports ? 'Yes' : 'No'}</p>
+        <p>Can manage users: {canManageUsers ? 'Yes' : 'No'}</p>
+        <p>Has any permission: {hasAnyPermission ? 'Yes' : 'No'}</p>
+      </div>
+
+      {/* Roles */}
+      <div>
+        <h4>Roles</h4>
+        <p>Is Admin: {isAdmin ? 'Yes' : 'No'}</p>
+        <p>Is Moderator: {isModerator ? 'Yes' : 'No'}</p>
+        <p>Has all roles: {hasAllRoles ? 'Yes' : 'No'}</p>
+      </div>
+
+      {/* Resource Access */}
+      <div>
+        <h4>Resource Access</h4>
+        <p>Can create users: {canCreateUsers ? 'Yes' : 'No'}</p>
+        <p>Can read reports: {canReadReports ? 'Yes' : 'No'}</p>
+        <p>Can update profile: {canUpdateProfile ? 'Yes' : 'No'}</p>
+        <p>Can delete posts: {canDeletePosts ? 'Yes' : 'No'}</p>
+      </div>
+
+      {/* Common Checks */}
+      <div>
+        <h4>Common Permission Checks</h4>
+        <p>Can manage users: {canManageUsers ? 'Yes' : 'No'}</p>
+        <p>Can view reports: {canViewReports ? 'Yes' : 'No'}</p>
+        <p>Can add users: {canAddUsers ? 'Yes' : 'No'}</p>
+      </div>
+
+      {/* Conditional Rendering Example */}
+      <div>
+        <h4>Conditional Rendering</h4>
+        {auth.isAuthenticated() && (
+          <div>
+            {auth.canViewReports() && (
+              <button>View Reports</button>
+            )}
+            {auth.canAddUsers() && (
+              <button>Add New User</button>
+            )}
+            {auth.isAdmin() && (
+              <button>Admin Panel</button>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// INTEGRATION WITH EXISTING HOOKS
+// ============================================================================
+
+function IntegratedAuthExample() {
+  const auth = useVormiaAuth();
+  const mutation = useVormiaQueryAuthMutation({
+    endpoint: "/api/update-profile",
+    method: "PUT",
+    onSuccess: (data) => {
+      // Update local user data after successful profile update
+      auth.setUser(data.data.user);
+    },
+  });
+
+  const handleProfileUpdate = (profileData) => {
+    // Check permissions before allowing update
+    if (!auth.canUpdate('profile')) {
+      alert('You do not have permission to update profiles');
+      return;
+    }
+
+    mutation.mutate(profileData);
+  };
+
+  return (
+    <div>
+      <h3>Integrated Authentication Example</h3>
+      {auth.isAuthenticated() ? (
+        <div>
+          <p>Welcome, {auth.getUser()?.name || 'User'}!</p>
+          {auth.canUpdate('profile') && (
+            <button onClick={() => handleProfileUpdate({ name: 'New Name' })}>
+              Update Profile
+            </button>
+          )}
+        </div>
+      ) : (
+        <p>Please log in to continue</p>
+      )}
+    </div>
+  );
+}
+
+// ============================================================================
 // COMPREHENSIVE EXAMPLE
 // ============================================================================
 
@@ -597,6 +738,16 @@ function ComprehensiveExample() {
       <section>
         <h3>6. Simple Test Query</h3>
         <TestComponent />
+      </section>
+
+      <section>
+        <h3>7. Authentication & Authorization Helpers</h3>
+        <AuthHelpersExample />
+      </section>
+
+      <section>
+        <h3>8. Integrated Authentication Example</h3>
+        <IntegratedAuthExample />
       </section>
     </div>
   );

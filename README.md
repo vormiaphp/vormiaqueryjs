@@ -184,6 +184,7 @@ VITE_VORMIA_WITH_CREDENTIALS=false            # Include credentials in requests
 **Utility Hooks:**
 
 - `useVormiaConfig` - Dynamic configuration management
+- `useVormiaAuth` - Comprehensive authentication and authorization helpers
 - `useVrmQuery` - Legacy query support
 - `useVrmMutation` - Legacy mutation support
 
@@ -375,6 +376,152 @@ const mutation = useVrmMutation({
   method: "POST",
   data: { legacy: "data" },
 });
+```
+
+---
+
+## 🔐 **Authentication & Authorization System**
+
+VormiaQueryJS provides a comprehensive authentication and authorization system with easy-to-use helpers for permission checking and role management.
+
+### **🚀 Authentication Helpers**
+
+```javascript
+import { useVormiaAuth } from "vormiaqueryjs";
+
+const auth = useVormiaAuth();
+
+// Basic authentication
+const isLoggedIn = auth.isAuthenticated();
+const user = auth.getUser();
+
+// Store user data after login
+auth.setUser({
+  id: 1,
+  name: "John Doe",
+  email: "john@example.com",
+  permissions: ["view_reports", "add_users"],
+  roles: ["user", "moderator"]
+});
+
+// Clear user data on logout
+auth.clearUser();
+```
+
+### **🔑 Permission Checking**
+
+```javascript
+// Check single permission
+const canViewReports = auth.hasPermission('view_reports');
+
+// Check multiple permissions (ALL must be present)
+const canManageUsers = auth.hasPermission(['manage_users', 'user_management']);
+
+// Check if user has ANY of the specified permissions
+const hasAnyPermission = auth.hasAnyPermission(['view_reports', 'add_users']);
+
+// Get all user permissions
+const permissions = auth.getPermissions();
+```
+
+### **👤 Role Checking**
+
+```javascript
+// Check single role
+const isAdmin = auth.isUser('Admin');
+
+// Check multiple roles (ANY can be present)
+const isModerator = auth.isUser(['moderator', 'Mod']);
+
+// Check if user has ALL specified roles
+const hasAllRoles = auth.hasAllRoles(['user', 'verified']);
+
+// Common role checks
+const isAdmin = auth.isAdmin();
+const isModerator = auth.isModerator();
+const isSuperUser = auth.isSuperUser();
+
+// Get all user roles
+const roles = auth.getRoles();
+```
+
+### **📋 Resource Access Control**
+
+```javascript
+// CRUD operations
+const canCreateUsers = auth.canCreate('users');
+const canReadReports = auth.canRead('reports');
+const canUpdateProfile = auth.canUpdate('profile');
+const canDeletePosts = auth.canDelete('posts');
+
+// Custom resource access
+const canAccess = auth.canAccess('reports', 'export');
+
+// Common permission checks
+const canManageUsers = auth.canManageUsers();
+const canViewReports = auth.canViewReports();
+const canAddUsers = auth.canAddUsers();
+```
+
+### **🎯 Conditional Rendering Example**
+
+```jsx
+function AdminPanel() {
+  const auth = useVormiaAuth();
+
+  return (
+    <div>
+      {auth.isAuthenticated() && (
+        <>
+          {auth.canViewReports() && (
+            <button>View Reports</button>
+          )}
+          {auth.canAddUsers() && (
+            <button>Add New User</button>
+          )}
+          {auth.isAdmin() && (
+            <button>Admin Panel</button>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+```
+
+### **🔗 Integration with Existing Hooks**
+
+```javascript
+function ProfileUpdate() {
+  const auth = useVormiaAuth();
+  const mutation = useVormiaQueryAuthMutation({
+    endpoint: "/api/update-profile",
+    method: "PUT",
+    onSuccess: (data) => {
+      // Update local user data after successful update
+      auth.setUser(data.data.user);
+    },
+  });
+
+  const handleUpdate = (profileData) => {
+    // Check permissions before allowing update
+    if (!auth.canUpdate('profile')) {
+      alert('You do not have permission to update profiles');
+      return;
+    }
+
+    mutation.mutate(profileData);
+  };
+
+  return (
+    <button 
+      onClick={() => handleUpdate({ name: 'New Name' })}
+      disabled={!auth.canUpdate('profile')}
+    >
+      Update Profile
+    </button>
+  );
+}
 ```
 
 ---

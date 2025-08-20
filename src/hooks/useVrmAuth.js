@@ -278,3 +278,185 @@ export const useAuthStatus = () => {
     isLoading: false,
   };
 };
+
+/**
+ * Enhanced authentication and authorization hook
+ * Provides comprehensive user management, permissions, and role checking
+ * @returns {Object} Authentication and authorization utilities
+ */
+export const useVormiaAuth = () => {
+  const client = getGlobalVormiaClient();
+
+  // Get user data from token or stored user info
+  const getUser = () => {
+    try {
+      const token = client.getAuthToken();
+      if (!token) return null;
+
+      // Try to get user from localStorage
+      const userData = localStorage.getItem('vormia_user_data');
+      if (userData) {
+        return JSON.parse(userData);
+      }
+
+      // If no stored user data, return basic token info
+      return { token: !!token };
+    } catch (error) {
+      console.warn('Failed to get user data:', error);
+      return null;
+    }
+  };
+
+  // Store user data (call this after successful login)
+  const setUser = (userData) => {
+    try {
+      localStorage.setItem('vormia_user_data', JSON.stringify(userData));
+    } catch (error) {
+      console.warn('Failed to store user data:', error);
+    }
+  };
+
+  // Clear user data (call this on logout)
+  const clearUser = () => {
+    try {
+      localStorage.removeItem('vormia_user_data');
+    } catch (error) {
+      console.warn('Failed to clear user data:', error);
+    }
+  };
+
+  // Check if user has a specific permission
+  const hasPermission = (permission) => {
+    const user = getUser();
+    if (!user || !user.permissions) return false;
+
+    if (Array.isArray(permission)) {
+      // Check if user has ALL permissions in the array
+      return permission.every(perm => user.permissions.includes(perm));
+    }
+
+    return user.permissions.includes(permission);
+  };
+
+  // Check if user has ANY of the specified permissions
+  const hasAnyPermission = (permissions) => {
+    const user = getUser();
+    if (!user || !user.permissions) return false;
+
+    return permissions.some(permission => user.permissions.includes(permission));
+  };
+
+  // Check if user has a specific role
+  const isUser = (role) => {
+    const user = getUser();
+    if (!user || !user.roles) return false;
+
+    if (Array.isArray(role)) {
+      // Check if user has ANY of the specified roles
+      return role.some(r => user.roles.includes(r));
+    }
+
+    return user.roles.includes(role);
+  };
+
+  // Check if user has ALL of the specified roles
+  const hasAllRoles = (roles) => {
+    const user = getUser();
+    if (!user || !user.roles) return false;
+
+    return roles.every(role => user.roles.includes(role));
+  };
+
+  // Get user's permissions
+  const getPermissions = () => {
+    const user = getUser();
+    return user?.permissions || [];
+  };
+
+  // Get user's roles
+  const getRoles = () => {
+    const user = getUser();
+    return user?.roles || [];
+  };
+
+  // Check if user is admin (common role name)
+  const isAdmin = () => {
+    return isUser(['admin', 'Admin', 'ADMIN', 'administrator', 'Administrator']);
+  };
+
+  // Check if user is moderator
+  const isModerator = () => {
+    return isUser(['moderator', 'Moderator', 'MODERATOR', 'mod', 'Mod']);
+  };
+
+  // Check if user is super user
+  const isSuperUser = () => {
+    return isUser(['superuser', 'SuperUser', 'SUPER_USER', 'super_user', 'super']);
+  };
+
+  // Check if user can access a specific resource
+  const canAccess = (resource, action = 'view') => {
+    const permission = `${action}_${resource}`;
+    return hasPermission(permission);
+  };
+
+  // Check if user can perform CRUD operations
+  const canCreate = (resource) => canAccess(resource, 'create');
+  const canRead = (resource) => canAccess(resource, 'view');
+  const canUpdate = (resource) => canAccess(resource, 'edit');
+  const canDelete = (resource) => canAccess(resource, 'delete');
+
+  // Check if user can manage other users
+  const canManageUsers = () => {
+    return hasPermission(['manage_users', 'user_management', 'admin_users']) || 
+           isAdmin() || 
+           isSuperUser();
+  };
+
+  // Check if user can view reports
+  const canViewReports = () => {
+    return hasPermission(['view_reports', 'report_access', 'reports_view']) || 
+           isAdmin() || 
+           isModerator();
+  };
+
+  // Check if user can add users
+  const canAddUsers = () => {
+    return hasPermission(['add_users', 'create_users', 'user_creation']) || 
+           isAdmin() || 
+           isSuperUser();
+  };
+
+  return {
+    // Basic auth
+    isAuthenticated: () => !!client.getAuthToken(),
+    getUser,
+    setUser,
+    clearUser,
+
+    // Permission checking
+    hasPermission,
+    hasAnyPermission,
+    getPermissions,
+
+    // Role checking
+    isUser,
+    hasAllRoles,
+    getRoles,
+    isAdmin,
+    isModerator,
+    isSuperUser,
+
+    // Resource access
+    canAccess,
+    canCreate,
+    canRead,
+    canUpdate,
+    canDelete,
+
+    // Common permission checks
+    canManageUsers,
+    canViewReports,
+    canAddUsers,
+  };
+};
