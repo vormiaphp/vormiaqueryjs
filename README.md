@@ -2,7 +2,7 @@
 
 A powerful, framework-agnostic query and mutation library with built-in error handling, notifications, and debug capabilities.
 
-## ✨ **What's New in v1.4.11**
+## ✨ **What's New in v1.4.29**
 
 ### 🚀 **Major Improvements**
 
@@ -53,6 +53,30 @@ const mutation = useVormiaQueryAuthMutation({
 
 **Authentication and Authorization System**: Added comprehensive permission and role checking with the new `useVormiaAuth` hook. This is a **non-breaking addition** that enhances your existing authentication capabilities.
 
+### 🆕 **New Features in v1.4.27**
+
+**Custom Error Labels**: Added `errorLabel` option to `useVormiaQueryAuthMutation` for personalized error logging:
+
+```javascript
+const mutation = useVormiaQueryAuthMutation({
+  endpoint: "/register",
+  errorLabel: "Registration Error", // 🆕 Custom error label!
+  showDebug: true,
+  // ... rest of config
+});
+```
+
+**Console Output**: Now shows " Registration Error" instead of generic " Mutation Error" for better debugging.
+
+### 🆕 **New Features in v1.4.29**
+
+**Enhanced Notification Styling**: Improved notification appearance with solid backgrounds and better visual hierarchy:
+
+- **Solid Backgrounds**: Changed from light (`bg-*-50`) to solid (`bg-*-500`) colors for better visibility
+- **Hidden Icons**: Cleaner notification appearance without icons
+- **Better Z-Index**: Increased layering for proper positioning
+- **Reduced Console Clutter**: Less fallback logging for cleaner console output
+
 **Migration Guide:**
 
 ```javascript
@@ -99,6 +123,8 @@ The `SimpleNotification` component provides a clean, consistent way to display n
 ```
 
 **Available Types**: `success`, `error`, `warning`, `info`, `announce`
+
+**🎨 Notification Styling**: All notification types now use solid background colors (`bg-*-500`) for better visibility and modern appearance. Icons are hidden by default for a cleaner look.
 
 ## 📦 **Required Peer Dependencies**
 
