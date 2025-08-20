@@ -3,6 +3,7 @@ import { getGlobalVormiaClient } from "../client/createVormiaClient";
 import {
   logErrorForDebug,
   logSuccessForDebug,
+  getDebugConfig,
 } from "../utils/enhancedErrorHandler.js";
 import {
   showSuccessNotification,
@@ -11,7 +12,6 @@ import {
 } from "../components/NotificationPanel.jsx";
 import {
   createErrorDebugHtml,
-  shouldShowDebug,
   createDebugInfo,
 } from "../components/ErrorDebugPanel.jsx";
 
@@ -30,8 +30,6 @@ export function useVormiaQuery({
   endpoint,
   method = "GET",
   showDebug = null,
-  onSuccess,
-  onError,
   ...options
 }) {
   // Get debug configuration
@@ -86,7 +84,7 @@ export function useVormiaQuery({
     },
 
     // Get debug panel HTML (framework agnostic)
-    getDebugHtml: (response, isSuccess = true) => {
+    getDebugHtml: (response) => {
       if (!shouldShowDebugPanel) return "";
       const debugInfo = createDebugInfo(response);
       return createErrorDebugHtml(debugInfo);

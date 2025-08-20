@@ -1,13 +1,7 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { getGlobalVormiaClient } from "../client/createVormiaClient";
+import { transformFormData } from "../utils/formDataTransformer.js";
 import {
-  transformFormData,
-  mergeFormdataConfig,
-} from "../utils/formDataTransformer.js";
-import {
-  handleApiError,
-  handleFieldErrors,
-  handleGeneralError,
   logErrorForDebug,
   logSuccessForDebug,
 } from "../utils/enhancedErrorHandler.js";
@@ -135,10 +129,6 @@ export const useVormiaQueryAuthMutation = (options) => {
     ...mutationOptions
   } = options;
 
-  // Get global configuration
-  const globalConfig =
-    typeof window !== "undefined" ? window.__VORMIA_CONFIG__ : {};
-
   // Determine if debug should be shown (respects VITE_VORMIA_DEBUG)
   const shouldShowDebugPanel =
     showDebug !== null ? showDebug : shouldShowDebug();
@@ -200,9 +190,6 @@ export const useVormiaQueryAuthMutation = (options) => {
       }
     },
     onError: (error, variables, context) => {
-      // Get clean error info
-      const errorInfo = handleApiError(error);
-
       // Log for debugging
       if (shouldShowDebugPanel) {
         logErrorForDebug(error, "Mutation Error");
@@ -270,7 +257,7 @@ export const useVormiaQueryAuthMutation = (options) => {
     },
 
     // Get debug panel HTML (framework agnostic)
-    getDebugHtml: (response, isSuccess = true) => {
+    getDebugHtml: (response) => {
       if (!shouldShowDebugPanel) return "";
       const debugInfo = createDebugInfo(response);
       return createErrorDebugHtml(debugInfo);

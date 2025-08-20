@@ -124,7 +124,7 @@ export function useVormiaQuerySimple({
     },
 
     // Get debug panel HTML (framework agnostic)
-    getDebugHtml: (response, isSuccess = true) => {
+    getDebugHtml: (response) => {
       if (!shouldShowDebugPanel) return "";
       const debugInfo = createDebugInfo(response);
       return createErrorDebugHtml(debugInfo);
