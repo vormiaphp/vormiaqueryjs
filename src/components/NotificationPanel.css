@@ -1,35 +1,45 @@
-/* Fallback styles for notifications - ensures proper background colors even if Tailwind JIT fails */
+/* Comprehensive fallback styles for notifications - ensures proper styling even if Tailwind JIT fails */
+
+/* Base notification styles */
+.vormia-notify-base {
+  padding: 1rem !important;
+  border: 1px solid !important;
+  border-radius: 0.5rem !important;
+  font-family: inherit !important;
+  font-size: 0.875rem !important;
+  line-height: 1.25rem !important;
+}
 
 /* Success notification */
-.vormia-notification-success {
+.vormia-notify-success {
   background-color: #f0fdf4 !important;
   border-color: #bbf7d0 !important;
   color: #166534 !important;
 }
 
 /* Error notification */
-.vormia-notification-error {
+.vormia-notify-error {
   background-color: #fef2f2 !important;
   border-color: #fecaca !important;
   color: #991b1b !important;
 }
 
 /* Warning notification */
-.vormia-notification-warning {
+.vormia-notify-warning {
   background-color: #fffbeb !important;
   border-color: #fed7aa !important;
   color: #92400e !important;
 }
 
 /* Info notification */
-.vormia-notification-info {
+.vormia-notify-info {
   background-color: #eff6ff !important;
   border-color: #bfdbfe !important;
   color: #1e40af !important;
 }
 
 /* Announce notification */
-.vormia-notification-announce {
+.vormia-notify-announce {
   background-color: #f9fafb !important;
   border-color: #e5e7eb !important;
   color: #374151 !important;
@@ -54,4 +64,79 @@
 
 .vormia-icon-announce {
   color: #9ca3af !important;
+}
+
+/* Legacy notification styles (keeping for backward compatibility) */
+.vormia-notification-success {
+  background-color: #f0fdf4 !important;
+  border-color: #bbf7d0 !important;
+  color: #166534 !important;
+}
+
+.vormia-notification-error {
+  background-color: #fef2f2 !important;
+  border-color: #fecaca !important;
+  color: #991b1b !important;
+}
+
+.vormia-notification-warning {
+  background-color: #fffbeb !important;
+  border-color: #fed7aa !important;
+  color: #92400e !important;
+}
+
+.vormia-notification-info {
+  background-color: #eff6ff !important;
+  border-color: #bfdbfe !important;
+  color: #1e40af !important;
+}
+
+.vormia-notification-announce {
+  background-color: #f9fafb !important;
+  border-color: #e5e7eb !important;
+  color: #374151 !important;
+}
+
+/* Additional utility classes for better styling */
+.vormia-notify-base {
+  display: block !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.vormia-notify-base .flex {
+  display: flex !important;
+}
+
+.vormia-notify-base .items-center {
+  align-items: center !important;
+}
+
+.vormia-notify-base .flex-shrink-0 {
+  flex-shrink: 0 !important;
+}
+
+.vormia-notify-base .flex-1 {
+  flex: 1 !important;
+}
+
+.vormia-notify-base .ml-3 {
+  margin-left: 0.75rem !important;
+}
+
+.vormia-notify-base .text-sm {
+  font-size: 0.875rem !important;
+  line-height: 1.25rem !important;
+}
+
+.vormia-notify-base .font-semibold {
+  font-weight: 600 !important;
+}
+
+.vormia-notify-base .hover\:opacity-70:hover {
+  opacity: 0.7 !important;
+}
+
+.vormia-notify-base .transition-opacity {
+  transition: opacity 0.15s ease-in-out !important;
 }
