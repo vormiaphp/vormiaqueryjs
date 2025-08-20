@@ -295,7 +295,7 @@ export const useVormiaAuth = () => {
       if (!token) return null;
 
       // Try to get user from localStorage
-      const userData = localStorage.getItem('vormia_user_data');
+      const userData = localStorage.getItem("vormia_user_data");
       if (userData) {
         return JSON.parse(userData);
       }
@@ -303,7 +303,7 @@ export const useVormiaAuth = () => {
       // If no stored user data, return basic token info
       return { token: !!token };
     } catch (error) {
-      console.warn('Failed to get user data:', error);
+      console.warn("Failed to get user data:", error);
       return null;
     }
   };
@@ -311,18 +311,18 @@ export const useVormiaAuth = () => {
   // Store user data (call this after successful login)
   const setUser = (userData) => {
     try {
-      localStorage.setItem('vormia_user_data', JSON.stringify(userData));
+      localStorage.setItem("vormia_user_data", JSON.stringify(userData));
     } catch (error) {
-      console.warn('Failed to store user data:', error);
+      console.warn("Failed to store user data:", error);
     }
   };
 
   // Clear user data (call this on logout)
   const clearUser = () => {
     try {
-      localStorage.removeItem('vormia_user_data');
+      localStorage.removeItem("vormia_user_data");
     } catch (error) {
-      console.warn('Failed to clear user data:', error);
+      console.warn("Failed to clear user data:", error);
     }
   };
 
@@ -333,7 +333,7 @@ export const useVormiaAuth = () => {
 
     if (Array.isArray(permission)) {
       // Check if user has ALL permissions in the array
-      return permission.every(perm => user.permissions.includes(perm));
+      return permission.every((perm) => user.permissions.includes(perm));
     }
 
     return user.permissions.includes(permission);
@@ -344,7 +344,9 @@ export const useVormiaAuth = () => {
     const user = getUser();
     if (!user || !user.permissions) return false;
 
-    return permissions.some(permission => user.permissions.includes(permission));
+    return permissions.some((permission) =>
+      user.permissions.includes(permission)
+    );
   };
 
   // Check if user has a specific role
@@ -354,7 +356,7 @@ export const useVormiaAuth = () => {
 
     if (Array.isArray(role)) {
       // Check if user has ANY of the specified roles
-      return role.some(r => user.roles.includes(r));
+      return role.some((r) => user.roles.includes(r));
     }
 
     return user.roles.includes(role);
@@ -365,7 +367,7 @@ export const useVormiaAuth = () => {
     const user = getUser();
     if (!user || !user.roles) return false;
 
-    return roles.every(role => user.roles.includes(role));
+    return roles.every((role) => user.roles.includes(role));
   };
 
   // Get user's permissions
@@ -382,50 +384,68 @@ export const useVormiaAuth = () => {
 
   // Check if user is admin (common role name)
   const isAdmin = () => {
-    return isUser(['admin', 'Admin', 'ADMIN', 'administrator', 'Administrator']);
+    return isUser([
+      "admin",
+      "Admin",
+      "ADMIN",
+      "administrator",
+      "Administrator",
+    ]);
   };
 
   // Check if user is moderator
   const isModerator = () => {
-    return isUser(['moderator', 'Moderator', 'MODERATOR', 'mod', 'Mod']);
+    return isUser(["moderator", "Moderator", "MODERATOR", "mod", "Mod"]);
   };
 
   // Check if user is super user
   const isSuperUser = () => {
-    return isUser(['superuser', 'SuperUser', 'SUPER_USER', 'super_user', 'super']);
+    return isUser([
+      "superuser",
+      "SuperUser",
+      "SUPER_USER",
+      "super_user",
+      "super",
+    ]);
   };
 
   // Check if user can access a specific resource
-  const canAccess = (resource, action = 'view') => {
+  const canAccess = (resource, action = "view") => {
     const permission = `${action}_${resource}`;
     return hasPermission(permission);
   };
 
   // Check if user can perform CRUD operations
-  const canCreate = (resource) => canAccess(resource, 'create');
-  const canRead = (resource) => canAccess(resource, 'view');
-  const canUpdate = (resource) => canAccess(resource, 'edit');
-  const canDelete = (resource) => canAccess(resource, 'delete');
+  const canCreate = (resource) => canAccess(resource, "create");
+  const canRead = (resource) => canAccess(resource, "view");
+  const canUpdate = (resource) => canAccess(resource, "edit");
+  const canDelete = (resource) => canAccess(resource, "delete");
 
   // Check if user can manage other users
   const canManageUsers = () => {
-    return hasPermission(['manage_users', 'user_management', 'admin_users']) || 
-           isAdmin() || 
-           isSuperUser();
+    return (
+      hasPermission(["manage_users", "user_management", "admin_users"]) ||
+      isAdmin() ||
+      isSuperUser()
+    );
   };
 
   // Check if user can view reports
   const canViewReports = () => {
-    return hasPermission(['view_reports', 'report_access', 'reports_view']) || 
-           isAdmin() || 
-           isModerator();
+    return (
+      hasPermission(["view_reports", "report_access", "reports_view"]) ||
+      isAdmin() ||
+      isModerator()
+    );
   };
 
   // Check if user can add users
   const canAddUsers = () => {
-    return hasPermission(['add_users', 'create_users', 'user_creation']) || 
-           isAdmin() || 
-           isSuperUser();
+    return (
+      hasPermission(["add_users", "create_users", "user_creation"]) ||
+      isAdmin() ||
+      isSuperUser()
+    );
   };
 
   return {
