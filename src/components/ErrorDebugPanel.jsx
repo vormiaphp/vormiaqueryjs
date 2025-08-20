@@ -51,7 +51,7 @@ export function ErrorDebugPanel({
       
       <div className="space-y-3 text-xs">
         {/* Basic Info */}
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2 mt-4">
           <div>
             <span className="font-medium text-gray-600">HTTP Status:</span>
             <span className={`ml-2 px-2 py-1 rounded text-xs ${
