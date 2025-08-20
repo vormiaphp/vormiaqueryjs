@@ -1,4 +1,5 @@
 import React from "react";
+import "./NotificationPanel.css";
 
 /**
  * Simple Notification Display Component
@@ -13,16 +14,16 @@ export function SimpleNotification({
 }) {
   if (!message) return null;
 
-  // Primary styling using Tailwind classes for guaranteed fallback
+  // Primary styling using Tailwind classes with CSS fallback
   const getStyles = () => {
-    const baseStyles = "p-4 border rounded-lg";
+    const baseStyles = "p-4 border rounded-lg vormia-notify-base";
     
     const typeStyles = {
-      success: "bg-green-500 border-green-200 text-green-800",
-      error: "bg-red-500 border-red-200 text-white",
-      warning: "bg-yellow-500 border-yellow-200 text-yellow-800",
-      info: "bg-blue-500 border-blue-200 text-blue-800",
-      announce: "bg-gray-500 border-gray-200 text-gray-800"
+      success: "bg-green-500 border-green-200 text-white vormia-notify-success",
+      error: "bg-red-500 border-red-200 text-white vormia-notify-error",
+      warning: "bg-yellow-500 border-yellow-200 text-white vormia-notify-warning",
+      info: "bg-blue-500 border-blue-200 text-white vormia-notify-info",
+      announce: "bg-gray-500 border-gray-200 text-white vormia-notify-announce"
     };
     
     return `${baseStyles} ${typeStyles[type] || typeStyles.announce}`;
@@ -67,11 +68,11 @@ export function SimpleNotification({
 
   const getIconColor = () => {
     const iconColors = {
-      success: "text-green-400",
-      error: "text-red-400",
-      warning: "text-yellow-400",
-      info: "text-blue-400",
-      announce: "text-gray-400"
+      success: "text-white vormia-icon-success",
+      error: "text-white vormia-icon-error",
+      warning: "text-white vormia-icon-warning",
+      info: "text-white vormia-icon-info",
+      announce: "text-white vormia-icon-announce"
     };
     
     return iconColors[type] || iconColors.announce;
@@ -133,7 +134,7 @@ export function NotificationPanel({ notification, onClose, className = "" }) {
 
   // Get notification styles based on type and variant
   const getNotificationStyles = () => {
-    const baseStyles = "rounded-lg border shadow-lg";
+    const baseStyles = "rounded-lg border shadow-lg vormia-notify-base";
     
     // Variant-specific styles
     let variantStyles = "";
@@ -153,23 +154,23 @@ export function NotificationPanel({ notification, onClose, className = "" }) {
         break;
     }
 
-    // Type-specific colors
+    // Type-specific colors with CSS fallback
     let typeStyles = "";
     switch (type) {
       case "success":
-        typeStyles = "bg-green-500 border-green-200 text-green-800";
+        typeStyles = "bg-green-500 border-green-200 text-white vormia-notify-success";
         break;
       case "error":
-        typeStyles = "bg-red-500 border-red-200 text-red-800";
+        typeStyles = "bg-red-500 border-red-200 text-white vormia-notify-error";
         break;
       case "warning":
-        typeStyles = "bg-yellow-500 border-yellow-200 text-yellow-800";
+        typeStyles = "bg-yellow-500 border-yellow-200 text-white vormia-notify-warning";
         break;
       case "info":
-        typeStyles = "bg-blue-500 border-blue-200 text-blue-800";
+        typeStyles = "bg-blue-500 border-blue-200 text-white vormia-notify-info";
         break;
       default:
-        typeStyles = "bg-gray-500 border-gray-200 text-gray-800";
+        typeStyles = "bg-gray-500 border-gray-200 text-white vormia-notify-announce";
         break;
     }
 
