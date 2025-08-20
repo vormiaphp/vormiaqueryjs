@@ -94,7 +94,7 @@ export function ErrorDebugPanel({
         {/* {isError && response.response?.data?.errors && ( */}
           <div>
             <span className="font-medium text-gray-600">🚨 Response Errors:</span>
-            <pre className="ml-2 mt-1 p-2 rounded text-xs overflow-x-auto bg-red-50 text-red-700 border border-red-200">
+            <pre className="ml-2 mt-1 p-2 rounded text-xs overflow-x-auto bg-red-500 text-white border border-red-200">
               {JSON.stringify(response.response)}
             </pre>
           </div>
@@ -104,7 +104,7 @@ export function ErrorDebugPanel({
         {response.response?.data?.errors && (
           <div>
             <span className="font-medium text-gray-600">🚨 Validation Errors (Formatted):</span>
-            <div className="ml-2 mt-1 p-2 rounded text-xs bg-red-50 border border-red-200">
+            <div className="ml-2 mt-1 p-2 rounded text-xs bg-red-500 border border-red-200">
               {Object.entries(response.response.data.errors).map(([field, messages]) => (
                 <div key={field} className="mb-2">
                   <span className="font-medium text-red-700">{field}:</span>

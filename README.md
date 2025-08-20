@@ -91,7 +91,7 @@ The `SimpleNotification` component provides a clean, consistent way to display n
 // ❌ Avoid: Manual HTML styling
 {
   generalError && (
-    <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+    <div className="p-4 bg-red-500 border border-red-200 rounded-lg text-white">
       {/* ... manual styling ... */}
     </div>
   );
