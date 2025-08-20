@@ -124,6 +124,7 @@ export const useVormiaQueryAuthMutation = (options) => {
     formdata,
     manualTransformation = false,
     showDebug = null,
+    errorLabel = "Mutation Error", // Allow custom error label
     onSuccess,
     onError,
     ...mutationOptions
@@ -192,7 +193,7 @@ export const useVormiaQueryAuthMutation = (options) => {
     onError: (error, variables, context) => {
       // Log for debugging
       if (shouldShowDebugPanel) {
-        logErrorForDebug(error, "Mutation Error");
+        logErrorForDebug(error, errorLabel);
       }
 
       // Show error notification
