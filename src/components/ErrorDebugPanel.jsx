@@ -90,17 +90,6 @@ export function ErrorDebugPanel({
           </div>
         )}
         
-        {/* Response Errors - Only show the errors key content for error responses */}
-        {response.response?.data?.errors && (
-          <div>
-            <span className="font-medium text-gray-600">🚨 Response Errors:</span>
-            <pre className="ml-2 mt-1 p-2 rounded text-xs overflow-x-auto bg-red-500 text-white border border-red-200">
-              {JSON.stringify(response.response.data.errors, null, 2)}
-            </pre>
-          </div>
-        )}
-        {/* )} */}
-        
         {/* Special handling for validation errors - Formatted display */}
         {response.response?.data?.errors && (
           <div>
@@ -119,6 +108,16 @@ export function ErrorDebugPanel({
                 </div>
               ))}
             </div>
+          </div>
+        )}
+        
+        {/* Response Errors - Only show the errors key content for error responses */}
+        {response.response?.data?.errors && (
+          <div>
+            <span className="font-medium text-gray-600">🚨 Response Errors:</span>
+            <pre className="ml-2 mt-1 p-2 rounded text-xs overflow-x-auto bg-red-500 text-white border border-red-200">
+              {JSON.stringify(response.response.data.errors, null, 2)}
+            </pre>
           </div>
         )}
         
@@ -202,19 +201,11 @@ export function shouldShowDebug() {
  * @returns {ErrorDebugInfo} Debug information object
  */
 export function createDebugInfo(response) {
-  // Debug logging to see what we're receiving
-  console.log("🔍 createDebugInfo - Input response:", response);
-  console.log("🔍 createDebugInfo - response.response:", response?.response);
-  console.log("🔍 createDebugInfo - response.response?.data:", response?.response?.data);
-  
   // Handle error objects (from onError)
   if (response?.response) {
     // This is an error response
     const errorResponse = response.response;
     const errorData = errorResponse.data || {};
-    
-    console.log("🔍 createDebugInfo - errorData:", errorData);
-    console.log("🔍 createDebugInfo - errorData.errors:", errorData.errors);
     
     // Check for errors in different possible locations
     let errors = null;
@@ -224,12 +215,9 @@ export function createDebugInfo(response) {
       errors = errorResponse.errors;
     }
     
-    console.log("🔍 createDebugInfo - Found errors:", errors);
-    
     // Handle nested response structure (like error.response.response.data.errors)
     if (!errors && errorResponse.response?.data?.errors) {
       errors = errorResponse.response.data.errors;
-      console.log("🔍 createDebugInfo - Found nested errors:", errors);
     }
     
     return {
@@ -272,7 +260,6 @@ export function createDebugInfo(response) {
   }
 
   // Fallback for unknown response structure
-  console.log("🔍 createDebugInfo - Using fallback, response:", response);
   
   // Try to extract errors from different possible structures
   let extractedErrors = null;
@@ -290,15 +277,15 @@ export function createDebugInfo(response) {
     extractedData = response.data;
   }
   
-  console.log("🔍 createDebugInfo - Extracted errors:", extractedErrors);
-  console.log("🔍 createDebugInfo - Extracted data:", extractedData);
-  
   return {
     status: response?.status || response?.response?.status || 0,
     message: response?.message || response?.response?.message || "Unknown response structure",
     response: {
       response: {
-        data: extractedData || response,
+        data: {
+          ...extractedData,
+          errors: extractedErrors
+        } || response,
         debug: response?.debug || response?.response?.debug
       },
       debug: response?.debug || response?.response?.debug
