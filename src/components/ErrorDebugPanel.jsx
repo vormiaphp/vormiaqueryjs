@@ -80,27 +80,30 @@ export function ErrorDebugPanel({
           </p>
         </div>
         
-        {/* Response Info - Shows data if success, errors if failure */}
-        {response.response?.data && (
+        {/* Response Data - Only show the data key content for success responses */}
+        {isSuccess && response.response?.data?.data && (
           <div>
-            <span className="font-medium text-gray-600">
-              {isSuccess
-                ? "📊 Response Data:"
-                : isError
-                ? "🚨 Response Errors:"
-                : "📋 Response Info:"}
-            </span>
+            <span className="font-medium text-gray-600">📊 Response Data:</span>
             <pre className="ml-2 mt-1 p-2 rounded text-xs overflow-x-auto bg-gray-100 text-gray-700">
-              {JSON.stringify(response.response.data, null, 2)}
+              {JSON.stringify(response.response.data.data, null, 2)}
             </pre>
           </div>
         )}
         
-
-        {/* Special handling for validation errors */}
+        {/* Response Errors - Only show the errors key content for error responses */}
+        {isError && response.response?.data?.errors && (
+          <div>
+            <span className="font-medium text-gray-600">🚨 Response Errors:</span>
+            <pre className="ml-2 mt-1 p-2 rounded text-xs overflow-x-auto bg-red-50 text-red-700 border border-red-200">
+              {JSON.stringify(response.response.data.errors, null, 2)}
+            </pre>
+          </div>
+        )}
+        
+        {/* Special handling for validation errors - Formatted display */}
         {response.response?.data?.errors && (
           <div>
-            <span className="font-medium text-gray-600">🚨 Validation Errors:</span>
+            <span className="font-medium text-gray-600">🚨 Validation Errors (Formatted):</span>
             <div className="ml-2 mt-1 p-2 rounded text-xs bg-red-50 border border-red-200">
               {Object.entries(response.response.data.errors).map(([field, messages]) => (
                 <div key={field} className="mb-2">
@@ -118,13 +121,15 @@ export function ErrorDebugPanel({
           </div>
         )}
         
-        {/* Full Response Structure */}
-        <div>
-          <span className="font-medium text-gray-600">Full Response Structure:</span>
-          <pre className="ml-2 mt-1 p-2 rounded text-xs overflow-x-auto bg-gray-100 text-gray-700">
-            {JSON.stringify(response, null, 2)}
-          </pre>
-        </div>
+        {/* Full Debug - Only show the debug key content */}
+        {(response.response?.data?.debug || response.debug) && (
+          <div>
+            <span className="font-medium text-gray-600">🔍 Full Debug:</span>
+            <pre className="ml-2 mt-1 p-2 rounded text-xs overflow-x-auto bg-blue-50 text-blue-700 border border-blue-200">
+              {JSON.stringify(response.response?.data?.debug || response.debug, null, 2)}
+            </pre>
+          </div>
+        )}
         
         {/* Timestamp */}
         <div>
