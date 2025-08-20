@@ -201,18 +201,39 @@ export function shouldShowDebug() {
  * @returns {ErrorDebugInfo} Debug information object
  */
 export function createDebugInfo(response) {
+  // Debug logging to see what we're receiving
+  console.log("🔍 createDebugInfo - Input response:", response);
+  console.log("🔍 createDebugInfo - response.response:", response?.response);
+  console.log("🔍 createDebugInfo - response.response?.data:", response?.response?.data);
+  
   // Handle error objects (from onError)
   if (response?.response) {
     // This is an error response
     const errorResponse = response.response;
     const errorData = errorResponse.data || {};
     
+    console.log("🔍 createDebugInfo - errorData:", errorData);
+    console.log("🔍 createDebugInfo - errorData.errors:", errorData.errors);
+    
+    // Check for errors in different possible locations
+    let errors = null;
+    if (errorData.errors) {
+      errors = errorData.errors;
+    } else if (errorResponse.errors) {
+      errors = errorResponse.errors;
+    }
+    
+    console.log("🔍 createDebugInfo - Found errors:", errors);
+    
     return {
       status: errorResponse.status || 0,
       message: errorData.message || errorResponse.message || "Error occurred",
       response: {
         response: {
-          data: errorData, // Use the ORIGINAL errorData directly - no copying needed!
+          data: {
+            ...errorData,
+            errors: errors // Ensure errors key is preserved
+          },
           debug: errorResponse.debug
         },
         debug: errorResponse.debug
@@ -244,15 +265,36 @@ export function createDebugInfo(response) {
   }
 
   // Fallback for unknown response structure
+  console.log("🔍 createDebugInfo - Using fallback, response:", response);
+  
+  // Try to extract errors from different possible structures
+  let extractedErrors = null;
+  let extractedData = null;
+  
+  // Check multiple possible error structures
+  if (response?.errors) {
+    extractedErrors = response.errors;
+    extractedData = response;
+  } else if (response?.response?.errors) {
+    extractedErrors = response.response.errors;
+    extractedData = response.response;
+  } else if (response?.data?.errors) {
+    extractedErrors = response.data.errors;
+    extractedData = response.data;
+  }
+  
+  console.log("🔍 createDebugInfo - Extracted errors:", extractedErrors);
+  console.log("🔍 createDebugInfo - Extracted data:", extractedData);
+  
   return {
-    status: 0,
-    message: "Unknown response structure",
+    status: response?.status || response?.response?.status || 0,
+    message: response?.message || response?.response?.message || "Unknown response structure",
     response: {
       response: {
-        data: response,
-        debug: null
+        data: extractedData || response,
+        debug: response?.debug || response?.response?.debug
       },
-      debug: null
+      debug: response?.debug || response?.response?.debug
     },
     errorType: "unknown",
     timestamp: new Date().toISOString()
