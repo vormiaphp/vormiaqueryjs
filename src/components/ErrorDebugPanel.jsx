@@ -207,25 +207,22 @@ export function createDebugInfo(response) {
     const errorResponse = response.response;
     const errorData = errorResponse.data || {};
     
-    // Preserve the original error response structure
+    // Preserve the COMPLETE original error response structure
     const responseData = {
-      success: false,
-      message: errorResponse.message || errorData.message || "Error occurred"
+      success: errorData.success,
+      message: errorData.message || errorResponse.message || "Error occurred"
     };
     
-    // Only add errors if they exist
-    if (errorData.errors) {
-      responseData.errors = errorData.errors;
-    }
-    
-    // Only add debug if it exists
-    if (errorData.debug) {
-      responseData.debug = errorData.debug;
-    }
+    // Always preserve ALL keys from the original response
+    Object.keys(errorData).forEach(key => {
+      if (key !== 'success' && key !== 'message') {
+        responseData[key] = errorData[key];
+      }
+    });
     
     return {
       status: errorResponse.status || 0,
-      message: errorResponse.message || errorData.message || "Error occurred",
+      message: errorData.message || errorResponse.message || "Error occurred",
       response: {
         response: {
           data: responseData,
@@ -242,26 +239,18 @@ export function createDebugInfo(response) {
   if (response?.data) {
     const isSuccess = response.data.success === true;
     
-    // Preserve the original response structure
+    // Preserve the COMPLETE original response structure
     const responseData = {
       success: response.data.success,
       message: response.data.message
     };
     
-    // Only add data if it exists (for success responses)
-    if (response.data.data) {
-      responseData.data = response.data.data;
-    }
-    
-    // Only add errors if they exist (for error responses)
-    if (response.data.errors) {
-      responseData.errors = response.data.errors;
-    }
-    
-    // Only add debug if it exists
-    if (response.data.debug) {
-      responseData.debug = response.data.debug;
-    }
+    // Always preserve ALL keys from the original response
+    Object.keys(response.data).forEach(key => {
+      if (key !== 'success' && key !== 'message') {
+        responseData[key] = response.data[key];
+      }
+    });
     
     return {
       status: isSuccess ? 200 : response.status || 0,
