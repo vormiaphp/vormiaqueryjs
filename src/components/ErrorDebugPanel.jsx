@@ -96,6 +96,7 @@ export function ErrorDebugPanel({
           </div>
         )}
         
+
         {/* Special handling for validation errors */}
         {response.response?.data?.errors && (
           <div>
@@ -200,17 +201,28 @@ export function createDebugInfo(response) {
     const errorResponse = response.response;
     const errorData = errorResponse.data || {};
     
+    // Preserve the original error response structure
+    const responseData = {
+      success: false,
+      message: errorResponse.message || errorData.message || "Error occurred"
+    };
+    
+    // Only add errors if they exist
+    if (errorData.errors) {
+      responseData.errors = errorData.errors;
+    }
+    
+    // Only add debug if it exists
+    if (errorData.debug) {
+      responseData.debug = errorData.debug;
+    }
+    
     return {
       status: errorResponse.status || 0,
       message: errorResponse.message || errorData.message || "Error occurred",
       response: {
         response: {
-          data: {
-            success: false,
-            message: errorResponse.message || errorData.message,
-            errors: errorData.errors || errorData.validation_errors || errorData.error,
-            debug: errorData.debug || errorResponse.debug
-          },
+          data: responseData,
           debug: errorResponse.debug
         },
         debug: errorResponse.debug
@@ -223,6 +235,28 @@ export function createDebugInfo(response) {
   // Handle success responses (from onSuccess)
   if (response?.data) {
     const isSuccess = response.data.success === true;
+    
+    // Preserve the original response structure
+    const responseData = {
+      success: response.data.success,
+      message: response.data.message
+    };
+    
+    // Only add data if it exists (for success responses)
+    if (response.data.data) {
+      responseData.data = response.data.data;
+    }
+    
+    // Only add errors if they exist (for error responses)
+    if (response.data.errors) {
+      responseData.errors = response.data.errors;
+    }
+    
+    // Only add debug if it exists
+    if (response.data.debug) {
+      responseData.debug = response.data.debug;
+    }
+    
     return {
       status: isSuccess ? 200 : response.status || 0,
       message: isSuccess
@@ -230,13 +264,7 @@ export function createDebugInfo(response) {
         : response.data.message || "Unknown response",
       response: {
         response: {
-          data: {
-            success: response.data.success,
-            message: response.data.message,
-            data: response.data.data,
-            errors: response.data.errors,
-            debug: response.data.debug
-          },
+          data: responseData,
           debug: response.debug
         },
         debug: response.debug
