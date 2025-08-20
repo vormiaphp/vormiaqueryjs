@@ -2,99 +2,32 @@
 
 A powerful, framework-agnostic query and mutation library with built-in error handling, notifications, and debug capabilities.
 
-## ✨ **Features Overview (v1.4.31)**
 
-### 🚀 **Core Features**
 
-- **🔐 Comprehensive Authentication System**: `useVormiaAuth` hook with permission and role checking
-- **🔑 Permission Management**: `hasPermission()`, `hasAnyPermission()`, and resource access control
-- **👤 Role-Based Access**: `isUser()`, `isAdmin()`, `isModerator()` and more role helpers
-- **📋 Resource Access Control**: `canCreate()`, `canRead()`, `canUpdate()`, `canDelete()` helpers
-- **Notifications Always Enabled**: Notifications are automatically shown for all queries and mutations
-- **Enhanced Debug Panel**: Better error/success response display with improved structure detection
-- **Cleaner API**: Simplified hook usage with sensible defaults
-- **Form Data Transformation**: Automatic field mapping and transformation for API requests
-- **📘 Full TypeScript Support**: Complete type definitions for all functions, hooks, and components
 
-### 🎨 **Notification System**
 
-- **Solid Background Colors**: Professional appearance with `bg-*-500` colors for maximum visibility
-- **Perfect Contrast**: Pure black/white combinations for optimal readability
-- **CSS Fallback**: Guaranteed styling even when Tailwind JIT compilation fails
-- **Hidden Icons**: Clean, minimalist design without visual clutter
-- **Multiple Variants**: Toast, banner, modal, and in-app notification styles
-- **Auto-dismiss**: Configurable duration and manual close options
 
-### 🔧 **Advanced Features**
 
-- **Custom Error Labels**: Personalized error logging with `errorLabel` option
-- **Environment Detection**: Automatic debug mode based on `VITE_VORMIA_DEBUG`
-- **Error Handling**: Comprehensive error management with field-specific validation
-- **Debug Logging**: Detailed console output for development and troubleshooting
-- **Framework Support**: React, Vue, Svelte, Solid, Qwik, and Astro adapters
 
-### 🏷️ **Custom Error Labels**
 
-Personalize your error logging with custom labels for better debugging:
 
-```javascript
-const mutation = useVormiaQueryAuthMutation({
-  endpoint: "/register",
-  errorLabel: "Registration Error", // 🏷️ Custom error label!
-  showDebug: true,
-  // ... rest of config
-});
-```
 
-**Console Output**: Shows " Registration Error" instead of generic " Mutation Error" for better identification.
 
-### 🎯 **SimpleNotification Component**
 
-The `SimpleNotification` component provides a clean, consistent way to display notifications without manual HTML styling:
 
-```jsx
-// ✅ Recommended: Use SimpleNotification
-{
-  generalError && (
-    <SimpleNotification
-      type="error"
-      title="Error"
-      message={generalError}
-      onClose={() => setGeneralError("")}
-      className="mb-4"
-    />
-  );
-}
 
-// ❌ Avoid: Manual HTML styling
-{
-  generalError && (
-    <div className="p-4 bg-red-500 border border-red-200 rounded-lg text-white">
-      {/* ... manual styling ... */}
-    </div>
-  );
-}
-```
 
-**Available Types**: `success`, `error`, `warning`, `info`, `announce`
 
-**🎨 Notification Styling**: All notification types use solid background colors with perfect contrast:
 
-| Type | Background | Text | Border | Description |
-|------|------------|------|--------|-------------|
-| **Success** | `bg-green-500` | `text-white` | `border-green-200` | Professional green with white text |
-| **Error** | `bg-red-500` | `text-white` | `border-red-200` | Clear red with white text |
-| **Warning** | `bg-yellow-500` | `text-white` | `border-yellow-200` | Bright yellow with white text |
-| **Info** | `bg-blue-500` | `text-white` | `border-blue-200` | Trusted blue with white text |
-| **Announce** | `bg-black` | `text-white` | `border-gray-200` | **Pure black with white text for maximum contrast** |
 
-**CSS Fallback**: Guaranteed styling even when Tailwind JIT compilation fails.
 
-**🛡️ Reliability Features:**
-- **Dual-Class System**: Tailwind + CSS fallback classes
-- **Guaranteed Styling**: CSS with `!important` ensures notifications always work
-- **Perfect Contrast**: All combinations meet WCAG accessibility standards
-- **Framework Agnostic**: Works consistently across all supported frameworks
+
+
+
+
+
+
+
 
 ## 📦 **Required Peer Dependencies**
 
@@ -224,6 +157,93 @@ VITE_VORMIA_WITH_CREDENTIALS=false            # Include credentials in requests
 - `VITE_VORMIA_DEBUG=false` = Production mode (hide debug info)
 
 **🔔 Notification System**: Notifications are automatically shown for all queries and mutations. The `showDebug` option controls debug panel visibility and respects the `VITE_VORMIA_DEBUG` environment variable.
+
+---
+
+## ✨ **Package Core Features**
+
+### 🚀 **Core Features**
+
+- **🔐 Comprehensive Authentication System**: `useVormiaAuth` hook with permission and role checking
+- **🔑 Permission Management**: `hasPermission()`, `hasAnyPermission()`, and resource access control
+- **👤 Role-Based Access**: `isUser()`, `isAdmin()`, `isModerator()` and more role helpers
+- **📋 Resource Access Control**: `canCreate()`, `canRead()`, `canUpdate()`, `canDelete()` helpers
+- **Notifications Always Enabled**: Notifications are automatically shown for all queries and mutations
+- **Enhanced Debug Panel**: Better error/success response display with improved structure detection
+- **Cleaner API**: Simplified hook usage with sensible defaults
+- **Form Data Transformation**: Automatic field mapping and transformation for API requests
+- **📘 Full TypeScript Support**: Complete type definitions for all functions, hooks, and components
+
+### 🎨 **Notification System**
+
+- **Solid Background Colors**: Professional appearance with `bg-*-500` colors for maximum visibility
+- **Perfect Contrast**: Pure black/white combinations for optimal readability
+- **CSS Fallback**: Guaranteed styling even when Tailwind JIT compilation fails
+- **Hidden Icons**: Clean, minimalist design without visual clutter
+- **Multiple Variants**: Toast, banner, modal, and in-app notification styles
+- **Auto-dismiss**: Configurable duration and manual close options
+
+### 🔧 **Advanced Features**
+
+- **Custom Error Labels**: Personalized error logging with `errorLabel` option
+- **Environment Detection**: Automatic debug mode based on `VITE_VORMIA_DEBUG`
+- **Error Handling**: Comprehensive error management with field-specific validation
+- **Debug Logging**: Detailed console output for development and troubleshooting
+- **Framework Support**: React, Vue, Svelte, Solid, Qwik, and Astro adapters
+
+### 🏷️ **Custom Error Labels**
+
+Personalize your error logging with custom labels for better debugging:
+
+```javascript
+const mutation = useVormiaQueryAuthMutation({
+  endpoint: "/register",
+  errorLabel: "Registration Error", // 🏷️ Custom error label!
+  showDebug: true,
+  // ... rest of config
+});
+```
+
+**Console Output**: Shows " Registration Error" instead of generic " Mutation Error" for better identification.
+
+### 🎯 **SimpleNotification Component**
+
+The `SimpleNotification` component provides a clean, consistent way to display notifications without manual HTML styling:
+
+```jsx
+// ✅ Recommended: Use SimpleNotification
+{
+  generalError && (
+    <SimpleNotification
+      type="error"
+      title="Error"
+      message={generalError}
+      onClose={() => setGeneralError("")}
+      className="mb-4"
+    />
+  );
+}
+```
+
+**Available Types**: `success`, `error`, `warning`, `info`, `announce`
+
+**🎨 Notification Styling**: All notification types use solid background colors with perfect contrast:
+
+| Type | Background | Text | Border | Description |
+|------|------------|------|--------|-------------|
+| **Success** | `bg-green-500` | `text-white` | `border-green-200` | Professional green with white text |
+| **Error** | `bg-red-500` | `text-white` | `border-red-200` | Clear red with white text |
+| **Warning** | `bg-yellow-500` | `text-white` | `border-yellow-200` | Bright yellow with white text |
+| **Info** | `bg-blue-500` | `text-white` | `border-blue-200` | Trusted blue with white text |
+| **Announce** | `bg-black` | `text-white` | `border-gray-200` | **Pure black with white text for maximum contrast** |
+
+**CSS Fallback**: Guaranteed styling even when Tailwind JIT compilation fails.
+
+**🛡️ Reliability Features:**
+- **Dual-Class System**: Tailwind + CSS fallback classes
+- **Guaranteed Styling**: CSS with `!important` ensures notifications always work
+- **Perfect Contrast**: All combinations meet WCAG accessibility standards
+- **Framework Agnostic**: Works consistently across all supported frameworks
 
 ---
 
