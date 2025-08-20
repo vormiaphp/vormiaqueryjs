@@ -38,88 +38,40 @@ export default function App() {
   const mutation = useVormiaQueryAuthMutation({
     endpoint: "/api/register",
     method: "POST",
-    
-    // Automatic form data transformation
     formdata: {
       rename: {
         confirmPassword: "password_confirmation",
       },
       add: {
         terms: true,
-        source: "web",
       },
       remove: ["confirmPassword"],
     },
-    
-    // Enable notifications and debug
-    enableNotifications: { toast: true, panel: true },
-    showDebug: true,
-    
     onSuccess: (data) => {
-      // Handle success
+      console.log("Registration successful:", data);
       setNotification({
         type: "success",
-        title: "Success",
-        message: "User registered successfully!",
+        title: "Registration Successful",
+        message: "Welcome! Your account has been created.",
         variant: "banner",
       });
-
-      // Set debug info for debug panel
-      const debugInfo = {
-        status: 200,
-        message: "Operation successful",
-        response: {
-          response: {
-            data: {
-              success: true,
-              message: data?.data?.message || "Operation completed successfully",
-              data: data?.data,
-              debug: data?.debug,
-            },
-          },
-          debug: data?.debug,
-        },
-        errorType: "success",
-        timestamp: new Date().toISOString(),
-      };
-
-      setDebugInfo(debugInfo);
-      setShowDebug(true);
-
-      // Clear errors and reset form
-      setFieldErrors({});
-      setGeneralError("");
-      setFormData({ name: "", email: "", password: "", confirmPassword: "" });
     },
-
     onError: (error) => {
-      // Handle error
-      setNotification({
-        type: "error",
-        title: "Error",
-        message: error.message || "Registration failed",
-        variant: "banner",
-      });
-
-      // Set debug info
-      const debugInfo = {
-        status: error.status || 500,
-        message: error.message || "Registration failed",
-        response: error.response,
-        errorType: "error",
-        timestamp: new Date().toISOString(),
-      };
-
-      setDebugInfo(debugInfo);
-      setShowDebug(true);
-
-      // Handle field errors if available
+      console.error("Registration failed:", error);
+      
+      // Handle field-specific errors
       if (error.response?.errors) {
         setFieldErrors(error.response.errors);
-        setGeneralError("");
-      } else {
-        setGeneralError(error.message || "Registration failed");
-        setFieldErrors({});
+      }
+      
+      // Handle general error
+      if (error.response?.message) {
+        setGeneralError(error.response.message);
+      }
+      
+      // Show debug info if enabled
+      if (showDebug) {
+        setDebugInfo(createDebugInfo(error));
       }
     },
   });

@@ -102,21 +102,20 @@ export const useVormiaQueryAuth = (options) => {
 };
 
 /**
- * Hook for authentication mutations (login, register, etc.)
+ * Authenticated mutation hook with form data transformation
  * @param {Object} options - Mutation options
  * @param {string} options.endpoint - API endpoint
  * @param {string} [options.method='POST'] - HTTP method
  * @param {Object} [options.headers] - Custom headers
- * @param {Function} [options.transform] - Transform function for response data
- * @param {boolean} [options.storeToken=true] - Whether to store the auth token
- * @param {Function} [options.onLoginSuccess] - Callback on successful login
- * @param {Object} [options.formdata] - Form data transformation configuration
- * @param {boolean} [options.manualTransformation=false] - Whether to use manual transformation
- * @param {Object} [options.enableNotifications] - Override notification settings
+ * @param {Function} [options.transform] - Response transformation function
+ * @param {boolean} [options.storeToken=true] - Whether to store auth token
+ * @param {Function} [options.onLoginSuccess] - Login success callback
+ * @param {Object} [options.formdata] - Form data transformation config
+ * @param {boolean} [options.manualTransformation=false] - Skip auto transformation
  * @param {boolean} [options.showDebug] - Override debug panel visibility
  * @param {Function} [options.onSuccess] - Success callback
  * @param {Function} [options.onError] - Error callback
- * @returns {Object} Mutation result with additional utilities
+ * @returns {Object} Mutation result with enhanced utilities
  */
 export const useVormiaQueryAuthMutation = (options) => {
   const client = getGlobalVormiaClient();
@@ -136,19 +135,18 @@ export const useVormiaQueryAuthMutation = (options) => {
     ...mutationOptions
   } = options;
 
-  // Always enable notifications by default
-  const enableNotifications = true;
-  
   // Get global configuration
-  const globalConfig = typeof window !== "undefined" ? window.__VORMIA_CONFIG__ : {};
-  
+  const globalConfig =
+    typeof window !== "undefined" ? window.__VORMIA_CONFIG__ : {};
+
   // Determine if debug should be shown (respects VITE_VORMIA_DEBUG)
-  const shouldShowDebugPanel = showDebug !== null ? showDebug : shouldShowDebug();
+  const shouldShowDebugPanel =
+    showDebug !== null ? showDebug : shouldShowDebug();
 
   const mutation = useMutation({
     mutationFn: async (variables) => {
       let requestData = variables;
-      
+
       // Apply form data transformation if configured
       if (!manualTransformation && formdata) {
         requestData = transformFormData(variables, formdata);
@@ -186,10 +184,9 @@ export const useVormiaQueryAuthMutation = (options) => {
         logSuccessForDebug(data, "Mutation Success");
       }
 
-      // Show success notification if enabled
-      if (enableNotifications) {
-        const message = data?.data?.message || "Operation completed successfully";
-        showSuccessNotification(message, "Success");
+      // Show success notification
+      if (data?.data?.message) {
+        showSuccessNotification(data.data.message, "Success");
       }
 
       // Call custom success handler
@@ -205,15 +202,16 @@ export const useVormiaQueryAuthMutation = (options) => {
     onError: (error, variables, context) => {
       // Get clean error info
       const errorInfo = handleApiError(error);
-      
+
       // Log for debugging
       if (shouldShowDebugPanel) {
         logErrorForDebug(error, "Mutation Error");
       }
 
-      // Show error notification if enabled
-      if (enableNotifications) {
-        const message = error.response?.message || error.response?.response?.data?.message || "An error occurred. Please try again.";
+      // Show error notification
+      if (error.response?.message || error.response?.response?.data?.message) {
+        const message =
+          error.response?.message || error.response?.response?.data?.message;
         showErrorNotification(message, "Error");
       }
 
@@ -244,7 +242,7 @@ export const useVormiaQueryAuthMutation = (options) => {
     login,
     logout,
     isAuthenticated,
-    
+
     // Form data transformation utilities
     transformFormData: (data) => {
       if (!manualTransformation && formdata) {
@@ -252,26 +250,31 @@ export const useVormiaQueryAuthMutation = (options) => {
       }
       return data;
     },
-    
+
     // Update formdata configuration
     updateFormdata: (newFormdata) => {
       if (formdata) {
         Object.assign(formdata, newFormdata);
       }
     },
-    
+
     // Get notification HTML (framework agnostic)
     getNotificationHtml: (type, title, message) => {
-      const notification = { type, title, message, key: `${type}-${Date.now()}` };
+      const notification = {
+        type,
+        title,
+        message,
+        key: `${type}-${Date.now()}`,
+      };
       return createNotificationHtml(notification);
     },
-    
+
     // Get debug panel HTML (framework agnostic)
     getDebugHtml: (response, isSuccess = true) => {
       if (!shouldShowDebugPanel) return "";
       const debugInfo = createDebugInfo(response);
       return createErrorDebugHtml(debugInfo);
-    }
+    },
   };
 };
 

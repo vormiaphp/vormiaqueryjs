@@ -291,7 +291,7 @@ export function getDebugFlag() {
   }
 }
 
-// Note: Notification settings are controlled per-query via enableNotifications option
+// Note: Notifications are always enabled by default
 // This function is kept for backward compatibility but not actively used
 export function getNotificationConfig() {
   return {

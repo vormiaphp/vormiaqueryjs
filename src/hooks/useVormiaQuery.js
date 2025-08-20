@@ -23,7 +23,6 @@ import {
  * @param {Object} [options.params] - Query parameters
  * @param {Object} [options.data] - Request body
  * @param {Object} [options.headers] - Custom headers
- * @param {Object} [options.enableNotifications] - Override notification settings
  * @param {boolean} [options.showDebug] - Override debug panel visibility
  * @returns {Object} Query result with enhanced utilities
  */
@@ -35,21 +34,14 @@ export function useVormiaQuery({
   onError,
   ...options
 }) {
-  // Always enable notifications by default
-  const enableNotifications = true;
-  
   // Get debug configuration
   const debugConfig = getDebugConfig();
   const shouldShowDebug = showDebug !== null ? showDebug : debugConfig.enabled;
+  const shouldShowDebugPanel = shouldShowDebug;
 
   const client = getGlobalVormiaClient();
 
-  const {
-    params,
-    data,
-    headers = {},
-    ...queryOptions
-  } = options;
+  const { params, data, headers = {}, ...queryOptions } = options;
 
   const queryKey = [endpoint, method, params, data];
 
@@ -102,16 +94,12 @@ export function useVormiaQuery({
 
     // Show success notification
     showSuccessNotification: (message, title = "Success") => {
-      if (enableNotifications?.toast !== false) {
-        showSuccessNotification(message, title);
-      }
+      showSuccessNotification(message, title);
     },
 
     // Show error notification
     showErrorNotification: (message, title = "Error") => {
-      if (enableNotifications?.toast !== false) {
-        showErrorNotification(message, title);
-      }
+      showErrorNotification(message, title);
     },
 
     // Log for debugging
@@ -125,4 +113,4 @@ export function useVormiaQuery({
       }
     },
   };
-};
+}

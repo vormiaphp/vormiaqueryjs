@@ -21,7 +21,6 @@ import {
  * @param {string} options.endpoint - API endpoint
  * @param {string} [options.method='POST'] - HTTP method
  * @param {Object} [options.headers] - Custom headers
- * @param {Object} [options.enableNotifications] - Override notification settings
  * @param {boolean} [options.showDebug] - Override debug panel visibility
  * @param {Function} [options.onSuccess] - Success callback
  * @param {Function} [options.onError] - Error callback
@@ -35,17 +34,12 @@ export function useVormiaQuerySimple({
   onError,
   ...options
 }) {
-  // Always enable notifications by default
-  const enableNotifications = true;
-  
   // Get debug configuration
   const debugConfig = getDebugConfig();
   const shouldShowDebug = showDebug !== null ? showDebug : debugConfig.enabled;
+  const shouldShowDebugPanel = shouldShowDebug;
 
   const client = getGlobalVormiaClient();
-
-  // Determine if debug should be shown (respects VITE_VORMIA_DEBUG)
-  const shouldShowDebugPanel = shouldShowDebug;
 
   const mutation = useMutation({
     mutationFn: async (data) => {
@@ -73,10 +67,10 @@ export function useVormiaQuerySimple({
       }
 
       // Show success notification if enabled
-      if (enableNotifications?.toast !== false) {
-        const message = data?.data?.message || "Operation completed successfully";
-        showSuccessNotification(message, "Success");
-      }
+      showSuccessNotification(
+        data?.data?.message || "Operation completed successfully",
+        "Success"
+      );
 
       // Call custom success handler
       if (onSuccess) {
@@ -90,10 +84,12 @@ export function useVormiaQuerySimple({
       }
 
       // Show error notification if enabled
-      if (enableNotifications?.toast !== false) {
-        const message = error.response?.message || error.response?.response?.data?.message || "An error occurred. Please try again.";
-        showErrorNotification(message, "Error");
-      }
+      showErrorNotification(
+        error.response?.message ||
+          error.response?.response?.data?.message ||
+          "An error occurred. Please try again.",
+        "Error"
+      );
 
       // Call custom error handler
       if (onError) {
@@ -136,16 +132,12 @@ export function useVormiaQuerySimple({
 
     // Show success notification
     showSuccessNotification: (message, title = "Success") => {
-      if (enableNotifications?.toast !== false) {
-        showSuccessNotification(message, title);
-      }
+      showSuccessNotification(message, title);
     },
 
     // Show error notification
     showErrorNotification: (message, title = "Error") => {
-      if (enableNotifications?.toast !== false) {
-        showErrorNotification(message, title);
-      }
+      showErrorNotification(message, title);
     },
 
     // Log for debugging
@@ -159,4 +151,4 @@ export function useVormiaQuerySimple({
       }
     },
   };
-};
+}

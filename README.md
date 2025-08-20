@@ -6,7 +6,7 @@ A powerful, framework-agnostic query and mutation library with built-in error ha
 
 ### 🚀 **Major Improvements**
 
-- **Notifications Always Enabled**: No more need to specify `enableNotifications: true` in every query
+- **Notifications Always Enabled**: Notifications are automatically shown for all queries and mutations
 - **Enhanced Debug Panel**: Better error/success response display with improved structure detection
 - **Cleaner API**: Simplified hook usage with sensible defaults
 - **Form Data Transformation**: Automatic field mapping and transformation for API requests
@@ -23,7 +23,6 @@ A powerful, framework-agnostic query and mutation library with built-in error ha
 // Before (v1.4.5 and earlier):
 const mutation = useVormiaQueryAuthMutation({
   endpoint: "/register",
-  enableNotifications: true, // ← Required every time
   showDebug: true,
   formdata: {
     /* ... */
@@ -128,7 +127,7 @@ VITE_VORMIA_WITH_CREDENTIALS=false            # Include credentials in requests
 - `VITE_VORMIA_DEBUG=true` = Development mode (show debug info)
 - `VITE_VORMIA_DEBUG=false` = Production mode (hide debug info)
 
-**🔔 Notification System**: Notifications are controlled per-query via the `enableNotifications` option, not through environment variables. This gives you full control over each request.
+**🔔 Notification System**: Notifications are automatically shown for all queries and mutations. The `showDebug` option controls debug panel visibility and respects the `VITE_VORMIA_DEBUG` environment variable.
 
 ---
 
@@ -286,8 +285,7 @@ import { useVormiaQuery } from "vormiaqueryjs";
 const query = useVormiaQuery({
   endpoint: "/public/data",
   method: "GET",
-  enableNotifications: true, // Enabled by default
-  showDebug: true,
+  showDebug: true, // Enabled by default
 });
 ```
 
@@ -299,8 +297,7 @@ import { useVormiaQueryAuth } from "vormiaqueryjs";
 const query = useVormiaQueryAuth({
   endpoint: "/user/profile",
   method: "GET",
-  enableNotifications: true, // Enabled by default
-  showDebug: true,
+  showDebug: true, // Enabled by default
 });
 ```
 
@@ -312,8 +309,7 @@ import { useVormiaQueryAuthMutation } from "vormiaqueryjs";
 const mutation = useVormiaQueryAuthMutation({
   endpoint: "/register",
   method: "POST",
-  enableNotifications: true, // Enabled by default
-  showDebug: true,
+  showDebug: true, // Enabled by default
   formdata: {
     rename: {
       confirmPassword: "password_confirmation",
@@ -337,8 +333,7 @@ const query = useVormiaQuerySimple({
   endpoint: "/test-endpoint",
   method: "POST",
   data: { test: "data" },
-  enableNotifications: true, // Enabled by default
-  showDebug: true,
+  showDebug: true, // Enabled by default
 });
 ```
 

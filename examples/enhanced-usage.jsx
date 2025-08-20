@@ -56,10 +56,10 @@ function PublicDataComponent() {
   const query = useVormiaQuery({
     endpoint: "/public/data",
     method: "GET",
-
+    
     // Override debug settings per-query
     showDebug: true,
-
+    
     // Cache configuration
     retry: 3,
     cacheTime: 10 * 60 * 1000, // 10 minutes
@@ -70,17 +70,17 @@ function PublicDataComponent() {
   const handleSuccess = () => {
     // Show custom notification
     query.showSuccessNotification("Data loaded successfully!", "Success");
-
+    
     // Get notification HTML for other frameworks
     const notificationHtml = query.getNotificationHtml(
       "success",
       "Success",
       "Data loaded!"
     );
-
+    
     // Get debug panel HTML
     const debugHtml = query.getDebugHtml(query.data);
-
+    
     // Log for debugging
     query.logForDebug(query.data, "Public Data Loaded");
   };
@@ -108,10 +108,10 @@ function UserProfileComponent() {
   const query = useVormiaQueryAuth({
     endpoint: "/user/profile",
     method: "GET",
-
+    
     // Override debug settings per-query
     showDebug: true,
-
+    
     // Cache configuration
     retry: 3,
     cacheTime: 10 * 60 * 1000, // 10 minutes
@@ -152,7 +152,7 @@ function RegistrationForm() {
   const mutation = useVormiaQueryAuthMutation({
     endpoint: "/register",
     method: "POST",
-
+    
     // Automatic form data transformation
     formdata: {
       rename: {
@@ -164,14 +164,14 @@ function RegistrationForm() {
       },
       remove: ["confirmPassword"],
     },
-
+    
     // Override global settings per-query
     showDebug: true,
-
+    
     // Custom success/error handlers
     onSuccess: (data) => {
       console.log("Registration successful:", data);
-
+      
       // Show success notification
       setNotification({
         type: "success",
@@ -179,7 +179,7 @@ function RegistrationForm() {
         message: "Account created successfully!",
         variant: "banner",
       });
-
+      
       // Set debug info
       setDebugInfo({
         status: 200,
@@ -188,16 +188,16 @@ function RegistrationForm() {
         errorType: "success",
         timestamp: new Date().toISOString(),
       });
-
+      
       // Clear errors and reset form
       setFieldErrors({});
       setGeneralError("");
       setFormData({ name: "", email: "", password: "", confirmPassword: "" });
     },
-
+    
     onError: (error) => {
       console.log("Registration failed:", error);
-
+      
       // Show error notification
       setNotification({
         type: "error",
@@ -205,7 +205,7 @@ function RegistrationForm() {
         message: error.message || "Registration failed",
         variant: "banner",
       });
-
+      
       // Set debug info
       setDebugInfo({
         status: error.status || 500,
@@ -214,7 +214,7 @@ function RegistrationForm() {
         errorType: "error",
         timestamp: new Date().toISOString(),
       });
-
+      
       // Handle field errors if available
       if (error.response?.errors) {
         setFieldErrors(error.response.errors);
@@ -228,11 +228,11 @@ function RegistrationForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+    
     // Clear previous errors
     setFieldErrors({});
     setGeneralError("");
-
+    
     // Just pass formData - package handles transformation automatically!
     mutation.mutate(formData);
   };
@@ -246,7 +246,7 @@ function RegistrationForm() {
           onClose={() => setNotification(null)}
         />
       )}
-
+      
       {/* Debug Panel */}
       {debugInfo && (
         <ErrorDebugPanel
@@ -255,7 +255,7 @@ function RegistrationForm() {
           onClose={() => setDebugInfo(null)}
         />
       )}
-
+      
       <form onSubmit={handleSubmit}>
         <input
           name="name"
@@ -269,10 +269,10 @@ function RegistrationForm() {
           <SimpleNotification
             type="error"
             message={fieldErrors.name}
-            onClose={() => setFieldErrors((prev) => ({ ...prev, name: "" }))}
+            onClose={() => setFieldErrors(prev => ({ ...prev, name: "" }))}
           />
         )}
-
+        
         <input
           name="email"
           type="email"
@@ -286,10 +286,10 @@ function RegistrationForm() {
           <SimpleNotification
             type="error"
             message={fieldErrors.email}
-            onClose={() => setFieldErrors((prev) => ({ ...prev, email: "" }))}
+            onClose={() => setFieldErrors(prev => ({ ...prev, email: "" }))}
           />
         )}
-
+        
         <input
           name="password"
           type="password"
@@ -303,29 +303,24 @@ function RegistrationForm() {
           <SimpleNotification
             type="error"
             message={fieldErrors.password}
-            onClose={() =>
-              setFieldErrors((prev) => ({ ...prev, password: "" }))
-            }
+            onClose={() => setFieldErrors(prev => ({ ...prev, password: "" }))}
           />
         )}
-
+        
         <input
           name="confirmPassword"
           type="password"
           value={formData.confirmPassword}
           onChange={(e) =>
-            setFormData((prev) => ({
-              ...prev,
-              confirmPassword: e.target.value,
-            }))
+            setFormData((prev) => ({ ...prev, confirmPassword: e.target.value }))
           }
           placeholder="Confirm Password"
         />
-
+        
         <button type="submit" disabled={mutation.isPending}>
           {mutation.isPending ? "Creating Account..." : "Create Account"}
         </button>
-
+        
         {/* General Error Display */}
         {generalError && (
           <SimpleNotification
@@ -356,13 +351,13 @@ function ManualTransformationForm() {
   const mutation = useVormiaQueryAuthMutation({
     endpoint: "/register",
     method: "POST",
-
+    
     // Disable automatic transformation
     manualTransformation: true,
-
+    
     // Override global settings per-query
     showDebug: false,
-
+    
     onSuccess: (data) => {
       setNotification({
         type: "success",
@@ -371,7 +366,7 @@ function ManualTransformationForm() {
         variant: "banner",
       });
     },
-
+    
     onError: (error) => {
       setNotification({
         type: "error",
@@ -384,7 +379,7 @@ function ManualTransformationForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+    
     // Manual transformation (your current way)
     const registrationData = {
       ...formData,
@@ -392,7 +387,7 @@ function ManualTransformationForm() {
       confirmPassword: undefined,
       terms: true,
     };
-
+    
     mutation.mutate(registrationData);
   };
 
@@ -405,7 +400,7 @@ function ManualTransformationForm() {
           onClose={() => setNotification(null)}
         />
       )}
-
+      
       <form onSubmit={handleSubmit}>
         <input
           name="name"
@@ -415,7 +410,7 @@ function ManualTransformationForm() {
           }
           placeholder="Full Name"
         />
-
+        
         <input
           name="email"
           type="email"
@@ -425,7 +420,7 @@ function ManualTransformationForm() {
           }
           placeholder="Email"
         />
-
+        
         <input
           name="password"
           type="password"
@@ -435,20 +430,17 @@ function ManualTransformationForm() {
           }
           placeholder="Password"
         />
-
+        
         <input
           name="confirmPassword"
           type="password"
           value={formData.confirmPassword}
           onChange={(e) =>
-            setFormData((prev) => ({
-              ...prev,
-              confirmPassword: e.target.value,
-            }))
+            setFormData((prev) => ({ ...prev, confirmPassword: e.target.value }))
           }
           placeholder="Confirm Password"
         />
-
+        
         <button type="submit" disabled={mutation.isPending}>
           {mutation.isPending ? "Creating Account..." : "Create Account"}
         </button>
@@ -471,53 +463,41 @@ function NotificationExamples() {
       message,
       title,
     };
-    setNotifications((prev) => [...prev, newNotification]);
+    setNotifications(prev => [...prev, newNotification]);
   };
 
   const removeNotification = (id) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
+    setNotifications(prev => prev.filter(n => n.id !== id));
   };
 
   return (
     <div>
       <h3>Notification Examples</h3>
-
+      
       <div className="space-y-4">
-        <button
-          onClick={() =>
-            addNotification("success", "Operation completed successfully!")
-          }
-        >
+        <button onClick={() => addNotification("success", "Operation completed successfully!")}>
           Show Success
         </button>
-
-        <button
-          onClick={() => addNotification("error", "Something went wrong!")}
-        >
+        
+        <button onClick={() => addNotification("error", "Something went wrong!")}>
           Show Error
         </button>
-
-        <button
-          onClick={() => addNotification("warning", "Please check your input")}
-        >
+        
+        <button onClick={() => addNotification("warning", "Please check your input")}>
           Show Warning
         </button>
-
-        <button
-          onClick={() => addNotification("info", "Here's some information")}
-        >
+        
+        <button onClick={() => addNotification("info", "Here's some information")}>
           Show Info
         </button>
-
-        <button
-          onClick={() => addNotification("announce", "Important announcement")}
-        >
+        
+        <button onClick={() => addNotification("announce", "Important announcement")}>
           Show Announcement
         </button>
       </div>
-
+      
       <div className="mt-6 space-y-2">
-        {notifications.map((notification) => (
+        {notifications.map(notification => (
           <SimpleNotification
             key={notification.id}
             type={notification.type}
@@ -539,14 +519,14 @@ function TestComponent() {
   const testQuery = useVormiaQuerySimple({
     endpoint: "/test",
     method: "POST",
-
+    
     // Override debug settings per-query
     showDebug: true,
-
+    
     onSuccess: (data) => {
       console.log("Test successful:", data);
     },
-
+    
     onError: (error) => {
       console.log("Test failed:", error);
     },
@@ -588,32 +568,32 @@ function ComprehensiveExample() {
   return (
     <div className="space-y-8">
       <h2>VormiaQueryJS Comprehensive Examples</h2>
-
+      
       <section>
         <h3>1. Basic Query (No Auth)</h3>
         <PublicDataComponent />
       </section>
-
+      
       <section>
         <h3>2. Authenticated Query</h3>
         <UserProfileComponent />
       </section>
-
+      
       <section>
         <h3>3. Form with Automatic Transformation</h3>
         <RegistrationForm />
       </section>
-
+      
       <section>
         <h3>4. Form with Manual Transformation</h3>
         <ManualTransformationForm />
       </section>
-
+      
       <section>
         <h3>5. Notification Examples</h3>
         <NotificationExamples />
       </section>
-
+      
       <section>
         <h3>6. Simple Test Query</h3>
         <TestComponent />
