@@ -48,23 +48,6 @@ const mutation = useVormiaQueryAuthMutation({
 
 **Console Output**: Shows " Registration Error" instead of generic " Mutation Error" for better identification.
 
-**Migration Guide:**
-
-```javascript
-// ❌ Before (v1.4.9 and earlier)
-const query = useVormiaQuery({
-  endpoint: "/data",
-  enableNotifications: true, // ← This parameter no longer exists
-  showDebug: true,
-});
-
-// ✅ After (v1.4.10+)
-const query = useVormiaQuery({
-  endpoint: "/data",
-  showDebug: true, // ← Only specify what you need to override
-});
-```
-
 ### 🎯 **SimpleNotification Component**
 
 The `SimpleNotification` component provides a clean, consistent way to display notifications without manual HTML styling:
@@ -95,7 +78,23 @@ The `SimpleNotification` component provides a clean, consistent way to display n
 
 **Available Types**: `success`, `error`, `warning`, `info`, `announce`
 
-**🎨 Notification Styling**: All notification types use solid background colors (`bg-*-500`) with perfect contrast. Pure black/white combinations ensure maximum readability. CSS fallback classes guarantee styling works even when Tailwind JIT compilation fails.
+**🎨 Notification Styling**: All notification types use solid background colors with perfect contrast:
+
+| Type | Background | Text | Border | Description |
+|------|------------|------|--------|-------------|
+| **Success** | `bg-green-500` | `text-white` | `border-green-200` | Professional green with white text |
+| **Error** | `bg-red-500` | `text-white` | `border-red-200` | Clear red with white text |
+| **Warning** | `bg-yellow-500` | `text-white` | `border-yellow-200` | Bright yellow with white text |
+| **Info** | `bg-blue-500` | `text-white` | `border-blue-200` | Trusted blue with white text |
+| **Announce** | `bg-black` | `text-white` | `border-gray-200` | **Pure black with white text for maximum contrast** |
+
+**CSS Fallback**: Guaranteed styling even when Tailwind JIT compilation fails.
+
+**🛡️ Reliability Features:**
+- **Dual-Class System**: Tailwind + CSS fallback classes
+- **Guaranteed Styling**: CSS with `!important` ensures notifications always work
+- **Perfect Contrast**: All combinations meet WCAG accessibility standards
+- **Framework Agnostic**: Works consistently across all supported frameworks
 
 ## 📦 **Required Peer Dependencies**
 
