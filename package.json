@@ -5,6 +5,7 @@
   "main": "dist/esm/index.mjs",
   "module": "dist/esm/index.mjs",
   "type": "module",
+  "types": "dist/types/vormiaqueryjs.d.ts",
   "exports": {
     ".": "./dist/esm/index.mjs",
     "./react": {
@@ -109,6 +110,7 @@
     "svelte": "^4.2.7",
     "tailwindcss": "^3.4.1",
     "terser": "^5.27.0",
+    "typescript": "^5.9.2",
     "vite": "^5.0.0",
     "vite-plugin-lib-inject-css": "^2.2.2",
     "vitest": "^1.2.2",

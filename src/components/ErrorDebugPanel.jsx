@@ -1,4 +1,5 @@
 import React from "react";
+import "./NotificationPanel.css";
 
 /**
  * Error Debug Info Interface
@@ -96,6 +97,27 @@ export function ErrorDebugPanel({
           </div>
         )}
         
+        {/* Special handling for validation errors */}
+        {response.response?.data?.errors && (
+          <div>
+            <span className="font-medium text-gray-600">🚨 Validation Errors:</span>
+            <div className="ml-2 mt-1 p-2 rounded text-xs bg-red-50 border border-red-200">
+              {Object.entries(response.response.data.errors).map(([field, messages]) => (
+                <div key={field} className="mb-2">
+                  <span className="font-medium text-red-700">{field}:</span>
+                  <div className="ml-2">
+                    {Array.isArray(messages) ? messages.map((msg, idx) => (
+                      <div key={idx} className="text-red-600">• {msg}</div>
+                    )) : (
+                      <div className="text-red-600">• {messages}</div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        
         {/* Full Response Structure */}
         <div>
           <span className="font-medium text-gray-600">Full Response Structure:</span>
@@ -177,16 +199,18 @@ export function createDebugInfo(response) {
   if (response?.response) {
     // This is an error response
     const errorResponse = response.response;
+    const errorData = errorResponse.data || {};
+    
     return {
       status: errorResponse.status || 0,
-      message: errorResponse.message || errorResponse.data?.message || "Error occurred",
+      message: errorResponse.message || errorData.message || "Error occurred",
       response: {
         response: {
           data: {
             success: false,
-            message: errorResponse.message || errorResponse.data?.message,
-            errors: errorResponse.data?.errors,
-            debug: errorResponse.data?.debug
+            message: errorResponse.message || errorData.message,
+            errors: errorData.errors || errorData.validation_errors || errorData.error,
+            debug: errorData.debug || errorResponse.debug
           },
           debug: errorResponse.debug
         },

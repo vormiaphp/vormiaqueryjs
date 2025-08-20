@@ -4,9 +4,21 @@ This folder contains examples of how to use VormiaQueryJS in different framework
 
 ## 📁 Available Examples
 
+### 📘 **typescript-example.ts** - TypeScript Implementation
+
+- **Purpose**: Complete TypeScript example with full type safety
+- **Features**:
+  - Full TypeScript definitions for all functions and hooks
+  - Type-safe configuration and query options
+  - Generic types for response data
+  - Comprehensive error handling with proper typing
+  - Example React components with TypeScript
+- **Best for**: TypeScript developers and teams requiring full type safety
+
 ### 🚀 **enhanced-usage.js** - Comprehensive React Example
+
 - **Purpose**: Complete demonstration of all VormiaQueryJS features
-- **Features**: 
+- **Features**:
   - All hook types (`useVormiaQuery`, `useVormiaQueryAuth`, `useVormiaQueryAuthMutation`, `useVormiaQuerySimple`)
   - Form data transformation (automatic and manual)
   - Notification system (`SimpleNotification`, `NotificationPanel`)
@@ -15,6 +27,7 @@ This folder contains examples of how to use VormiaQueryJS in different framework
 - **Best for**: Learning the complete API and seeing all features in action
 
 ### ⚛️ **React** - `App.jsx`
+
 - **Purpose**: Real-world React implementation
 - **Features**:
   - User registration form with automatic form transformation
@@ -25,6 +38,7 @@ This folder contains examples of how to use VormiaQueryJS in different framework
 - **Best for**: React developers building production applications
 
 ### 💚 **Vue** - `App.vue`
+
 - **Purpose**: Vue.js implementation
 - **Features**:
   - Vue 3 Composition API
@@ -35,6 +49,7 @@ This folder contains examples of how to use VormiaQueryJS in different framework
 - **Best for**: Vue developers integrating VormiaQueryJS
 
 ### 🟦 **Svelte** - `App.svelte`
+
 - **Purpose**: Svelte implementation
 - **Features**:
   - Svelte 5 syntax
@@ -45,6 +60,7 @@ This folder contains examples of how to use VormiaQueryJS in different framework
 - **Best for**: Svelte developers integrating VormiaQueryJS
 
 ### 🟨 **Vanilla JavaScript** - `App.js`
+
 - **Purpose**: Framework-agnostic implementation
 - **Features**:
   - ES6+ class-based architecture
@@ -57,16 +73,20 @@ This folder contains examples of how to use VormiaQueryJS in different framework
 ## 🎯 **How to Use These Examples**
 
 ### 1. **Choose Your Framework**
+
 - Pick the example that matches your development environment
 - All examples demonstrate the same core concepts
 
 ### 2. **Install Dependencies**
+
 ```bash
 npm install vormiaqueryjs
 ```
 
 ### 3. **Set Up Environment Variables**
+
 Create a `.env` file:
+
 ```env
 VITE_VORMIA_API_URL=https://api.example.com
 VITE_VORMIA_DEBUG=true
@@ -76,6 +96,7 @@ VITE_VORMIA_WITH_CREDENTIALS=false
 ```
 
 ### 4. **Copy and Customize**
+
 - Copy the relevant example file
 - Modify the API endpoints for your backend
 - Adjust the form fields for your use case
@@ -84,6 +105,7 @@ VITE_VORMIA_WITH_CREDENTIALS=false
 ## 🔑 **Key Concepts Demonstrated**
 
 ### **Form Data Transformation**
+
 ```javascript
 // Automatic transformation
 const mutation = useVormiaQueryAuthMutation({
@@ -91,18 +113,19 @@ const mutation = useVormiaQueryAuthMutation({
   formdata: {
     rename: { confirmPassword: "password_confirmation" },
     add: { terms: true, source: "web" },
-    remove: ["confirmPassword"]
-  }
+    remove: ["confirmPassword"],
+  },
 });
 
 // Manual transformation
 const mutation = useVormiaQueryAuthMutation({
   endpoint: "/register",
-  manualTransformation: true
+  manualTransformation: true,
 });
 ```
 
 ### **Notification System**
+
 ```javascript
 // Simple notifications
 <SimpleNotification
@@ -124,6 +147,7 @@ const mutation = useVormiaQueryAuthMutation({
 ```
 
 ### **Error Handling**
+
 ```javascript
 onError: (error) => {
   // Handle field errors
@@ -132,7 +156,7 @@ onError: (error) => {
   } else {
     setGeneralError(error.message);
   }
-}
+};
 ```
 
 ## 🚀 **Getting Started**
@@ -150,7 +174,8 @@ onError: (error) => {
 
 ## 🤝 **Contributing**
 
-Found a bug or want to improve an example? 
+Found a bug or want to improve an example?
+
 - Update the example code
 - Test in the target framework
 - Ensure it follows current package workflow

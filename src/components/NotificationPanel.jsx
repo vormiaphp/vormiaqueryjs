@@ -1,4 +1,5 @@
 import React from "react";
+import "./NotificationPanel.css";
 
 /**
  * Simple Notification Display Component
@@ -13,24 +14,25 @@ export function SimpleNotification({
 }) {
   if (!message) return null;
 
+  // Tailwind JIT safelist - ensure these classes are included in the build
+  // bg-green-50 bg-red-50 bg-yellow-50 bg-blue-50 bg-gray-50
+  // border-green-200 border-red-200 border-yellow-200 border-blue-200 border-gray-200
+  // text-green-800 text-red-800 text-yellow-800 text-blue-800 text-gray-800
+  // text-green-400 text-red-400 text-yellow-400 text-blue-400 text-gray-400
+
+  // Predefined styles to ensure Tailwind JIT includes all classes
   const getStyles = () => {
     const baseStyles = "p-4 border rounded-lg";
     
-    // Type-specific colors
-    switch (type) {
-      case "success":
-        return `${baseStyles} bg-green-50 border-green-200 text-green-800`;
-      case "error":
-        return `${baseStyles} bg-red-50 border-red-200 text-red-800`;
-      case "warning":
-        return `${baseStyles} bg-yellow-50 border-yellow-200 text-yellow-800`;
-      case "info":
-        return `${baseStyles} bg-blue-50 border-blue-200 text-blue-800`;
-      case "announce":
-        return `${baseStyles} bg-gray-50 border-gray-200 text-gray-800`;
-      default:
-        return `${baseStyles} bg-gray-50 border-gray-200 text-gray-800`;
-    }
+    const typeStyles = {
+      success: "bg-green-50 border-green-200 text-green-800",
+      error: "bg-red-50 border-red-200 text-red-800",
+      warning: "bg-yellow-50 border-yellow-200 text-yellow-800",
+      info: "bg-blue-50 border-blue-200 text-blue-800",
+      announce: "bg-gray-50 border-gray-200 text-gray-800"
+    };
+    
+    return `${baseStyles} ${typeStyles[type] || typeStyles.announce}`;
   };
 
   const getIcon = () => {
@@ -71,18 +73,19 @@ export function SimpleNotification({
   };
 
   const getIconColor = () => {
-    switch (type) {
-      case "success": return "text-green-400";
-      case "error": return "text-red-400";
-      case "warning": return "text-yellow-400";
-      case "info": return "text-blue-400";
-      case "announce": return "text-gray-400";
-      default: return "text-gray-400";
-    }
+    const iconColors = {
+      success: "text-green-400",
+      error: "text-red-400",
+      warning: "text-yellow-400",
+      info: "text-blue-400",
+      announce: "text-gray-400"
+    };
+    
+    return iconColors[type] || iconColors.announce;
   };
 
   return (
-    <div className={`${getStyles()} ${className}`}>
+    <div className={`${getStyles()} vormia-notification-${type} ${className}`}>
       <div className="flex items-center">
         <div className="flex-shrink-0">
           {getIcon()}
@@ -94,7 +97,7 @@ export function SimpleNotification({
         {onClose && (
           <button
             onClick={onClose}
-            className={`ml-3 ${getIconColor()} hover:opacity-70 transition-opacity`}
+            className={`ml-3 ${getIconColor()} vormia-icon-${type} hover:opacity-70 transition-opacity`}
             aria-label="Close notification"
           >
             ✕

@@ -1,0 +1,57 @@
+/* Fallback styles for notifications - ensures proper background colors even if Tailwind JIT fails */
+
+/* Success notification */
+.vormia-notification-success {
+  background-color: #f0fdf4 !important;
+  border-color: #bbf7d0 !important;
+  color: #166534 !important;
+}
+
+/* Error notification */
+.vormia-notification-error {
+  background-color: #fef2f2 !important;
+  border-color: #fecaca !important;
+  color: #991b1b !important;
+}
+
+/* Warning notification */
+.vormia-notification-warning {
+  background-color: #fffbeb !important;
+  border-color: #fed7aa !important;
+  color: #92400e !important;
+}
+
+/* Info notification */
+.vormia-notification-info {
+  background-color: #eff6ff !important;
+  border-color: #bfdbfe !important;
+  color: #1e40af !important;
+}
+
+/* Announce notification */
+.vormia-notification-announce {
+  background-color: #f9fafb !important;
+  border-color: #e5e7eb !important;
+  color: #374151 !important;
+}
+
+/* Icon colors fallback */
+.vormia-icon-success {
+  color: #4ade80 !important;
+}
+
+.vormia-icon-error {
+  color: #f87171 !important;
+}
+
+.vormia-icon-warning {
+  color: #fbbf24 !important;
+}
+
+.vormia-icon-info {
+  color: #60a5fa !important;
+}
+
+.vormia-icon-announce {
+  color: #9ca3af !important;
+}

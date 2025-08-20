@@ -14,6 +14,7 @@ A powerful, framework-agnostic query and mutation library with built-in error ha
 - **Enhanced Debug Panel**: Better error/success response display with improved structure detection
 - **Cleaner API**: Simplified hook usage with sensible defaults
 - **Form Data Transformation**: Automatic field mapping and transformation for API requests
+- **📘 Full TypeScript Support**: Complete type definitions for all functions, hooks, and components
 
 ### 🔧 **Bug Fixes**
 
@@ -53,6 +54,7 @@ const mutation = useVormiaQueryAuthMutation({
 **Authentication and Authorization System**: Added comprehensive permission and role checking with the new `useVormiaAuth` hook. This is a **non-breaking addition** that enhances your existing authentication capabilities.
 
 **Migration Guide:**
+
 ```javascript
 // ❌ Before (v1.4.9 and earlier)
 const query = useVormiaQuery({
@@ -127,6 +129,75 @@ yarn add vormiaqueryjs
 ```
 
 > **🌐 Browser Compatibility**: VormiaQueryJS is designed for **browser environments** and uses ESM modules for optimal compatibility with modern bundlers like Vite, Webpack, and Rollup. It does not support Node.js environments.
+
+---
+
+## 📘 **TypeScript Support**
+
+VormiaQueryJS includes **complete TypeScript definitions** for all functions, hooks, components, and types. No additional `@types` package is required!
+
+### **Automatic Type Detection**
+
+TypeScript will automatically detect the types when you import from `vormiaqueryjs`:
+
+```typescript
+import {
+  useVormiaQuery,
+  VormiaConfig,
+  VormiaError,
+  createVormiaClient,
+  HttpMethod,
+} from "vormiaqueryjs";
+
+// Full type safety for configuration
+const config: VormiaConfig = {
+  baseURL: "https://api.example.com",
+  headers: { Authorization: "Bearer token" },
+  withCredentials: true,
+  debug: true,
+};
+
+// Type-safe query options
+const queryOptions = {
+  endpoint: "/api/users",
+  method: HttpMethod.GET,
+  params: { page: 1, limit: 10 },
+  showDebug: true,
+};
+
+// Generic types for response data
+const { data, isLoading, error } = useVormiaQuery<User[]>(queryOptions);
+```
+
+### **Available Types**
+
+- **Core Types**: `VormiaConfig`, `VormiaQueryOptions`, `VormiaResponse<T>`, `HttpMethod`
+- **Error Types**: `VormiaError` class with utility methods
+- **Hook Types**: Full typing for all query and mutation hooks
+- **Component Types**: `VormiaProviderProps` and other component interfaces
+
+### **Error Handling with Types**
+
+```typescript
+import { VormiaError } from "vormiaqueryjs";
+
+if (error instanceof VormiaError) {
+  // Type-safe error handling
+  if (error.isValidationError()) {
+    const validationErrors = error.getValidationErrors();
+    // validationErrors is properly typed
+  }
+
+  if (error.isNetworkError()) {
+    // Handle network errors
+  }
+
+  // Get user-friendly message
+  const userMessage = error.getUserMessage();
+}
+```
+
+See the [TypeScript example](./examples/typescript-example.ts) for more detailed usage patterns.
 
 ---
 
@@ -409,7 +480,7 @@ auth.setUser({
   name: "John Doe",
   email: "john@example.com",
   permissions: ["view_reports", "add_users"],
-  roles: ["user", "moderator"]
+  roles: ["user", "moderator"],
 });
 
 // Clear user data on logout
@@ -420,13 +491,13 @@ auth.clearUser();
 
 ```javascript
 // Check single permission
-const canViewReports = auth.hasPermission('view_reports');
+const canViewReports = auth.hasPermission("view_reports");
 
 // Check multiple permissions (ALL must be present)
-const canManageUsers = auth.hasPermission(['manage_users', 'user_management']);
+const canManageUsers = auth.hasPermission(["manage_users", "user_management"]);
 
 // Check if user has ANY of the specified permissions
-const hasAnyPermission = auth.hasAnyPermission(['view_reports', 'add_users']);
+const hasAnyPermission = auth.hasAnyPermission(["view_reports", "add_users"]);
 
 // Get all user permissions
 const permissions = auth.getPermissions();
@@ -436,13 +507,13 @@ const permissions = auth.getPermissions();
 
 ```javascript
 // Check single role
-const isAdmin = auth.isUser('Admin');
+const isAdmin = auth.isUser("Admin");
 
 // Check multiple roles (ANY can be present)
-const isModerator = auth.isUser(['moderator', 'Mod']);
+const isModerator = auth.isUser(["moderator", "Mod"]);
 
 // Check if user has ALL specified roles
-const hasAllRoles = auth.hasAllRoles(['user', 'verified']);
+const hasAllRoles = auth.hasAllRoles(["user", "verified"]);
 
 // Common role checks
 const isAdmin = auth.isAdmin();
@@ -457,13 +528,13 @@ const roles = auth.getRoles();
 
 ```javascript
 // CRUD operations
-const canCreateUsers = auth.canCreate('users');
-const canReadReports = auth.canRead('reports');
-const canUpdateProfile = auth.canUpdate('profile');
-const canDeletePosts = auth.canDelete('posts');
+const canCreateUsers = auth.canCreate("users");
+const canReadReports = auth.canRead("reports");
+const canUpdateProfile = auth.canUpdate("profile");
+const canDeletePosts = auth.canDelete("posts");
 
 // Custom resource access
-const canAccess = auth.canAccess('reports', 'export');
+const canAccess = auth.canAccess("reports", "export");
 
 // Common permission checks
 const canManageUsers = auth.canManageUsers();
@@ -481,15 +552,9 @@ function AdminPanel() {
     <div>
       {auth.isAuthenticated() && (
         <>
-          {auth.canViewReports() && (
-            <button>View Reports</button>
-          )}
-          {auth.canAddUsers() && (
-            <button>Add New User</button>
-          )}
-          {auth.isAdmin() && (
-            <button>Admin Panel</button>
-          )}
+          {auth.canViewReports() && <button>View Reports</button>}
+          {auth.canAddUsers() && <button>Add New User</button>}
+          {auth.isAdmin() && <button>Admin Panel</button>}
         </>
       )}
     </div>
@@ -513,8 +578,8 @@ function ProfileUpdate() {
 
   const handleUpdate = (profileData) => {
     // Check permissions before allowing update
-    if (!auth.canUpdate('profile')) {
-      alert('You do not have permission to update profiles');
+    if (!auth.canUpdate("profile")) {
+      alert("You do not have permission to update profiles");
       return;
     }
 
@@ -522,9 +587,9 @@ function ProfileUpdate() {
   };
 
   return (
-    <button 
-      onClick={() => handleUpdate({ name: 'New Name' })}
-      disabled={!auth.canUpdate('profile')}
+    <button
+      onClick={() => handleUpdate({ name: "New Name" })}
+      disabled={!auth.canUpdate("profile")}
     >
       Update Profile
     </button>
