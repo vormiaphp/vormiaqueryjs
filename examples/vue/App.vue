@@ -46,13 +46,13 @@ const { data, error, isLoading } = useVormiaQuery({
             required
           />
           <div v-if="fieldErrors.name" class="mt-2">
-            <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div class="p-4 bg-red-500 border border-red-200 rounded-lg text-white">
               <div class="flex items-center">
-                <svg class="h-5 w-5 text-red-400 mr-3" viewBox="0 0 20 20" fill="currentColor">
+                <svg class="h-5 w-5 text-white mr-3" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                 </svg>
-                <p class="text-sm text-red-800">{{ fieldErrors.name }}</p>
-                <button @click="clearFieldError('name')" class="ml-auto text-red-400 hover:text-red-600">
+                <p class="text-sm text-white">{{ fieldErrors.name }}</p>
+                <button @click="clearFieldError('name')" class="ml-auto text-white hover:text-gray-200">
                   ✕
                 </button>
               </div>
@@ -72,13 +72,13 @@ const { data, error, isLoading } = useVormiaQuery({
             required
           />
           <div v-if="fieldErrors.email" class="mt-2">
-            <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div class="p-4 bg-red-500 border border-red-200 rounded-lg text-white">
               <div class="flex items-center">
-                <svg class="h-5 w-5 text-red-400 mr-3" viewBox="0 0 20 20" fill="currentColor">
+                <svg class="h-5 w-5 text-white mr-3" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                 </svg>
-                <p class="text-sm text-red-800">{{ fieldErrors.email }}</p>
-                <button @click="clearFieldError('email')" class="ml-auto text-red-400 hover:text-red-600">
+                <p class="text-sm text-white">{{ fieldErrors.email }}</p>
+                <button @click="clearFieldError('email')" class="ml-auto text-white hover:text-gray-200">
                   ✕
                 </button>
               </div>
@@ -98,13 +98,13 @@ const { data, error, isLoading } = useVormiaQuery({
             required
           />
           <div v-if="fieldErrors.password" class="mt-2">
-            <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div class="p-4 bg-red-500 border border-red-200 rounded-lg text-white">
               <div class="flex items-center">
-                <svg class="h-5 w-5 text-red-400 mr-3" viewBox="0 0 20 20" fill="currentColor">
+                <svg class="h-5 w-5 text-white mr-3" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
                 </svg>
-                <p class="text-sm text-red-800">{{ fieldErrors.password }}</p>
-                <button @click="clearFieldError('password')" class="ml-auto text-red-400 hover:text-red-600">
+                <p class="text-sm text-white">{{ fieldErrors.password }}</p>
+                <button @click="clearFieldError('password')" class="ml-auto text-white hover:text-gray-200">
                   ✕
                 </button>
               </div>
@@ -136,12 +136,12 @@ const { data, error, isLoading } = useVormiaQuery({
 
       <!-- General Error Display -->
       <div v-if="generalError" class="mt-4">
-        <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+        <div class="p-4 bg-red-500 border border-red-200 rounded-lg text-white">
           <div class="flex items-center">
-            <svg class="h-5 w-5 text-red-400 mr-3" viewBox="0 0 20 20" fill="currentColor">
+            <svg class="h-5 w-5 text-white mr-3" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
             </svg>
-            <p class="text-sm text-red-800 flex-1">{{ generalError }}</p>
+            <p class="text-sm text-white flex-1">{{ generalError }}</p>
             <button @click="clearGeneralError" class="text-red-400 hover:text-red-600">
               ✕
             </button>
@@ -285,7 +285,7 @@ export default {
         case 'success':
           return `${baseClasses} bg-green-50 border-green-200 text-green-800`
         case 'error':
-          return `${baseClasses} bg-red-50 border-red-200 text-red-800`
+          return `${baseClasses} bg-red-500 border-red-200 text-white`
         case 'warning':
           return `${baseClasses} bg-yellow-50 border-yellow-200 text-yellow-800`
         case 'info':
