@@ -2,7 +2,7 @@
 
 A powerful, framework-agnostic query and mutation library with built-in error handling, notifications, and debug capabilities.
 
-## ✨ **What's New in v1.4.9**
+## ✨ **What's New in v1.4.10**
 
 ### 🚀 **Major Improvements**
 
@@ -16,6 +16,7 @@ A powerful, framework-agnostic query and mutation library with built-in error ha
 - Fixed ErrorDebugPanel not showing API responses correctly
 - Improved environment variable detection for debug mode
 - Better handling of different response structures (success vs error)
+- Resolved linting issues and improved code quality
 
 ### 📝 **Usage Changes**
 
@@ -29,13 +30,33 @@ const mutation = useVormiaQueryAuthMutation({
   },
 });
 
-// After (v1.4.9+):
+// After (v1.4.10+):
 const mutation = useVormiaQueryAuthMutation({
   endpoint: "/register",
-  showDebug: true, // ← Notifications enabled by default!
+  showDebug: true, // ← Override debug panel visibility
   formdata: {
     /* ... */
   },
+});
+```
+
+### ⚠️ **Breaking Changes in v1.4.10**
+
+**The `enableNotifications` parameter has been removed from all hooks.** Notifications are now always enabled by default, simplifying the API and reducing configuration overhead.
+
+**Migration Guide:**
+```javascript
+// ❌ Before (v1.4.9 and earlier)
+const query = useVormiaQuery({
+  endpoint: "/data",
+  enableNotifications: true, // ← This parameter no longer exists
+  showDebug: true,
+});
+
+// ✅ After (v1.4.10+)
+const query = useVormiaQuery({
+  endpoint: "/data",
+  showDebug: true, // ← Only specify what you need to override
 });
 ```
 
@@ -285,7 +306,7 @@ import { useVormiaQuery } from "vormiaqueryjs";
 const query = useVormiaQuery({
   endpoint: "/public/data",
   method: "GET",
-  showDebug: true, // Enabled by default
+  showDebug: true, // Override debug panel visibility
 });
 ```
 
@@ -297,7 +318,7 @@ import { useVormiaQueryAuth } from "vormiaqueryjs";
 const query = useVormiaQueryAuth({
   endpoint: "/user/profile",
   method: "GET",
-  showDebug: true, // Enabled by default
+  showDebug: true, // Override debug panel visibility
 });
 ```
 
@@ -309,7 +330,7 @@ import { useVormiaQueryAuthMutation } from "vormiaqueryjs";
 const mutation = useVormiaQueryAuthMutation({
   endpoint: "/register",
   method: "POST",
-  showDebug: true, // Enabled by default
+  showDebug: true, // Override debug panel visibility
   formdata: {
     rename: {
       confirmPassword: "password_confirmation",
@@ -333,7 +354,7 @@ const query = useVormiaQuerySimple({
   endpoint: "/test-endpoint",
   method: "POST",
   data: { test: "data" },
-  showDebug: true, // Enabled by default
+  showDebug: true, // Override debug panel visibility
 });
 ```
 
