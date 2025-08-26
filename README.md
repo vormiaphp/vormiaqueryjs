@@ -232,6 +232,63 @@ The `SimpleNotification` component provides a clean, consistent way to display n
 - **🐛 Debug System**: Environment-aware debug panel with comprehensive logging
 - **🌍 Cross-Framework**: Works with React, Vue, Svelte, Solid, Qwik, and Astro
 - **⚡ Performance**: Built on TanStack Query for optimal caching and state management
+- **🔄 HTTP Client**: Robust HTTP client with comprehensive response handling including 204 No Content support
+
+### **🔄 HTTP Client & Response Handling**
+
+VormiaQueryJS includes a robust HTTP client that handles all response types gracefully:
+
+#### **204 No Content Response Support**
+
+The client automatically handles 204 No Content responses, which are common in:
+- **Logout endpoints** - Often return 204 when successful
+- **Delete operations** - Usually return 204 after successful deletion
+- **Update operations** - Sometimes return 204 when no content needed
+- **Status changes** - Like activating/deactivating resources
+
+```javascript
+import { createVormiaClient } from 'vormiaqueryjs';
+
+const client = createVormiaClient({
+  baseURL: 'https://api.example.com'
+});
+
+// 204 responses are handled automatically
+const logoutResponse = await client.post('/api/auth/logout');
+console.log(logoutResponse.status); // 204
+console.log(logoutResponse.data); // { message: "Success - No content returned" }
+
+// Delete operations with 204
+const deleteResponse = await client.delete('/api/users/123');
+if (deleteResponse.status === 204) {
+  console.log('User deleted successfully');
+}
+
+// PUT/PATCH operations with 204
+const updateResponse = await client.put('/api/resource/123', { name: 'Updated' });
+if (updateResponse.status === 204) {
+  console.log('Resource updated successfully');
+}
+```
+
+#### **Robust Response Handling**
+
+- **Automatic Detection**: Detects 204/205 status codes automatically
+- **Graceful Fallbacks**: Handles JSON parsing failures gracefully
+- **Universal Support**: Works across all HTTP methods (GET, POST, PUT, PATCH, DELETE)
+- **Error Resilience**: Continues working even with malformed responses
+- **Framework Agnostic**: Consistent behavior across all supported frameworks
+
+#### **Response Types Supported**
+
+| Status Code | Description | Handling |
+|-------------|-------------|----------|
+| **200-299** | Success responses | JSON parsed automatically |
+| **204** | No Content | Special handling with success message |
+| **205** | Reset Content | Special handling with success message |
+| **4xx/5xx** | Error responses | Wrapped in VormiaError with details |
+| **Network Errors** | Connection issues | Graceful error handling |
+| **JSON Parse Errors** | Malformed responses | Fallback with descriptive messages |
 
 ### **🆕 New Zustand-Powered Features:**
 
@@ -674,6 +731,13 @@ function EnhancedAuthExample() {
   // Enhanced authentication with automatic token management
   const handleLogin = async (credentials) => {
     const result = await auth.login(credentials);
+    
+    // Handle different response types including 204 No Content
+    if (result.status === 204) {
+      console.log('Operation completed successfully (204 No Content)');
+      return;
+    }
+    
     if (result.success) {
       // Token automatically stored and managed
       // User data automatically cached
@@ -703,7 +767,10 @@ function EnhancedAuthExample() {
 
   return (
     <div>
-      <button onClick={() => auth.logout()}>Logout</button>
+      <button onClick={async () => {
+        await auth.logout();
+        // Logout automatically handles 204 responses from logout endpoints
+      }}>Logout</button>
       <button onClick={() => setTheme("dark")}>Dark Theme</button>
     </div>
   );
