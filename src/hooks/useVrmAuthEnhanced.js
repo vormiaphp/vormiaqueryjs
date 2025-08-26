@@ -65,6 +65,13 @@ export const useVrmAuthEnhanced = () => {
     try {
       const response = await client.post(endpoint, credentials);
 
+      // Handle 204 responses (no content) and other responses
+      if (response.status === 204) {
+        // For 204 responses, we might not have data, but the request succeeded
+        // This could be useful for logout or other operations that don't return content
+        return { success: true, message: "Operation completed successfully" };
+      }
+
       if (response.data?.token) {
         const {
           token,
@@ -131,7 +138,16 @@ export const useVrmAuthEnhanced = () => {
     try {
       // Call logout endpoint if specified
       if (endpoint) {
-        await client.post(endpoint);
+        try {
+          const response = await client.post(endpoint);
+          // Handle 204 responses (no content) - this is normal for logout
+          if (response.status === 204) {
+            console.log("Logout endpoint called successfully (204 No Content)");
+          }
+        } catch (error) {
+          // Log the error but don't fail the logout process
+          console.warn("Logout endpoint call failed, but continuing with local cleanup:", error.message);
+        }
       }
 
       // Clear Zustand store

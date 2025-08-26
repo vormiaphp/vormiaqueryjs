@@ -42,6 +42,11 @@ export function useVrmAuthEnhancedSvelte() {
         throw new Error('Login failed')
       }
       
+      // Handle 204 responses (no content)
+      if (response.status === 204) {
+        return { success: true, message: "Operation completed successfully" };
+      }
+      
       const data = await response.json()
       
       // Store authentication data

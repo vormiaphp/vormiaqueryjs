@@ -63,7 +63,24 @@ const createHttpClient = (baseConfig) => {
               : "same-origin",
         });
 
-        const responseData = await response.json().catch(() => ({}));
+        // Handle different response types based on status code
+        let responseData = {};
+        
+        // 204 No Content and other status codes without content body
+        if (response.status === 204 || response.status === 205) {
+          responseData = { message: "Success - No content returned" };
+        } else {
+          // Try to parse JSON for other responses
+          try {
+            responseData = await response.json();
+          } catch (parseError) {
+            // If JSON parsing fails, create a basic response object
+            responseData = {
+              message: `Response received but could not parse content (Status: ${response.status})`,
+              status: response.status
+            };
+          }
+        }
 
         if (!response.ok) {
           // Create a VormiaError with detailed information
