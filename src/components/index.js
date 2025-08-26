@@ -7,3 +7,5 @@
 export * from "./ErrorDebugPanel.jsx";
 export * from "./NotificationPanel.jsx";
 export * from "./VormiaRouteGuard.jsx";
+export { createVormiaRouteGuardVue } from "./VormiaRouteGuardVue.js";
+export { createVormiaRouteGuardSvelte } from "./VormiaRouteGuardSvelte.js";

@@ -30,6 +30,11 @@ export * from "./utils/enhancedErrorHandler.js";
 // Export Zustand stores and new features
 export * from "./stores/index.js";
 
+// Export enhanced authentication hooks for different frameworks
+export { useVrmAuthEnhanced } from "./hooks/useVrmAuthEnhanced.js";
+export { useVrmAuthEnhancedVue } from "./hooks/useVrmAuthEnhancedVue.js";
+export { useVrmAuthEnhancedSvelte } from "./hooks/useVrmAuthEnhancedSvelte.js";
+
 // Export types as plain objects for documentation purposes
 export const VormiaError = {};
 export const VormiaConfig = {};

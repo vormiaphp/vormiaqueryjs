@@ -305,14 +305,7 @@ export const useVrmAuthEnhanced = () => {
     return result;
   };
 
-  // User preferences management
-  const setUserPreference = (key, value) => {
-    useStorageStore.getState().setUserPreference(key, value);
-  };
 
-  const getUserPreference = (key, defaultValue = null) => {
-    return useStorageStore.getState().getUserPreference(key, defaultValue);
-  };
 
   // Form data persistence
   const saveFormData = (formId, data) => {
