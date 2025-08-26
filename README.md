@@ -630,7 +630,40 @@ function ProfileUpdate() {
 
 ### **🚀 Enhanced Authentication with Zustand**
 
-The new `useVrmAuthEnhanced` hook provides advanced authentication features powered by Zustand stores:
+The new `useVrmAuthEnhanced` hook provides advanced authentication features powered by Zustand stores. It's available for React, Vue.js, and Svelte:
+
+#### **React Usage**
+
+```javascript
+import { useVrmAuthEnhanced } from 'vormiaqueryjs';
+
+function EnhancedAuthExample() {
+  const auth = useVrmAuthEnhanced();
+  // ... rest of implementation
+}
+```
+
+#### **Vue.js Usage**
+
+```javascript
+import { useVrmAuthEnhancedVue } from 'vormiaqueryjs';
+
+export default {
+  setup() {
+    const auth = useVrmAuthEnhancedVue();
+    // ... rest of implementation
+  }
+}
+```
+
+#### **Svelte Usage**
+
+```javascript
+import { useVrmAuthEnhancedSvelte } from 'vormiaqueryjs';
+
+const auth = useVrmAuthEnhancedSvelte();
+// ... rest of implementation
+```
 
 ```javascript
 import { useVrmAuthEnhanced } from "vormiaqueryjs";
@@ -723,7 +756,45 @@ function OfflineExample() {
 
 ## 🛡️ Route Protection with VormiaRouteGuard
 
-The new `VormiaRouteGuard` component provides declarative route protection using your existing authentication system:
+The new `VormiaRouteGuard` component provides declarative route protection using your existing authentication system. It's available for React, Vue.js, and Svelte:
+
+### **React Usage**
+
+```jsx
+import { VormiaRouteGuard } from 'vormiaqueryjs';
+
+<VormiaRouteGuard roles={["admin"]} redirectTo="/login">
+  <AdminDashboard />
+</VormiaRouteGuard>
+```
+
+### **Vue.js Usage**
+
+```javascript
+import { createVormiaRouteGuardVue } from 'vormiaqueryjs';
+
+// In your Vue component
+const VormiaRouteGuard = createVormiaRouteGuardVue();
+
+// Use in template
+<VormiaRouteGuard :roles="['admin']" redirect-to="/login">
+  <AdminDashboard />
+</VormiaRouteGuard>
+```
+
+### **Svelte Usage**
+
+```javascript
+import { createVormiaRouteGuardSvelte } from 'vormiaqueryjs';
+
+// In your Svelte component
+const VormiaRouteGuard = createVormiaRouteGuardSvelte();
+
+// Use in template
+<VormiaRouteGuard roles={['admin']} redirectTo="/login">
+  <AdminDashboard />
+</VormiaRouteGuard>
+```
 
 ### **Basic Usage**
 
@@ -868,6 +939,19 @@ const debugInfo = createDebugInfo(response);
 - `VormiaProvider`
 - `NotificationPanel`
 - `ErrorDebugPanel`
+- `VormiaRouteGuard` - Route protection component
+
+### **Vue.js Support**
+
+- `createVormiaRouteGuardVue()` - Factory function for Vue 3 route guard
+- `useVrmAuthEnhancedVue()` - Enhanced authentication hook for Vue 3 Composition API
+
+### **Svelte Support**
+
+- `createVormiaRouteGuardSvelte()` - Factory function for Svelte route guard
+- `useVrmAuthEnhancedSvelte()` - Enhanced authentication hook for Svelte
+
+### **Framework-Agnostic HTML**
 
 ### **Framework-Agnostic HTML**
 
@@ -924,7 +1008,9 @@ See the `examples/` directory for comprehensive usage examples:
 ### **🆕 Zustand Integration Examples**
 
 - **`zustand-integration-example.jsx`**: Complete demonstration of all new Zustand-powered features
-- **Route Protection**: Examples of `VormiaRouteGuard` usage
+- **`vue-zustand-integration-example.vue`**: Vue.js implementation with Composition API
+- **`svelte-zustand-integration-example.svelte`**: Svelte implementation with reactive stores
+- **Route Protection**: Examples of `VormiaRouteGuard` usage across all frameworks
 - **State Management**: Auth, cache, storage, and settings stores
 - **Offline Support**: Caching strategies and offline data management
 - **Enhanced Auth**: Token management, permissions, and user preferences
