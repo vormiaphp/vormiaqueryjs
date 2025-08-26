@@ -27,6 +27,9 @@ export * from "./utils/formDataTransformer.js";
 // Enhanced Error Handling
 export * from "./utils/enhancedErrorHandler.js";
 
+// Export Zustand stores and new features
+export * from "./stores/index.js";
+
 // Export types as plain objects for documentation purposes
 export const VormiaError = {};
 export const VormiaConfig = {};

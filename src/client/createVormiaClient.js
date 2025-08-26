@@ -1,4 +1,5 @@
-import { VormiaError } from './utils/VormiaError';
+import { VormiaError } from "./utils/VormiaError";
+import { useAuthStore } from "../stores/useAuthStore.js";
 
 // Helper function to convert headers to HeadersInit
 const toHeadersInit = (headers) => {
@@ -23,18 +24,18 @@ const createHttpClient = (baseConfig) => {
       // Fix URL construction to properly handle baseURL with existing path
       let fullUrl;
       if (config.url) {
-        if (config.url.startsWith('http')) {
+        if (config.url.startsWith("http")) {
           // Absolute URL, use as is
           fullUrl = config.url;
         } else {
           // Relative URL, concatenate with baseURL
           const baseURL = config.baseURL || baseConfig.baseURL;
-          if (baseURL.endsWith('/') && config.url.startsWith('/')) {
+          if (baseURL.endsWith("/") && config.url.startsWith("/")) {
             // Remove trailing slash from baseURL to avoid double slashes
             fullUrl = baseURL.slice(0, -1) + config.url;
-          } else if (!baseURL.endsWith('/') && !config.url.startsWith('/')) {
+          } else if (!baseURL.endsWith("/") && !config.url.startsWith("/")) {
             // Add slash between baseURL and url
-            fullUrl = baseURL + '/' + config.url;
+            fullUrl = baseURL + "/" + config.url;
           } else {
             // One of them already has a slash, just concatenate
             fullUrl = baseURL + config.url;
@@ -43,7 +44,7 @@ const createHttpClient = (baseConfig) => {
       } else {
         fullUrl = "";
       }
-      
+
       const headers = toHeadersInit({
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -67,7 +68,9 @@ const createHttpClient = (baseConfig) => {
         if (!response.ok) {
           // Create a VormiaError with detailed information
           const errorData = {
-            message: responseData.message || `Request failed with status ${response.status}`,
+            message:
+              responseData.message ||
+              `Request failed with status ${response.status}`,
             status: response.status,
             response: {
               data: responseData,
@@ -75,9 +78,9 @@ const createHttpClient = (baseConfig) => {
               statusText: response.statusText,
               headers: {},
             },
-            debug: responseData.debug
+            debug: responseData.debug,
           };
-          
+
           throw new VormiaError(errorData);
         }
 
@@ -93,32 +96,32 @@ const createHttpClient = (baseConfig) => {
         if (error instanceof VormiaError) {
           throw error;
         }
-        
+
         // Handle network errors
-        if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
+        if (error.name === "TypeError" && error.message === "Failed to fetch") {
           throw new VormiaError({
-            message: 'Network error: Unable to connect to the server',
-            code: 'NETWORK_ERROR',
-            status: 0
+            message: "Network error: Unable to connect to the server",
+            code: "NETWORK_ERROR",
+            status: 0,
           });
         }
-        
+
         // Handle JSON parse errors
         if (error instanceof SyntaxError) {
           throw new VormiaError({
-            message: 'Invalid JSON response from server',
-            code: 'INVALID_JSON',
-            status: 0
+            message: "Invalid JSON response from server",
+            code: "INVALID_JSON",
+            status: 0,
           });
         }
-        
+
         // For other errors, wrap them in a VormiaError
         throw new VormiaError({
-          message: error.message || 'An unknown error occurred',
-          code: error.code || 'UNKNOWN_ERROR',
+          message: error.message || "An unknown error occurred",
+          code: error.code || "UNKNOWN_ERROR",
           status: error.status || 0,
           response: error.response,
-          stack: error.stack
+          stack: error.stack,
         });
       }
     },
@@ -167,9 +170,9 @@ class VormiaClient {
     });
   }
 
-  // Simplified interceptor-like functionality
+  // Enhanced interceptor-like functionality with Zustand integration
   async handleRequest(config) {
-    // Add auth token if available
+    // Add auth token if available (now from Zustand store)
     const token = this.getAuthToken();
     if (token) {
       config.headers = {
@@ -189,6 +192,17 @@ class VormiaClient {
   }
 
   getAuthToken() {
+    // First try to get from Zustand store (reactive)
+    try {
+      const authStore = useAuthStore.getState();
+      if (authStore.token) {
+        return authStore.token;
+      }
+    } catch (error) {
+      // Fallback to localStorage if Zustand store not available
+    }
+
+    // Fallback to localStorage for backward compatibility
     if (typeof window !== "undefined") {
       return localStorage.getItem(this.config.authTokenKey);
     }
@@ -196,12 +210,30 @@ class VormiaClient {
   }
 
   setAuthToken(token) {
+    // Set in Zustand store (reactive)
+    try {
+      const authStore = useAuthStore.getState();
+      authStore.setToken(token);
+    } catch (error) {
+      // Fallback to localStorage if Zustand store not available
+    }
+
+    // Also set in localStorage for backward compatibility
     if (typeof window !== "undefined") {
       localStorage.setItem(this.config.authTokenKey, token);
     }
   }
 
   removeAuthToken() {
+    // Remove from Zustand store (reactive)
+    try {
+      const authStore = useAuthStore.getState();
+      authStore.logout();
+    } catch (error) {
+      // Fallback to localStorage if Zustand store not available
+    }
+
+    // Also remove from localStorage for backward compatibility
     if (typeof window !== "undefined") {
       localStorage.removeItem(this.config.authTokenKey);
     }

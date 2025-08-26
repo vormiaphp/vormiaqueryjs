@@ -6,3 +6,4 @@
 // Export all components
 export * from "./ErrorDebugPanel.jsx";
 export * from "./NotificationPanel.jsx";
+export * from "./VormiaRouteGuard.jsx";

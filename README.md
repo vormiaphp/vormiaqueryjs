@@ -2,33 +2,6 @@
 
 A powerful, framework-agnostic query and mutation library with built-in error handling, notifications, and debug capabilities.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## 📦 **Required Peer Dependencies**
 
 Before installing `vormiaqueryjs`, you must install the correct peer dependencies for your framework:
@@ -40,6 +13,7 @@ Before installing `vormiaqueryjs`, you must install the correct peer dependencie
 - **Qwik**: `@builder.io/qwik`
 - **Astro**: `@tanstack/react-query` + `react react-dom`
 - **Common**: `axios` (required for all frameworks)
+- **State Management**: `zustand` (required for advanced features)
 
 ---
 
@@ -229,17 +203,18 @@ The `SimpleNotification` component provides a clean, consistent way to display n
 
 **🎨 Notification Styling**: All notification types use solid background colors with perfect contrast:
 
-| Type | Background | Text | Border | Description |
-|------|------------|------|--------|-------------|
-| **Success** | `bg-green-500` | `text-white` | `border-green-200` | Professional green with white text |
-| **Error** | `bg-red-500` | `text-white` | `border-red-200` | Clear red with white text |
-| **Warning** | `bg-yellow-500` | `text-white` | `border-yellow-200` | Bright yellow with white text |
-| **Info** | `bg-blue-500` | `text-white` | `border-blue-200` | Trusted blue with white text |
-| **Announce** | `bg-black` | `text-white` | `border-gray-200` | **Pure black with white text for maximum contrast** |
+| Type         | Background      | Text         | Border              | Description                                         |
+| ------------ | --------------- | ------------ | ------------------- | --------------------------------------------------- |
+| **Success**  | `bg-green-500`  | `text-white` | `border-green-200`  | Professional green with white text                  |
+| **Error**    | `bg-red-500`    | `text-white` | `border-red-200`    | Clear red with white text                           |
+| **Warning**  | `bg-yellow-500` | `text-white` | `border-yellow-200` | Bright yellow with white text                       |
+| **Info**     | `bg-blue-500`   | `text-white` | `border-blue-200`   | Trusted blue with white text                        |
+| **Announce** | `bg-black`      | `text-white` | `border-gray-200`   | **Pure black with white text for maximum contrast** |
 
 **CSS Fallback**: Guaranteed styling even when Tailwind JIT compilation fails.
 
 **🛡️ Reliability Features:**
+
 - **Dual-Class System**: Tailwind + CSS fallback classes
 - **Guaranteed Styling**: CSS with `!important` ensures notifications always work
 - **Perfect Contrast**: All combinations meet WCAG accessibility standards
@@ -257,8 +232,22 @@ The `SimpleNotification` component provides a clean, consistent way to display n
 - **🐛 Debug System**: Environment-aware debug panel with comprehensive logging
 - **🌍 Cross-Framework**: Works with React, Vue, Svelte, Solid, Qwik, and Astro
 - **⚡ Performance**: Built on TanStack Query for optimal caching and state management
+
+### **🆕 New Zustand-Powered Features:**
+
+- **🏗️ Centralized State Management**: Zustand-powered stores for auth, cache, storage, and settings
+- **🛡️ Route Protection**: Declarative route protection with `VormiaRouteGuard` component
+- **📱 Offline Support**: Smart caching with offline data persistence and background sync
+- **💾 Local Storage**: User preferences, app settings, and form data persistence
+- **🔄 Token Management**: Automatic token refresh, secure storage, and cross-tab synchronization
+- **⚡ Performance Optimization**: Intelligent cache invalidation, size management, and cleanup strategies
+- **🔐 Enhanced Security**: Secure storage strategies and automatic token expiry handling
 - **🛡️ Error Handling**: Comprehensive error parsing and field-level error mapping
 - **🧪 Tested**: Modern testing with Vitest for reliability
+- **🔄 Cross-Tab Sync**: State automatically synchronizes across browser tabs
+- **📊 Smart Caching**: Intelligent cache management with tags, expiration, and size limits
+- **🎨 Theme Management**: Dynamic theme switching with persistent user preferences
+- **🔔 Enhanced Notifications**: Persistent notification preferences and settings
 
 ### **📦 Components & Hooks Available:**
 
@@ -280,8 +269,16 @@ The `SimpleNotification` component provides a clean, consistent way to display n
 
 - `useVormiaConfig` - Dynamic configuration management
 - `useVormiaAuth` - Comprehensive authentication and authorization helpers
+- `useVrmAuthEnhanced` - Enhanced authentication with Zustand stores
 - `useVrmQuery` - Legacy query support
 - `useVrmMutation` - Legacy mutation support
+
+**Zustand Stores:**
+
+- `useAuthStore` - Centralized authentication state management
+- `useCacheStore` - Offline data caching and persistence
+- `useStorageStore` - Local data storage and user preferences
+- `useSettingsStore` - Application-wide configuration and settings
 
 ---
 
@@ -305,6 +302,24 @@ function App() {
     <VormiaProvider
       config={{
         baseURL: import.meta.env.VITE_VORMIA_API_URL,
+        // New Zustand-powered configuration options
+        enableZustand: true, // Enable Zustand stores
+        persistAuth: true, // Persist authentication state
+        persistCache: true, // Persist cache data
+        persistStorage: true, // Persist user preferences
+        persistSettings: true, // Persist app settings
+        // Cache configuration
+        cacheConfig: {
+          maxSize: 100, // Maximum cache items
+          maxAge: 3600000, // 1 hour cache expiry
+          enableOfflineQueue: true, // Queue requests when offline
+        },
+        // Storage configuration
+        storageConfig: {
+          encryption: false, // Enable encryption for sensitive data
+          compression: true, // Enable data compression
+          maxSize: 50 * 1024 * 1024, // 50MB storage limit
+        },
       }}
     >
       <YourApp />
@@ -613,7 +628,141 @@ function ProfileUpdate() {
 }
 ```
 
+### **🚀 Enhanced Authentication with Zustand**
+
+The new `useVrmAuthEnhanced` hook provides advanced authentication features powered by Zustand stores:
+
+```javascript
+import { useVrmAuthEnhanced } from "vormiaqueryjs";
+
+function EnhancedAuthExample() {
+  const auth = useVrmAuthEnhanced();
+
+  // Enhanced authentication with automatic token management
+  const handleLogin = async (credentials) => {
+    const result = await auth.login(credentials);
+    if (result.success) {
+      // Token automatically stored and managed
+      // User data automatically cached
+      // Offline queue automatically processed
+    }
+  };
+
+  // Automatic token refresh
+  const ensureValidToken = async () => {
+    const isValid = await auth.ensureValidToken();
+    if (!isValid) {
+      // Redirect to login or refresh token
+    }
+  };
+
+  // User preferences with persistence
+  const setTheme = (theme) => {
+    auth.setUserPreference("theme", theme);
+    // Automatically saved and synced across tabs
+  };
+
+  // Form data persistence
+  const saveForm = (formData) => {
+    auth.saveFormData("profile-form", formData);
+    // Automatically restored on page reload
+  };
+
+  return (
+    <div>
+      <button onClick={() => auth.logout()}>Logout</button>
+      <button onClick={() => setTheme("dark")}>Dark Theme</button>
+    </div>
+  );
+}
+```
+
+### **📱 Offline-First Data Management**
+
+```javascript
+import { useCacheStore, useStorageStore } from "vormiaqueryjs";
+
+function OfflineExample() {
+  const cache = useCacheStore();
+  const storage = useStorageStore();
+
+  // Cache data with tags for smart invalidation
+  const cacheUserData = (userData) => {
+    cache.setCache("user-profile", userData, {
+      tags: ["user", "profile"],
+      maxAge: 3600000, // 1 hour
+    });
+  };
+
+  // Add to offline queue when network is down
+  const queueRequest = (request) => {
+    cache.addToOfflineQueue({
+      type: "POST",
+      endpoint: "/api/update",
+      data: request,
+      retryCount: 3,
+    });
+  };
+
+  // Persistent user preferences
+  const savePreferences = (prefs) => {
+    storage.setUserPreference("notifications", prefs);
+    // Automatically synced across tabs
+  };
+
+  return (
+    <div>
+      <button onClick={() => cache.clearCache()}>Clear Cache</button>
+      <button onClick={() => storage.exportData()}>Export Data</button>
+    </div>
+  );
+}
+```
+
 ---
+
+## 🛡️ Route Protection with VormiaRouteGuard
+
+The new `VormiaRouteGuard` component provides declarative route protection using your existing authentication system:
+
+### **Basic Usage**
+
+```jsx
+import { VormiaRouteGuard } from 'vormiaqueryjs';
+
+// Role-based protection
+<VormiaRouteGuard roles={["admin"]} redirectTo="/login">
+  <AdminDashboard />
+</VormiaRouteGuard>
+
+// Permission-based protection
+<VormiaRouteGuard permissions={["manage_users", "delete_posts"]} fallback={<AccessDenied />}>
+  <UserManagement />
+</VormiaRouteGuard>
+
+// Multiple roles (ANY role)
+<VormiaRouteGuard roles={["admin", "moderator"]} requireAll={false}>
+  <ModeratorPanel />
+</VormiaRouteGuard>
+
+// Custom validation
+<VormiaRouteGuard
+  validate={(user) => user?.isVerified && user?.subscription === 'premium'}
+  fallback={<UpgradeRequired />}
+>
+  <PremiumFeatures />
+</VormiaRouteGuard>
+```
+
+### **Advanced Features**
+
+- **Flexible Protection**: Support for roles, permissions, and custom validation
+- **Multiple Fallback Options**: Redirect, custom components, or callbacks
+- **Performance Optimized**: Only re-renders when auth state changes
+- **Framework Agnostic**: Works across all supported frameworks
+- **TypeScript Support**: Full type safety for all props and callbacks
+- **Higher-Order Component**: `withVormiaGuard` HOC for class components
+- **Hook Support**: `useVormiaGuard` hook for custom logic
 
 ## 🚀 Explore Further Features
 
@@ -771,6 +920,84 @@ See the `examples/` directory for comprehensive usage examples:
 - Notification system usage
 - Debug panel integration
 - Cross-framework examples
+
+### **🆕 Zustand Integration Examples**
+
+- **`zustand-integration-example.jsx`**: Complete demonstration of all new Zustand-powered features
+- **Route Protection**: Examples of `VormiaRouteGuard` usage
+- **State Management**: Auth, cache, storage, and settings stores
+- **Offline Support**: Caching strategies and offline data management
+- **Enhanced Auth**: Token management, permissions, and user preferences
+- **Smart Caching**: Cache invalidation, tagging, and offline queue management
+- **User Preferences**: Theme switching, notification settings, and app configuration
+- **Form Persistence**: Automatic form data saving and restoration
+
+## 🏗️ Zustand Stores
+
+VormiaQueryJS now includes powerful Zustand stores for comprehensive state management:
+
+### **🔐 Auth Store (`useAuthStore`)**
+
+- **User Authentication**: Login state, user data, and session management
+- **Token Management**: Automatic token refresh, expiry handling, and secure storage
+- **Permission System**: Granular permission checking with `hasPermission()` and `hasAnyPermission()`
+- **Role Management**: Role-based access control with `hasRole()` and `hasAllRoles()`
+- **Cross-Tab Sync**: State automatically synchronizes across browser tabs
+- **Offline Detection**: Automatic offline state detection and handling
+
+### **💾 Cache Store (`useCacheStore`)**
+
+- **Smart Caching**: Intelligent cache invalidation with tags and expiration
+- **Offline Persistence**: Data persists across browser sessions and offline periods
+- **Request Queuing**: Offline requests are queued and processed when connection returns
+- **Performance Optimization**: Configurable cache size limits and cleanup strategies
+- **Cache Statistics**: Monitor cache hit rates and performance metrics
+
+### **💿 Storage Store (`useStorageStore`)**
+
+- **User Preferences**: Persistent user settings and customization
+- **Form Data Persistence**: Automatic form saving and restoration
+- **Search History**: Persistent search queries and recent searches
+- **Recent Items**: Track and restore recently accessed content
+- **Generic Storage**: Flexible key-value storage for any application data
+- **Import/Export**: Backup and restore user data
+
+### **⚙️ Settings Store (`useSettingsStore`)**
+
+- **Theme Management**: Dynamic theme switching with persistent preferences
+- **UI Configuration**: Font sizes, compact mode, sidebar state
+- **Notification Settings**: Customizable notification preferences
+- **Performance Tuning**: Configurable performance and network settings
+- **Privacy Controls**: User privacy and data handling preferences
+- **Localization**: Language and regional settings
+
+---
+
+## 🧪 **Testing & Quality Assurance**
+
+VormiaQueryJS includes comprehensive testing with modern tools:
+
+- **🧪 Vitest Testing**: Fast, modern testing framework with React Testing Library
+- **🔍 Component Testing**: Full component testing with mocked Zustand stores
+- **📊 Store Testing**: Comprehensive testing of all Zustand stores
+- **🔄 Integration Testing**: End-to-end testing of authentication and caching flows
+- **📱 Cross-Framework Testing**: Tests ensure compatibility across all supported frameworks
+- **🛡️ Error Handling Tests**: Comprehensive error scenario testing
+- **📈 Performance Testing**: Cache performance and memory usage validation
+
+### **Running Tests**
+
+```bash
+# Run all tests
+npm test
+
+# Run specific test files
+npm test test/zustand-integration.test.js
+npm test test/VormiaRouteGuard.test.jsx
+
+# Run tests in watch mode
+npm run test:watch
+```
 
 ---
 
