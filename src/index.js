@@ -34,6 +34,9 @@ export * from "./stores/index.js";
 export { useVrmAuthEnhanced } from "./hooks/useVrmAuthEnhanced.js";
 export { useVrmAuthEnhancedVue } from "./hooks/useVrmAuthEnhancedVue.js";
 export { useVrmAuthEnhancedSvelte } from "./hooks/useVrmAuthEnhancedSvelte.js";
+export { useVormiaCache } from "./hooks/useVormiaCache.js";
+export { useVormiaCacheVue } from "./hooks/useVormiaCacheVue.js";
+export { useVormiaCacheSvelte } from "./hooks/useVormiaCacheSvelte.js";
 
 // Export types as plain objects for documentation purposes
 export const VormiaError = {};

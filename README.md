@@ -233,6 +233,7 @@ The `SimpleNotification` component provides a clean, consistent way to display n
 - **🌍 Cross-Framework**: Works with React, Vue, Svelte, Solid, Qwik, and Astro
 - **⚡ Performance**: Built on TanStack Query for optimal caching and state management
 - **🔄 HTTP Client**: Robust HTTP client with comprehensive response handling including 204 No Content support
+- **🚀 Enhanced Caching**: Advanced caching system with auto-refresh, retry logic, and smart fallbacks
 
 ### **🔄 HTTP Client & Response Handling**
 
@@ -241,33 +242,36 @@ VormiaQueryJS includes a robust HTTP client that handles all response types grac
 #### **204 No Content Response Support**
 
 The client automatically handles 204 No Content responses, which are common in:
+
 - **Logout endpoints** - Often return 204 when successful
 - **Delete operations** - Usually return 204 after successful deletion
 - **Update operations** - Sometimes return 204 when no content needed
 - **Status changes** - Like activating/deactivating resources
 
 ```javascript
-import { createVormiaClient } from 'vormiaqueryjs';
+import { createVormiaClient } from "vormiaqueryjs";
 
 const client = createVormiaClient({
-  baseURL: 'https://api.example.com'
+  baseURL: "https://api.example.com",
 });
 
 // 204 responses are handled automatically
-const logoutResponse = await client.post('/api/auth/logout');
+const logoutResponse = await client.post("/api/auth/logout");
 console.log(logoutResponse.status); // 204
 console.log(logoutResponse.data); // { message: "Success - No content returned" }
 
 // Delete operations with 204
-const deleteResponse = await client.delete('/api/users/123');
+const deleteResponse = await client.delete("/api/users/123");
 if (deleteResponse.status === 204) {
-  console.log('User deleted successfully');
+  console.log("User deleted successfully");
 }
 
 // PUT/PATCH operations with 204
-const updateResponse = await client.put('/api/resource/123', { name: 'Updated' });
+const updateResponse = await client.put("/api/resource/123", {
+  name: "Updated",
+});
 if (updateResponse.status === 204) {
-  console.log('Resource updated successfully');
+  console.log("Resource updated successfully");
 }
 ```
 
@@ -281,14 +285,14 @@ if (updateResponse.status === 204) {
 
 #### **Response Types Supported**
 
-| Status Code | Description | Handling |
-|-------------|-------------|----------|
-| **200-299** | Success responses | JSON parsed automatically |
-| **204** | No Content | Special handling with success message |
-| **205** | Reset Content | Special handling with success message |
-| **4xx/5xx** | Error responses | Wrapped in VormiaError with details |
-| **Network Errors** | Connection issues | Graceful error handling |
-| **JSON Parse Errors** | Malformed responses | Fallback with descriptive messages |
+| Status Code           | Description         | Handling                              |
+| --------------------- | ------------------- | ------------------------------------- |
+| **200-299**           | Success responses   | JSON parsed automatically             |
+| **204**               | No Content          | Special handling with success message |
+| **205**               | Reset Content       | Special handling with success message |
+| **4xx/5xx**           | Error responses     | Wrapped in VormiaError with details   |
+| **Network Errors**    | Connection issues   | Graceful error handling               |
+| **JSON Parse Errors** | Malformed responses | Fallback with descriptive messages    |
 
 ### **🆕 New Zustand-Powered Features:**
 
@@ -329,6 +333,12 @@ if (updateResponse.status === 204) {
 - `useVrmAuthEnhanced` - Enhanced authentication with Zustand stores
 - `useVrmQuery` - Legacy query support
 - `useVrmMutation` - Legacy mutation support
+
+**Enhanced Caching Hooks:**
+
+- `useVormiaCache` - React enhanced caching with auto-refresh and smart fallbacks
+- `useVormiaCacheVue` - Vue.js enhanced caching with auto-refresh and smart fallbacks
+- `useVormiaCacheSvelte` - Svelte enhanced caching with auto-refresh and smart fallbacks
 
 **Zustand Stores:**
 
@@ -692,7 +702,7 @@ The new `useVrmAuthEnhanced` hook provides advanced authentication features powe
 #### **React Usage**
 
 ```javascript
-import { useVrmAuthEnhanced } from 'vormiaqueryjs';
+import { useVrmAuthEnhanced } from "vormiaqueryjs";
 
 function EnhancedAuthExample() {
   const auth = useVrmAuthEnhanced();
@@ -703,20 +713,20 @@ function EnhancedAuthExample() {
 #### **Vue.js Usage**
 
 ```javascript
-import { useVrmAuthEnhancedVue } from 'vormiaqueryjs';
+import { useVrmAuthEnhancedVue } from "vormiaqueryjs";
 
 export default {
   setup() {
     const auth = useVrmAuthEnhancedVue();
     // ... rest of implementation
-  }
-}
+  },
+};
 ```
 
 #### **Svelte Usage**
 
 ```javascript
-import { useVrmAuthEnhancedSvelte } from 'vormiaqueryjs';
+import { useVrmAuthEnhancedSvelte } from "vormiaqueryjs";
 
 const auth = useVrmAuthEnhancedSvelte();
 // ... rest of implementation
@@ -731,13 +741,13 @@ function EnhancedAuthExample() {
   // Enhanced authentication with automatic token management
   const handleLogin = async (credentials) => {
     const result = await auth.login(credentials);
-    
+
     // Handle different response types including 204 No Content
     if (result.status === 204) {
-      console.log('Operation completed successfully (204 No Content)');
+      console.log("Operation completed successfully (204 No Content)");
       return;
     }
-    
+
     if (result.success) {
       // Token automatically stored and managed
       // User data automatically cached
@@ -767,10 +777,14 @@ function EnhancedAuthExample() {
 
   return (
     <div>
-      <button onClick={async () => {
-        await auth.logout();
-        // Logout automatically handles 204 responses from logout endpoints
-      }}>Logout</button>
+      <button
+        onClick={async () => {
+          await auth.logout();
+          // Logout automatically handles 204 responses from logout endpoints
+        }}
+      >
+        Logout
+      </button>
       <button onClick={() => setTheme("dark")}>Dark Theme</button>
     </div>
   );
@@ -821,6 +835,302 @@ function OfflineExample() {
 
 ---
 
+## 🚀 Enhanced Caching with useVormiaCache
+
+VormiaQueryJS now includes powerful enhanced caching hooks that provide a `vormiaqueryjs`-style API for advanced caching operations. These hooks wrap the underlying Zustand stores and offer features like auto-refresh, retry logic, data validation, and smart fallbacks.
+
+### **🆕 New Enhanced Caching Hooks**
+
+**Available for all frameworks:**
+
+- **React**: `useVormiaCache`
+- **Vue.js**: `useVormiaCacheVue`
+- **Svelte**: `useVormiaCacheSvelte`
+
+### **🌟 Key Features**
+
+- **⏰ Configurable TTL**: Set custom expiration times for different data types
+- **🔄 Auto-Refresh**: Automatic background refreshing of cached data
+- **🔄 Manual Refresh**: On-demand data refresh with retry logic
+- **🏷️ Tag-Based Invalidation**: Remove cache entries by tags
+- **📊 Smart Fallbacks**: Provide fallback data when cache misses occur
+- **✅ Data Validation**: Validate cached data before returning
+- **📈 Priority Management**: High/medium/low priority for cache cleanup
+- **🔄 Retry Logic**: Exponential backoff for failed refresh operations
+- **📱 Offline Support**: Cache persists across browser sessions
+
+### **📱 React Usage**
+
+```jsx
+import { useVormiaCache } from "vormiaqueryjs";
+
+function UserProfile() {
+  const cache = useVormiaCache({
+    defaultTTL: 1800000, // 30 minutes default
+    defaultPriority: "high", // High priority by default
+    autoRefresh: true, // Enable auto-refresh
+    refreshInterval: 300000, // 5 minutes refresh interval
+    maxRetries: 3, // Retry failed refreshes
+    retryDelay: 1000, // 1 second base delay
+  });
+
+  // Store user data with auto-refresh
+  const storeUserData = async () => {
+    const userData = await fetchUserData();
+
+    cache.store("user:profile", userData, {
+      ttl: 3600000, // 1 hour TTL
+      priority: "high", // High priority
+      tags: ["user", "profile"], // Tag for invalidation
+      autoRefresh: true, // Enable auto-refresh
+      refreshInterval: 300000, // 5 minutes
+      refreshFunction: fetchUserData, // Function to refresh data
+      maxRetries: 2, // Custom retry count
+      retryDelay: 1500, // Custom retry delay
+    });
+  };
+
+  // Get data with fallback and validation
+  const getUserData = () => {
+    return cache.get("user:profile", {
+      fallback: defaultUserData, // Fallback if cache miss
+      validate: (data) => data && data.id, // Validate data integrity
+      refresh: true, // Trigger refresh if data exists
+      refreshFunction: fetchUserData, // Function to refresh
+    });
+  };
+
+  // Manual refresh with retry logic
+  const refreshUserData = async () => {
+    const result = await cache.refresh("user:profile", fetchUserData, {
+      fallback: getUserData(), // Use current data as fallback
+      validate: (data) => data && data.id, // Validate new data
+      maxRetries: 3, // Retry up to 3 times
+      retryDelay: 2000, // 2 second base delay
+    });
+
+    if (result.success) {
+      console.log("Data refreshed successfully");
+    } else if (result.retryCount > 0) {
+      console.log(`Retrying... (${result.retryCount} attempts left)`);
+    }
+  };
+
+  // Invalidate cache by pattern or tags
+  const clearUserCache = () => {
+    // Remove all user-related cache entries
+    cache.invalidate("user:", { clearTimers: true });
+
+    // Remove all profile-tagged entries
+    cache.invalidateByTags(["profile"], { clearTimers: true });
+  };
+
+  // Get cache statistics
+  const showCacheStats = () => {
+    const stats = cache.stats();
+    console.log("Cache Statistics:", {
+      totalItems: stats.totalItems,
+      totalSize: `${(stats.totalSize / 1024 / 1024).toFixed(2)} MB`,
+      cacheEfficiency: `${(stats.cacheEfficiency * 100).toFixed(1)}%`,
+      expiredItems: stats.expiredItems,
+    });
+  };
+
+  // Configure cache settings
+  const configureCache = () => {
+    cache.configure({
+      maxSize: 100 * 1024 * 1024, // 100MB
+      maxAge: 7200000, // 2 hours
+      maxItems: 1000, // Maximum 1000 items
+    });
+  };
+
+  return (
+    <div>
+      <button onClick={storeUserData}>Store User Data</button>
+      <button onClick={refreshUserData}>Refresh Data</button>
+      <button onClick={clearUserCache}>Clear Cache</button>
+      <button onClick={showCacheStats}>Show Stats</button>
+      <button onClick={configureCache}>Configure Cache</button>
+
+      <div>
+        <h3>User Data:</h3>
+        <pre>{JSON.stringify(getUserData(), null, 2)}</pre>
+      </div>
+    </div>
+  );
+}
+```
+
+### **🎯 Vue.js Usage**
+
+```javascript
+import { useVormiaCacheVue } from "vormiaqueryjs";
+
+export default {
+  setup() {
+    const cache = useVormiaCacheVue({
+      defaultTTL: 1800000,
+      autoRefresh: true,
+      refreshInterval: 300000,
+    });
+
+    const storeData = async () => {
+      const data = await fetchData();
+      cache.store("key", data, {
+        ttl: 3600000,
+        tags: ["important"],
+        autoRefresh: true,
+        refreshFunction: fetchData,
+      });
+    };
+
+    const getData = () => {
+      return cache.get("key", {
+        fallback: defaultData,
+        validate: (data) => data && data.id,
+      });
+    };
+
+    return {
+      storeData,
+      getData,
+      cache,
+    };
+  },
+};
+```
+
+### **⚡ Svelte Usage**
+
+```javascript
+import { useVormiaCacheSvelte } from "vormiaqueryjs";
+
+export default {
+  setup() {
+    const cache = useVormiaCacheSvelte({
+      defaultTTL: 1800000,
+      defaultPriority: "high",
+    });
+
+    const storeData = async () => {
+      const data = await fetchData();
+      cache.store("key", data, {
+        priority: "high",
+        tags: ["critical"],
+      });
+    };
+
+    const getData = () => {
+      return cache.get("key", {
+        fallback: defaultData,
+      });
+    };
+
+    return {
+      storeData,
+      getData,
+      cache,
+    };
+  },
+};
+```
+
+### **🔧 Advanced Configuration Options**
+
+```javascript
+const cache = useVormiaCache({
+  // Time settings
+  defaultTTL: 1800000, // 30 minutes default TTL
+  refreshInterval: 300000, // 5 minutes refresh interval
+
+  // Priority settings
+  defaultPriority: "high", // 'high', 'normal', 'low'
+
+  // Auto-refresh settings
+  autoRefresh: true, // Enable auto-refresh globally
+  maxRetries: 3, // Maximum retry attempts
+  retryDelay: 1000, // Base retry delay (exponential backoff)
+});
+```
+
+### **📊 Cache Entry Options**
+
+```javascript
+cache.store("key", data, {
+  // Time settings
+  ttl: 3600000, // Custom TTL for this entry
+
+  // Priority and organization
+  priority: "high", // 'high', 'normal', 'low'
+  tags: ["user", "profile"], // Tags for invalidation
+  size: 1024, // Size in bytes for cleanup calculations
+
+  // Auto-refresh settings
+  autoRefresh: true, // Enable auto-refresh for this entry
+  refreshInterval: 300000, // Custom refresh interval
+  refreshFunction: fetchData, // Function to refresh data
+  maxRetries: 2, // Custom retry count
+  retryDelay: 1500, // Custom retry delay
+});
+```
+
+### **🔄 Smart Data Retrieval**
+
+```javascript
+const data = cache.get("key", {
+  // Fallback data
+  fallback: defaultData,
+
+  // Data validation
+  validate: (data) => {
+    return data && typeof data === "object" && data.id && data.name;
+  },
+
+  // Auto-refresh options
+  refresh: true, // Trigger refresh if data exists
+  refreshFunction: fetchData, // Function to refresh data
+});
+```
+
+### **📈 Cache Management**
+
+```javascript
+// Remove specific entry
+cache.remove("user:profile");
+
+// Invalidate by pattern
+cache.invalidate("user:", { clearTimers: true });
+
+// Invalidate by tags
+cache.invalidateByTags(["profile"], { clearTimers: true });
+
+// Clear all cache
+cache.clear();
+
+// Get cache statistics
+const stats = cache.stats();
+
+// Configure cache settings
+cache.configure({
+  maxSize: 100 * 1024 * 1024, // 100MB
+  maxAge: 7200000, // 2 hours
+  maxItems: 1000, // Maximum items
+});
+```
+
+### **🎯 Use Cases**
+
+- **🔄 Real-time Data**: Auto-refresh user dashboards
+- **📱 Offline Apps**: Cache critical data for offline access
+- **⚡ Performance**: Reduce API calls with smart caching
+- **🔄 Background Sync**: Keep data fresh in the background
+- **📊 Analytics**: Cache expensive API responses
+- **🎨 User Preferences**: Persist user settings and preferences
+- **📝 Form Data**: Auto-save form data with validation
+
+---
+
 ## 🛡️ Route Protection with VormiaRouteGuard
 
 The new `VormiaRouteGuard` component provides declarative route protection using your existing authentication system. It's available for React, Vue.js, and Svelte:
@@ -828,11 +1138,11 @@ The new `VormiaRouteGuard` component provides declarative route protection using
 ### **React Usage**
 
 ```jsx
-import { VormiaRouteGuard } from 'vormiaqueryjs';
+import { VormiaRouteGuard } from "vormiaqueryjs";
 
 <VormiaRouteGuard roles={["admin"]} redirectTo="/login">
   <AdminDashboard />
-</VormiaRouteGuard>
+</VormiaRouteGuard>;
 ```
 
 ### **Vue.js Usage**
@@ -852,15 +1162,15 @@ const VormiaRouteGuard = createVormiaRouteGuardVue();
 ### **Svelte Usage**
 
 ```javascript
-import { createVormiaRouteGuardSvelte } from 'vormiaqueryjs';
+import { createVormiaRouteGuardSvelte } from "vormiaqueryjs";
 
 // In your Svelte component
 const VormiaRouteGuard = createVormiaRouteGuardSvelte();
 
 // Use in template
-<VormiaRouteGuard roles={['admin']} redirectTo="/login">
+<VormiaRouteGuard roles={["admin"]} redirectTo="/login">
   <AdminDashboard />
-</VormiaRouteGuard>
+</VormiaRouteGuard>;
 ```
 
 ### **Basic Usage**
