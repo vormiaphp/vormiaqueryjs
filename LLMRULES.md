@@ -381,6 +381,7 @@ export function VormiaErrorBoundary({ children }) {
 - **CONSIDER** framework-specific state patterns
 
 ### **6. 🚨 CRITICAL: Dependency Resolution**
+
 - **NEVER** export React-specific hooks from the main package index
 - **NEVER** export Vue-specific hooks from the main package index
 - **NEVER** export Svelte-specific hooks from the main package index
@@ -388,19 +389,20 @@ export function VormiaErrorBoundary({ children }) {
 - **MAINTAIN** main package as truly framework-agnostic
 
 #### **Export Structure Rules**
+
 ```javascript
 // ✅ CORRECT: Main package (src/index.js) - Framework-agnostic only
 export * from "./client/createVormiaClient.js";
-export const HttpMethod = { GET: "GET", POST: "POST", /* ... */ };
+export const HttpMethod = { GET: "GET", POST: "POST" /* ... */ };
 
 // ✅ CORRECT: React adapter (src/adapters/react/index.js) - React-specific
-export { useVormiaQuery } from './useVormiaQuery.js';
-export { VormiaProvider } from '../../providers/VormiaProvider.jsx';
-export * from '../../stores/index.js';
+export { useVormiaQuery } from "./useVormiaQuery.js";
+export { VormiaProvider } from "../../providers/VormiaProvider.jsx";
+export * from "../../stores/index.js";
 
 // ✅ CORRECT: Vue adapter (src/adapters/vue/index.js) - Vue-specific
-export { useVormia } from './useVormia.js';
-export { useVrmAuthEnhancedVue } from '../../hooks/useVrmAuthEnhancedVue.js';
+export { useVormia } from "./useVormia.js";
+export { useVrmAuthEnhancedVue } from "../../hooks/useVrmAuthEnhancedVue.js";
 
 // ❌ AVOID: Mixing framework-specific exports in main package
 export { useVormiaQuery } from "./hooks/useVormiaQuery.js"; // React-specific!
@@ -408,6 +410,7 @@ export { useVrmAuthEnhancedVue } from "./hooks/useVrmAuthEnhancedVue.js"; // Vue
 ```
 
 #### **Why This Matters**
+
 - **Bundler Issues**: When React projects import the main package, bundlers try to resolve ALL exports
 - **Vue Resolution Error**: If Vue hooks are exported from main, bundlers try to resolve Vue dependencies
 - **React Resolution Error**: If React hooks are exported from main, bundlers try to resolve React dependencies

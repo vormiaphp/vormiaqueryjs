@@ -35,6 +35,47 @@ yarn add vormiaqueryjs
 
 ---
 
+## 📥 **Import Structure**
+
+VormiaQueryJS uses **framework-specific adapters** to prevent dependency resolution conflicts. Choose the correct import path for your framework:
+
+### **Core Package (Framework-Agnostic)**
+```javascript
+import { createVormiaClient, HttpMethod } from "vormiaqueryjs";
+```
+
+### **React Framework**
+```javascript
+import { useVormiaQuery, VormiaProvider } from "vormiaqueryjs/react";
+import { useVrmAuthEnhanced } from "vormiaqueryjs/react";
+```
+
+### **Vue Framework**
+```javascript
+import { useVormia } from "vormiaqueryjs/vue";
+import { useVrmAuthEnhancedVue } from "vormiaqueryjs/vue";
+```
+
+### **Svelte Framework**
+```javascript
+import { vormiaStore } from "vormiaqueryjs/svelte";
+import { useVrmAuthEnhancedSvelte } from "vormiaqueryjs/svelte";
+```
+
+### **Solid Framework**
+```javascript
+import { createVormiaResource } from "vormiaqueryjs/solid";
+```
+
+### **Qwik Framework**
+```javascript
+import { useVormia } from "vormiaqueryjs/qwik";
+```
+
+> **⚠️ Important**: Always use the framework-specific import path to avoid dependency resolution errors. The main package only exports framework-agnostic utilities.
+
+---
+
 ## 📘 **TypeScript Support**
 
 VormiaQueryJS includes **complete TypeScript definitions** for all functions, hooks, components, and types. No additional `@types` package is required!
@@ -44,13 +85,19 @@ VormiaQueryJS includes **complete TypeScript definitions** for all functions, ho
 TypeScript will automatically detect the types when you import from `vormiaqueryjs`:
 
 ```typescript
+// Core functionality - Framework-agnostic
+import {
+  createVormiaClient,
+  HttpMethod,
+} from "vormiaqueryjs";
+
+// React-specific functionality
 import {
   useVormiaQuery,
   VormiaConfig,
   VormiaError,
-  createVormiaClient,
-  HttpMethod,
-} from "vormiaqueryjs";
+  VormiaProvider,
+} from "vormiaqueryjs/react";
 
 // Full type safety for configuration
 const config: VormiaConfig = {
@@ -362,7 +409,7 @@ The `VormiaProvider` sets up the foundation for your entire application. It's es
 - **🛡️ Security**: CORS and credentials settings are configured
 
 ```jsx
-import { VormiaProvider } from "vormiaqueryjs";
+import { VormiaProvider } from "vormiaqueryjs/react";
 
 function App() {
   return (
@@ -398,7 +445,7 @@ function App() {
 ### **NotificationPanel** - Advanced Notification System
 
 ```jsx
-import { NotificationPanel } from "vormiaqueryjs";
+import { NotificationPanel } from "vormiaqueryjs/react";
 
 function MyComponent() {
   const [notification, setNotification] = useState(null);
@@ -419,7 +466,7 @@ function MyComponent() {
 ### **SimpleNotification** - Easy Drop-in Component
 
 ````jsx
-import { SimpleNotification } from "vormiaqueryjs";
+import { SimpleNotification } from "vormiaqueryjs/react";
 
 function MyComponent() {
   const [error, setError] = useState(null);
@@ -455,7 +502,7 @@ function MyComponent() {
 ### **ErrorDebugPanel** - Debug Information
 
 ```jsx
-import { ErrorDebugPanel } from "vormiaqueryjs";
+import { ErrorDebugPanel } from "vormiaqueryjs/react";
 
 function MyComponent() {
   const [debugInfo, setDebugInfo] = useState(null);
@@ -479,7 +526,7 @@ function MyComponent() {
 ### **1. useVormiaQuery** - Basic Query (No Auth)
 
 ```jsx
-import { useVormiaQuery } from "vormiaqueryjs";
+import { useVormiaQuery } from "vormiaqueryjs/react";
 
 const query = useVormiaQuery({
   endpoint: "/public/data",
@@ -491,7 +538,7 @@ const query = useVormiaQuery({
 ### **2. useVormiaQueryAuth** - Authenticated Query
 
 ```jsx
-import { useVormiaQueryAuth } from "vormiaqueryjs";
+import { useVormiaQueryAuth } from "vormiaqueryjs/react";
 
 const query = useVormiaQueryAuth({
   endpoint: "/user/profile",
@@ -503,7 +550,7 @@ const query = useVormiaQueryAuth({
 ### **3. useVormiaQueryAuthMutation** - Authenticated Mutation with Form Transformation
 
 ```jsx
-import { useVormiaQueryAuthMutation } from "vormiaqueryjs";
+import { useVormiaQueryAuthMutation } from "vormiaqueryjs/react";
 
 const mutation = useVormiaQueryAuthMutation({
   endpoint: "/register",
@@ -526,7 +573,7 @@ const mutation = useVormiaQueryAuthMutation({
 ### **4. useVormiaQuerySimple** - Flexible Testing Query
 
 ```jsx
-import { useVormiaQuerySimple } from "vormiaqueryjs";
+import { useVormiaQuerySimple } from "vormiaqueryjs/react";
 
 const query = useVormiaQuerySimple({
   endpoint: "/test-endpoint",
@@ -539,7 +586,7 @@ const query = useVormiaQuerySimple({
 ### **5. Legacy Hooks (Backward Compatibility)**
 
 ```jsx
-import { useVrmQuery, useVrmMutation } from "vormiaqueryjs";
+import { useVrmQuery, useVrmMutation } from "vormiaqueryjs/react";
 
 // Legacy query hook
 const query = useVrmQuery({
@@ -564,7 +611,7 @@ VormiaQueryJS provides a comprehensive authentication and authorization system w
 ### **🚀 Authentication Helpers**
 
 ```javascript
-import { useVormiaAuth } from "vormiaqueryjs";
+import { useVormiaAuth } from "vormiaqueryjs/react";
 
 const auth = useVormiaAuth();
 
@@ -702,7 +749,7 @@ The new `useVrmAuthEnhanced` hook provides advanced authentication features powe
 #### **React Usage**
 
 ```javascript
-import { useVrmAuthEnhanced } from "vormiaqueryjs";
+import { useVrmAuthEnhanced } from "vormiaqueryjs/react";
 
 function EnhancedAuthExample() {
   const auth = useVrmAuthEnhanced();
@@ -713,7 +760,7 @@ function EnhancedAuthExample() {
 #### **Vue.js Usage**
 
 ```javascript
-import { useVrmAuthEnhancedVue } from "vormiaqueryjs";
+import { useVrmAuthEnhancedVue } from "vormiaqueryjs/vue";
 
 export default {
   setup() {
@@ -726,14 +773,14 @@ export default {
 #### **Svelte Usage**
 
 ```javascript
-import { useVrmAuthEnhancedSvelte } from "vormiaqueryjs";
+import { useVrmAuthEnhancedSvelte } from "vormiaqueryjs/svelte";
 
 const auth = useVrmAuthEnhancedSvelte();
 // ... rest of implementation
 ```
 
 ```javascript
-import { useVrmAuthEnhanced } from "vormiaqueryjs";
+import { useVrmAuthEnhanced } from "vormiaqueryjs/react";
 
 function EnhancedAuthExample() {
   const auth = useVrmAuthEnhanced();
@@ -794,7 +841,7 @@ function EnhancedAuthExample() {
 ### **📱 Offline-First Data Management**
 
 ```javascript
-import { useCacheStore, useStorageStore } from "vormiaqueryjs";
+import { useCacheStore, useStorageStore } from "vormiaqueryjs/react";
 
 function OfflineExample() {
   const cache = useCacheStore();
@@ -862,7 +909,7 @@ VormiaQueryJS now includes powerful enhanced caching hooks that provide a `vormi
 ### **📱 React Usage**
 
 ```jsx
-import { useVormiaCache } from "vormiaqueryjs";
+import { useVormiaCache } from "vormiaqueryjs/react";
 
 function UserProfile() {
   const cache = useVormiaCache({
@@ -965,7 +1012,7 @@ function UserProfile() {
 ### **🎯 Vue.js Usage**
 
 ```javascript
-import { useVormiaCacheVue } from "vormiaqueryjs";
+import { useVormiaCacheVue } from "vormiaqueryjs/vue";
 
 export default {
   setup() {
@@ -1004,7 +1051,7 @@ export default {
 ### **⚡ Svelte Usage**
 
 ```javascript
-import { useVormiaCacheSvelte } from "vormiaqueryjs";
+import { useVormiaCacheSvelte } from "vormiaqueryjs/svelte";
 
 export default {
   setup() {
@@ -1138,7 +1185,7 @@ The new `VormiaRouteGuard` component provides declarative route protection using
 ### **React Usage**
 
 ```jsx
-import { VormiaRouteGuard } from "vormiaqueryjs";
+import { VormiaRouteGuard } from "vormiaqueryjs/react";
 
 <VormiaRouteGuard roles={["admin"]} redirectTo="/login">
   <AdminDashboard />
@@ -1148,7 +1195,7 @@ import { VormiaRouteGuard } from "vormiaqueryjs";
 ### **Vue.js Usage**
 
 ```javascript
-import { createVormiaRouteGuardVue } from 'vormiaqueryjs';
+import { createVormiaRouteGuardVue } from 'vormiaqueryjs/vue';
 
 // In your Vue component
 const VormiaRouteGuard = createVormiaRouteGuardVue();
@@ -1162,7 +1209,7 @@ const VormiaRouteGuard = createVormiaRouteGuardVue();
 ### **Svelte Usage**
 
 ```javascript
-import { createVormiaRouteGuardSvelte } from "vormiaqueryjs";
+import { createVormiaRouteGuardSvelte } from "vormiaqueryjs/svelte";
 
 // In your Svelte component
 const VormiaRouteGuard = createVormiaRouteGuardSvelte();
@@ -1176,7 +1223,7 @@ const VormiaRouteGuard = createVormiaRouteGuardSvelte();
 ### **Basic Usage**
 
 ```jsx
-import { VormiaRouteGuard } from 'vormiaqueryjs';
+import { VormiaRouteGuard } from 'vormiaqueryjs/react';
 
 // Role-based protection
 <VormiaRouteGuard roles={["admin"]} redirectTo="/login">
@@ -1294,7 +1341,7 @@ The debug panel automatically:
 #### **Usage**
 
 ```jsx
-import { ErrorDebugPanel, createDebugInfo } from "vormiaqueryjs";
+import { ErrorDebugPanel, createDebugInfo } from "vormiaqueryjs/react";
 
 // Create debug info from API response
 const debugInfo = createDebugInfo(response);

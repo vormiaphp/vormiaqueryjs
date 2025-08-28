@@ -319,6 +319,64 @@ src/
 - Debug components provide additional information
 - Production builds should disable debug features
 
+## 🔧 **Troubleshooting Common Issues**
+
+### **1. Dependency Resolution Errors**
+```bash
+# ❌ ERROR: Could not resolve "vue" imported by "vormiaqueryjs"
+# ❌ ERROR: Could not resolve "react" imported by "vormiaqueryjs"
+```
+
+**Solution**: Use framework-specific import paths:
+```javascript
+// ✅ CORRECT: React project
+import { useVormiaQuery } from 'vormiaqueryjs/react';
+
+// ✅ CORRECT: Vue project  
+import { useVormia } from 'vormiaqueryjs/vue';
+
+// ❌ WRONG: Direct import from main package
+import { useVormiaQuery } from 'vormiaqueryjs'; // Will cause errors!
+```
+
+### **2. Missing Exports**
+```bash
+# ❌ ERROR: Does not provide an export named 'ErrorDebugPanel'
+```
+
+**Solution**: Import from the correct framework adapter:
+```javascript
+// ✅ CORRECT: React components
+import { ErrorDebugPanel } from 'vormiaqueryjs/react';
+
+// ✅ CORRECT: Vue components
+import { useVormia } from 'vormiaqueryjs/vue';
+```
+
+### **3. Framework Mismatch**
+```bash
+# ❌ ERROR: React Hook "useVormiaQuery" is called in a non-React component
+```
+
+**Solution**: Ensure you're using the correct framework adapter and have the required peer dependencies installed.
+
+### **4. Build Configuration Issues**
+```bash
+# ❌ ERROR: Module not found: Can't resolve 'zustand'
+```
+
+**Solution**: Install required peer dependencies:
+```bash
+# For React projects
+npm install @tanstack/react-query zustand
+
+# For Vue projects  
+npm install @tanstack/vue-query zustand
+
+# For Svelte projects
+npm install @tanstack/svelte-query zustand
+```
+
 ## 🔗 **Related Documentation**
 
 - **Package.json**: Dependencies and peer requirements
