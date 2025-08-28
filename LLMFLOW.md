@@ -174,30 +174,54 @@ import { createVormiaResource } from "vormiaqueryjs/solid";
 
 ## 📦 **Package Structure & Exports**
 
-### **Main Exports**
-
+### **Main Exports (Framework-Agnostic)**
 ```javascript
-// Core functionality
-import { createVormiaClient, VormiaError } from "vormiaqueryjs";
+// Core functionality - No framework dependencies
+import { createVormiaClient, HttpMethod } from 'vormiaqueryjs';
 
-// Framework-specific
-import { useVormiaQuery } from "vormiaqueryjs/react";
-import { useVormia } from "vormiaqueryjs/vue";
-import { vormiaStore } from "vormiaqueryjs/svelte";
+// Only framework-agnostic utilities and types
+```
+
+### **Framework-Specific Exports**
+```javascript
+// React-specific functionality
+import { useVormiaQuery, VormiaProvider } from 'vormiaqueryjs/react';
+
+// Vue-specific functionality  
+import { useVormia, useVrmAuthEnhancedVue } from 'vormiaqueryjs/vue';
+
+// Svelte-specific functionality
+import { vormiaStore, useVrmAuthEnhancedSvelte } from 'vormiaqueryjs/svelte';
+
+// Solid-specific functionality
+import { createVormiaResource } from 'vormiaqueryjs/solid';
+
+// Qwik-specific functionality
+import { useVormia } from 'vormiaqueryjs/qwik';
 ```
 
 ### **File Organization**
-
 ```
 src/
 ├── adapters/          # Framework-specific implementations
-├── core/             # Core HTTP client and utilities
+│   ├── react/         # React hooks, components, and stores
+│   ├── vue/           # Vue hooks and utilities
+│   ├── svelte/        # Svelte stores and hooks
+│   ├── solid/         # Solid.js hooks
+│   └── qwik/          # Qwik hooks
+├── core/             # Framework-agnostic core logic
+├── client/           # HTTP client and utilities
 ├── providers/        # Configuration providers
 ├── stores/           # State management (Zustand)
 ├── components/       # UI components
 ├── hooks/            # Framework-agnostic hooks
 └── utils/            # Utility functions
 ```
+
+### **Export Strategy**
+- **Main Package**: Only exports framework-agnostic utilities and core client
+- **Framework Adapters**: Export all framework-specific hooks, components, and stores
+- **Dependency Isolation**: Prevents bundlers from resolving unnecessary framework dependencies
 
 ## 🔄 **Data Flow & Lifecycle**
 
