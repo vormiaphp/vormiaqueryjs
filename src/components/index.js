@@ -1,11 +1,11 @@
 /**
  * Components index file for VormiaQueryJS
- * Exports all UI components and utilities
+ * Exports framework-agnostic utilities and functions
  */
 
-// Export all components
-export * from "./ErrorDebugPanel.jsx";
-export * from "./NotificationPanel.jsx";
-export * from "./VormiaRouteGuard.jsx";
+// Export framework-agnostic utilities
 export { createVormiaRouteGuardVue } from "./VormiaRouteGuardVue.js";
 export { createVormiaRouteGuardSvelte } from "./VormiaRouteGuardSvelte.js";
+
+// Note: React components are exported through the React adapter
+// to prevent dependency resolution issues in non-React environments

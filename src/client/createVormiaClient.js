@@ -1,5 +1,4 @@
 import { VormiaError } from "./utils/VormiaError";
-import { useAuthStore } from "../stores/useAuthStore.js";
 
 // Helper function to convert headers to HeadersInit
 const toHeadersInit = (headers) => {
@@ -209,17 +208,7 @@ class VormiaClient {
   }
 
   getAuthToken() {
-    // First try to get from Zustand store (reactive)
-    try {
-      const authStore = useAuthStore.getState();
-      if (authStore.token) {
-        return authStore.token;
-      }
-    } catch (error) {
-      // Fallback to localStorage if Zustand store not available
-    }
-
-    // Fallback to localStorage for backward compatibility
+    // Get token from localStorage
     if (typeof window !== "undefined") {
       return localStorage.getItem(this.config.authTokenKey);
     }
@@ -227,30 +216,14 @@ class VormiaClient {
   }
 
   setAuthToken(token) {
-    // Set in Zustand store (reactive)
-    try {
-      const authStore = useAuthStore.getState();
-      authStore.setToken(token);
-    } catch (error) {
-      // Fallback to localStorage if Zustand store not available
-    }
-
-    // Also set in localStorage for backward compatibility
+    // Set token in localStorage
     if (typeof window !== "undefined") {
       localStorage.setItem(this.config.authTokenKey, token);
     }
   }
 
   removeAuthToken() {
-    // Remove from Zustand store (reactive)
-    try {
-      const authStore = useAuthStore.getState();
-      authStore.logout();
-    } catch (error) {
-      // Fallback to localStorage if Zustand store not available
-    }
-
-    // Also remove from localStorage for backward compatibility
+    // Remove token from localStorage
     if (typeof window !== "undefined") {
       localStorage.removeItem(this.config.authTokenKey);
     }
