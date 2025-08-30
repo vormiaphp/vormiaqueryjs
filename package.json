@@ -9,13 +9,14 @@
   "exports": {
     ".": "./dist/esm/index.mjs",
     "./react": {
-      "import": "./dist/esm/adapters/react/useVormiaQuery.mjs",
-      "types": "./dist/types/adapters/react/useVormiaQuery.d.ts"
+      "import": "./dist/esm/adapters/react.mjs",
+      "types": "./dist/types/adapters/react.d.ts"
     },
     "./react/VormiaProvider": {
       "import": "./dist/esm/adapters/react/VormiaProvider.mjs",
       "types": "./dist/types/adapters/react/VormiaProvider.d.ts"
     },
+    "./stores": "./dist/esm/stores.mjs",
     "./svelte": "./dist/esm/adapters/svelte.mjs",
     "./solid": "./dist/esm/adapters/solid.mjs",
     "./core": "./dist/esm/core.mjs",
