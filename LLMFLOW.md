@@ -1,10 +1,10 @@
 # VormiaQueryJS - AI Chat Model Guide
 
-## 🎯 **Package Overview**
+## Package Overview
 
 VormiaQueryJS is a **framework-agnostic query and mutation library** designed to work with VormiaPHP Laravel backend applications. It provides a unified API for data fetching, error handling, notifications, and debugging across multiple JavaScript frameworks.
 
-## ✅ **Recent Configuration Fixes (v2.0.1)**
+## Recent Configuration Fixes (v2.0.1)
 
 ### **100% Configuration Compliance Achieved**
 
@@ -12,22 +12,22 @@ As of version 2.0.1, VormiaQueryJS has achieved **100% configuration compliance*
 
 #### **Fixed Issues**
 
-- ✅ **Route Guard Functions**: `createVormiaRouteGuardVue` and `createVormiaRouteGuardSvelte` now properly exported
-- ✅ **Build Configuration**: All dependencies properly externalized (React, zustand, etc.)
-- ✅ **React Adapter**: Now exports all 28 documented components, hooks, and utilities
-- ✅ **Framework Adapters**: All documented functionality now available across all frameworks
+- Route Guard Functions: `createVormiaRouteGuardVue` and `createVormiaRouteGuardSvelte` now properly exported
+- Build Configuration: All dependencies properly externalized (React, zustand, etc.)
+- React Adapter: Now exports all 28 documented components, hooks, and utilities
+- Framework Adapters: All documented functionality now available across all frameworks
 
 #### **Current Status**
 
-- **Components**: 5/5 ✅ (100% configured)
-- **Hooks**: 10/10 ✅ (100% configured)
-- **Stores**: 7/7 ✅ (100% configured)
-- **Framework Adapters**: 4/4 ✅ (100% configured)
-- **Route Guards**: 4/4 ✅ (100% configured)
+- Components: 5/5 (100% configured)
+- Hooks: 10/10 (100% configured)
+- Stores: 7/7 (100% configured)
+- Framework Adapters: 4/4 (100% configured)
+- Route Guards: 4/4 (100% configured)
 
-**Overall Configuration**: **100% Complete** ✅
+**Overall Configuration**: 100% Complete
 
-## 🏗️ **Architecture & Core Concepts**
+## Architecture & Core Concepts
 
 ### **1. Multi-Framework Support**
 
@@ -73,7 +73,7 @@ The package uses **adapter pattern** to support multiple frameworks:
 - **Stores**: Authentication, caching, settings, and storage management
 - **Location**: `src/stores/`
 
-## 🔧 **Key Configuration & Environment Variables**
+## Key Configuration & Environment Variables
 
 ### **Required Environment Variables**
 
@@ -91,7 +91,7 @@ VITE_VORMIA_DEBUG=true          # Enables debug mode
 VITE_VORMIA_ENV=local          # Environment setting (local/production)
 ```
 
-## 📚 **Usage Patterns & API Design**
+## Usage Patterns & API Design
 
 ### **1. Basic Query Pattern**
 
@@ -136,7 +136,7 @@ if (error instanceof VormiaError) {
 }
 ```
 
-## 🎨 **UI Components & Styling**
+## UI Components & Styling
 
 ### **Component Philosophy**
 
@@ -150,7 +150,7 @@ if (error instanceof VormiaError) {
 - **NotificationPanel**: User notification system
 - **VormiaRouteGuard**: Route protection and authentication
 
-## 🔍 **Debug & Development Features**
+## Debug & Development Features
 
 ### **Debug Mode**
 
@@ -165,7 +165,7 @@ if (error instanceof VormiaError) {
 - **Network Errors**: HTTP status code handling
 - **User Messages**: Human-readable error messages
 
-## 🚀 **Framework-Specific Implementations**
+## Framework-Specific Implementations
 
 ### **React (Primary)**
 
@@ -195,7 +195,7 @@ import { vormiaStore } from "vormiaqueryjs/svelte";
 import { createVormiaResource } from "vormiaqueryjs/solid";
 ```
 
-## 📦 **Package Structure & Exports**
+## Package Structure & Exports
 
 ### **Main Exports (Framework-Agnostic)**
 
@@ -250,7 +250,7 @@ src/
 - **Framework Adapters**: Export all framework-specific hooks, components, and stores
 - **Dependency Isolation**: Prevents bundlers from resolving unnecessary framework dependencies
 
-## 🔄 **Data Flow & Lifecycle**
+## Data Flow & Lifecycle
 
 ### **1. Initialization**
 
@@ -274,7 +274,7 @@ src/
 3. Error is passed to React Query for state management
 4. UI components can access error details
 
-## 🧪 **Testing & Development**
+## Testing & Development
 
 ### **Test Framework**
 
@@ -288,7 +288,7 @@ src/
 - Component tests for UI elements
 - Integration tests for framework adapters
 
-## 📋 **Common Use Cases & Patterns**
+## Common Use Cases & Patterns
 
 ### **1. Authentication**
 
@@ -314,7 +314,7 @@ src/
 // Validation error display components
 ```
 
-## 🚨 **Important Notes for AI Models**
+## Important Notes for AI Models
 
 ### **1. Framework Compatibility**
 
@@ -346,7 +346,7 @@ src/
 - Debug components provide additional information
 - Production builds should disable debug features
 
-## 🔧 **Troubleshooting Common Issues**
+## Troubleshooting Common Issues
 
 ### **1. Dependency Resolution Errors**
 
@@ -358,13 +358,13 @@ src/
 **Solution**: Use framework-specific import paths:
 
 ```javascript
-// ✅ CORRECT: React project
+// CORRECT: React project
 import { useVormiaQuery } from "vormiaqueryjs/react";
 
-// ✅ CORRECT: Vue project
+// CORRECT: Vue project
 import { useVormia } from "vormiaqueryjs/vue";
 
-// ❌ WRONG: Direct import from main package
+// WRONG: Direct import from main package
 import { useVormiaQuery } from "vormiaqueryjs"; // Will cause errors!
 ```
 
@@ -377,10 +377,10 @@ import { useVormiaQuery } from "vormiaqueryjs"; // Will cause errors!
 **Solution**: Import from the correct framework adapter:
 
 ```javascript
-// ✅ CORRECT: React components
+// CORRECT: React components
 import { ErrorDebugPanel } from "vormiaqueryjs/react";
 
-// ✅ CORRECT: Vue components
+// CORRECT: Vue components
 import { useVormia } from "vormiaqueryjs/vue";
 ```
 
@@ -411,7 +411,7 @@ npm install @tanstack/vue-query zustand
 npm install @tanstack/svelte-query zustand
 ```
 
-## 🔗 **Related Documentation**
+## Related Documentation
 
 - **Package.json**: Dependencies and peer requirements
 - **README.md**: User-facing documentation

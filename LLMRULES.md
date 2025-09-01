@@ -1,10 +1,10 @@
 # VormiaQueryJS - AI IDE Assistant Rules & Guidelines
 
-## 🎯 **Project Overview for AI IDE Assistants**
+## Project Overview for AI IDE Assistants
 
 VormiaQueryJS is a **framework-agnostic query and mutation library** for JavaScript meta-frameworks. This document provides coding standards, patterns, and rules that AI IDE assistants should follow when helping with this project.
 
-## ✅ **Current Configuration Status (v2.0.1)**
+## Current Configuration Status (v2.0.1)
 
 ### **100% Configuration Compliance Achieved**
 
@@ -12,20 +12,20 @@ As of version 2.0.1, VormiaQueryJS has achieved **100% configuration compliance*
 
 #### **Configuration Status**
 
-- **Components**: 5/5 ✅ (100% configured)
-- **Hooks**: 10/10 ✅ (100% configured)
-- **Stores**: 7/7 ✅ (100% configured)
-- **Framework Adapters**: 4/4 ✅ (100% configured)
-- **Route Guards**: 4/4 ✅ (100% configured)
+- Components: 5/5 (100% configured)
+- Hooks: 10/10 (100% configured)
+- Stores: 7/7 (100% configured)
+- Framework Adapters: 4/4 (100% configured)
+- Route Guards: 4/4 (100% configured)
 
 #### **Recent Fixes Applied**
 
-- ✅ **Route Guard Functions**: Added missing exports for Vue and Svelte
-- ✅ **Build Configuration**: Fixed dependency externalization
-- ✅ **React Adapter**: All 28 exports now working correctly
-- ✅ **Framework Adapters**: All documented functionality available
+- Route Guard Functions: Added missing exports for Vue and Svelte
+- Build Configuration: Fixed dependency externalization
+- React Adapter: All 28 exports now working correctly
+- Framework Adapters: All documented functionality available
 
-**Overall Configuration**: **100% Complete** ✅
+**Overall Configuration**: 100% Complete
 
 #### **Important Note for AI Assistants**
 
@@ -34,7 +34,7 @@ As of version 2.0.1, VormiaQueryJS has achieved **100% configuration compliance*
 - **ALL** import examples in README are accurate
 - **ALL** framework adapters are fully functional
 
-## 🏗️ **Project Architecture Rules**
+## Project Architecture Rules
 
 ### **1. Multi-Framework Adapter Pattern**
 
@@ -50,7 +50,7 @@ As of version 2.0.1, VormiaQueryJS has achieved **100% configuration compliance*
 - **MAINTAIN** `src/utils/` for shared utilities
 - **AVOID** importing framework-specific libraries in core modules
 
-## 📝 **Coding Standards & Patterns**
+## Coding Standards & Patterns
 
 ### **1. JavaScript/TypeScript Rules**
 
@@ -65,13 +65,13 @@ As of version 2.0.1, VormiaQueryJS has achieved **100% configuration compliance*
 ### **2. Import/Export Patterns**
 
 ```javascript
-// ✅ CORRECT: Named exports for utilities
+// CORRECT: Named exports for utilities
 export { VormiaError, createVormiaClient } from './core';
 
-// ✅ CORRECT: Default exports for main classes
+// CORRECT: Default exports for main classes
 export default class VormiaClient { }
 
-// ❌ AVOID: Mixed export styles in same file
+// AVOID: Mixed export styles in same file
 export default VormiaClient;
 export { VormiaError };
 ```
@@ -97,7 +97,7 @@ try {
 throw new Error("Something went wrong");
 ```
 
-## 🔧 **Configuration & Environment Rules**
+## Configuration & Environment Rules
 
 ### **1. Environment Variable Standards**
 
@@ -125,7 +125,7 @@ const environment = import.meta.env.VITE_VORMIA_ENV || "local";
 console.log("Debug info"); // Only if debug mode is enabled
 ```
 
-## 🎨 **UI Component Rules**
+## UI Component Rules
 
 ### **1. Styling Standards**
 
