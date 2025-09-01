@@ -466,3 +466,15 @@ export { useVrmAuthEnhancedVue } from "./hooks/useVrmAuthEnhancedVue.js"; // Vue
 ---
 
 **Remember**: This project emphasizes **framework-agnostic design**, **clean separation of concerns**, and **consistent error handling**. Always consider the user's specific framework and maintain the established architectural patterns.
+
+## Key Features
+
+- **Framework Agnostic**: Core functionality works with any JavaScript framework
+- **Framework Adapters**: Specialized hooks for React, Vue, Svelte, Solid, Qwik, and Astro
+- **Advanced Caching**: Smart caching with auto-refresh and fallback strategies
+- **Route Protection**: Built-in route guards for authentication and authorization
+- **State Management**: Zustand-powered stores for complex state management
+- **Form Data Transformation**: Automatic form data transformation before API calls
+- **Enhanced Error Handling**: Comprehensive error handling with validation error extraction
+- **Debug Tools**: Development tools for debugging API calls and responses
+- **TypeScript Support**: Full TypeScript definitions and type safety

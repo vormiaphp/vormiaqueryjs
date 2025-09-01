@@ -341,6 +341,65 @@ if (updateResponse.status === 204) {
 | **Network Errors**    | Connection issues   | Graceful error handling               |
 | **JSON Parse Errors** | Malformed responses | Fallback with descriptive messages    |
 
+### **🔄 Form Data Transformation**
+
+VormiaQueryJS provides automatic form data transformation through the `formdata` configuration option in `useVrmMutation`. This feature allows you to:
+
+- **Rename fields** before sending to the API
+- **Add new fields** to requests
+- **Remove fields** after transformation
+
+#### **Basic Usage**
+
+```javascript
+import { useVrmMutation } from 'vormiaqueryjs/react';
+
+const mutation = useVrmMutation({
+  endpoint: "/register",
+  method: "POST",
+  formdata: {
+    rename: {
+      confirmPassword: "password_confirmation"  // Rename field
+    },
+    add: { 
+      terms: true                               // Add new field
+    },
+    remove: ["confirmPassword"]                 // Remove field after transformation
+  }
+});
+```
+
+#### **Transformation Process**
+
+1. **Original form data**:
+   ```javascript
+   {
+     name: "John Doe",
+     email: "john@example.com",
+     password: "secret123",
+     confirmPassword: "secret123"
+   }
+   ```
+
+2. **After transformation**:
+   ```javascript
+   {
+     name: "John Doe",
+     email: "john@example.com",
+     password: "secret123",
+     password_confirmation: "secret123",  // Renamed
+     terms: true                          // Added
+   }
+   // confirmPassword removed
+   ```
+
+#### **Use Cases**
+
+- **API Field Mapping**: Map form field names to API field names
+- **Default Values**: Add default fields like `terms: true` or `locale: "en"`
+- **Field Cleanup**: Remove temporary fields like `confirmPassword` after validation
+- **Data Normalization**: Standardize data format before sending to API
+
 ### **🆕 New Zustand-Powered Features:**
 
 - **🏗️ Centralized State Management**: Zustand-powered stores for auth, cache, storage, and settings
@@ -594,10 +653,19 @@ const query = useVrmQuery({
   method: "GET",
 });
 
-// Legacy mutation hook
+// Legacy mutation hook with form data transformation
 const mutation = useVrmMutation({
   endpoint: "/legacy/endpoint",
   method: "POST",
+  formdata: {
+    rename: {
+      confirmPassword: "password_confirmation"  // Rename field
+    },
+    add: { 
+      terms: true                               // Add new field
+    },
+    remove: ["confirmPassword"]                 // Remove field after transformation
+  },
   data: { legacy: "data" },
 });
 ```

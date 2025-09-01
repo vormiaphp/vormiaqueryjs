@@ -421,3 +421,96 @@ npm install @tanstack/svelte-query zustand
 ---
 
 This guide should help AI chat models understand the architecture, patterns, and best practices for working with VormiaQueryJS. Always consider the user's specific framework and use case when providing assistance.
+
+## Form Data Transformation
+
+The `useVrmMutation` hook now supports automatic form data transformation through the `formdata` configuration option. This allows you to:
+
+- **Rename fields** before sending to the API
+- **Add new fields** to the request
+- **Remove fields** from the request
+
+### Basic Usage
+
+```javascript
+const mutation = useVrmMutation({
+  endpoint: "/register",
+  method: "POST",
+  formdata: {
+    rename: {
+      confirmPassword: "password_confirmation"  // Rename field
+    },
+    add: { 
+      terms: true                               // Add new field
+    },
+    remove: ["confirmPassword"]                 // Remove field after transformation
+  }
+});
+```
+
+### Transformation Process
+
+1. **Original form data**:
+   ```javascript
+   {
+     name: "John Doe",
+     email: "john@example.com",
+     password: "secret123",
+     confirmPassword: "secret123"
+   }
+   ```
+
+2. **After transformation**:
+   ```javascript
+   {
+     name: "John Doe",
+     email: "john@example.com",
+     password: "secret123",
+     password_confirmation: "secret123",  // Renamed
+     terms: true                          // Added
+   }
+   // confirmPassword removed
+   ```
+
+### API Response Structure
+
+The library now properly handles standard API response formats:
+
+**Error Response (422 Validation)**:
+```javascript
+{
+  success: false,
+  message: "Validation errors",
+  errors: {
+    name: "The name field is required",
+    email: "Invalid email format"
+  },
+  debug: { ... }
+}
+```
+
+**Success Response**:
+```javascript
+{
+  success: true,
+  message: "User created successfully",
+  data: { ... },
+  debug: { ... }
+}
+```
+
+### Error Handling
+
+The `VormiaError` class now properly extracts validation errors:
+
+```javascript
+if (error instanceof VormiaError && error.isValidationError()) {
+  const errors = error.getValidationErrors(); // Now works correctly
+  
+  if (errors) {
+    Object.keys(errors).forEach((field) => {
+      setFieldErrors(prev => ({ ...prev, [field]: errors[field] }));
+    });
+  }
+}
+```

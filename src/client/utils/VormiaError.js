@@ -19,29 +19,45 @@ export class VormiaError extends Error {
     let errorStatus = status;
     let errorData = null;
     let errorDebug = null;
+    let errorErrors = null;
 
-    if (message && typeof message === 'object') {
+    if (message && typeof message === "object") {
       errorResponse = message;
-      errorMessage = message.message || 'An error occurred';
+      errorMessage = message.message || "An error occurred";
       errorStatus = message.status || status;
       errorCode = message.code || code;
       errorData = message.data;
       errorDebug = message.debug;
+
+      // Handle the actual API response structure
+      if (message.response && message.response.data) {
+        const apiData = message.response.data;
+        errorMessage = apiData.message || errorMessage;
+        errorDebug = apiData.debug || errorDebug;
+        errorErrors = apiData.errors;
+
+        // If this is an API response with errors, use that as the main data
+        if (apiData.errors) {
+          errorData = apiData;
+        }
+      }
     } else if (response && response.data) {
       errorData = response.data;
-      if (typeof response.data === 'object') {
+      if (typeof response.data === "object") {
         errorMessage = response.data.message || errorMessage;
         errorDebug = response.data.debug;
+        errorErrors = response.data.errors;
       }
     }
 
     super(errorMessage);
-    this.name = 'VormiaError';
+    this.name = "VormiaError";
     this.status = errorStatus || (errorResponse && errorResponse.status);
     this.response = errorResponse;
     this.code = errorCode;
     this.data = errorData;
     this.debug = errorDebug;
+    this.errors = errorErrors;
     this.timestamp = new Date().toISOString();
 
     // Maintains proper stack trace for where our error was thrown (only available on V8)
@@ -59,16 +75,20 @@ export class VormiaError extends Error {
     const isProduction = (() => {
       try {
         // Check for Node.js environment
-        if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV) {
-          return process.env.NODE_ENV === 'production';
+        if (
+          typeof process !== "undefined" &&
+          process.env &&
+          process.env.NODE_ENV
+        ) {
+          return process.env.NODE_ENV === "production";
         }
         // Check for browser environment with Vite/Webpack injected variable
-        if (typeof import.meta !== 'undefined' && import.meta.env) {
+        if (typeof import.meta !== "undefined" && import.meta.env) {
           return import.meta.env.PROD === true;
         }
         // Check for browser environment with custom __ENV__
-        if (typeof window !== 'undefined' && window.__ENV__?.NODE_ENV) {
-          return window.__ENV__.NODE_ENV === 'production';
+        if (typeof window !== "undefined" && window.__ENV__?.NODE_ENV) {
+          return window.__ENV__.NODE_ENV === "production";
         }
       } catch {
         // If any error occurs, assume development
@@ -77,17 +97,19 @@ export class VormiaError extends Error {
       // Default to development if we can't determine
       return false;
     })();
-    
+
     if (isProduction) {
-      return this.message || 'An unexpected error occurred. Please try again later.';
+      return (
+        this.message || "An unexpected error occurred. Please try again later."
+      );
     }
-    
+
     // In development, include more details
     if (this.isDatabaseError()) {
       return `Database error: ${this.getDatabaseErrorMessage()}`;
     }
-    
-    return this.message || 'An error occurred';
+
+    return this.message || "An error occurred";
   }
 
   /**
@@ -95,7 +117,7 @@ export class VormiaError extends Error {
    * @returns {boolean}
    */
   isNetworkError() {
-    return this.code === 'NETWORK_ERROR' || !this.status;
+    return this.code === "NETWORK_ERROR" || !this.status;
   }
 
   /**
@@ -120,8 +142,10 @@ export class VormiaError extends Error {
    */
   isDatabaseError() {
     return (
-      (this.message && this.message.includes('SQLSTATE')) ||
-      (this.debug && this.debug.message && this.debug.message.includes('SQLSTATE'))
+      (this.message && this.message.includes("SQLSTATE")) ||
+      (this.debug &&
+        this.debug.message &&
+        this.debug.message.includes("SQLSTATE"))
     );
   }
 
@@ -131,25 +155,27 @@ export class VormiaError extends Error {
    * @private
    */
   getDatabaseErrorMessage() {
-    const errorSource = this.debug?.message || this.message || '';
-    
+    const errorSource = this.debug?.message || this.message || "";
+
     // Extract the main error message (part after the last colon)
-    const parts = errorSource.split(':');
+    const parts = errorSource.split(":");
     const cleanMessage = parts[parts.length - 1].trim();
-    
+
     // Map common database errors to user-friendly messages
-    if (errorSource.includes('foreign key constraint fails')) {
-      return 'A referenced record does not exist. Please check your input.';
+    if (errorSource.includes("foreign key constraint fails")) {
+      return "A referenced record does not exist. Please check your input.";
     }
-    if (errorSource.includes('duplicate entry')) {
-      return 'This record already exists with the provided details.';
+    if (errorSource.includes("duplicate entry")) {
+      return "This record already exists with the provided details.";
     }
-    if (errorSource.includes('cannot be null')) {
+    if (errorSource.includes("cannot be null")) {
       const field = errorSource.match(/Column '([^']+)'/i);
-      return field ? `The field '${field[1]}' is required.` : 'A required field is missing.';
+      return field
+        ? `The field '${field[1]}' is required.`
+        : "A required field is missing.";
     }
-    
-    return cleanMessage || 'A database error occurred.';
+
+    return cleanMessage || "A database error occurred.";
   }
 
   /**
@@ -160,23 +186,27 @@ export class VormiaError extends Error {
     // Use the same environment detection as getUserMessage
     const isProduction = (() => {
       try {
-        if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV) {
-          return process.env.NODE_ENV === 'production';
+        if (
+          typeof process !== "undefined" &&
+          process.env &&
+          process.env.NODE_ENV
+        ) {
+          return process.env.NODE_ENV === "production";
         }
-        if (typeof import.meta !== 'undefined' && import.meta.env) {
+        if (typeof import.meta !== "undefined" && import.meta.env) {
           return import.meta.env.PROD === true;
         }
-        if (typeof window !== 'undefined' && window.__ENV__?.NODE_ENV) {
-          return window.__ENV__.NODE_ENV === 'production';
+        if (typeof window !== "undefined" && window.__ENV__?.NODE_ENV) {
+          return window.__ENV__.NODE_ENV === "production";
         }
       } catch {
         return false;
       }
       return false;
     })();
-    
+
     if (isProduction) {
-      return { error: 'Debug information is not available in production' };
+      return { error: "Debug information is not available in production" };
     }
 
     return {
@@ -186,7 +216,7 @@ export class VormiaError extends Error {
       timestamp: this.timestamp,
       debug: this.debug,
       stack: this.stack,
-      response: this.response
+      response: this.response,
     };
   }
 
@@ -228,12 +258,13 @@ export class VormiaError extends Error {
    */
   getErrorMessage() {
     if (this.data) {
-      if (typeof this.data === 'string') return this.data;
+      if (typeof this.data === "string") return this.data;
       if (this.data.message) return this.data.message;
       if (this.data.error) return this.data.error;
-      if (Array.isArray(this.data.errors)) return this.data.errors[0]?.message || this.message;
+      if (Array.isArray(this.data.errors))
+        return this.data.errors[0]?.message || this.message;
     }
-    return this.message || 'An unknown error occurred';
+    return this.message || "An unknown error occurred";
   }
 
   /**
@@ -241,8 +272,17 @@ export class VormiaError extends Error {
    * @returns {Object|null} Validation errors or null if not a validation error
    */
   getValidationErrors() {
-    if (this.status === 422 && this.data && typeof this.data === 'object') {
-      return this.data.errors || this.data;
+    // Check if this is a validation error (422 status)
+    if (this.status === 422) {
+      // First try to get errors from the direct errors field
+      if (this.errors && typeof this.errors === "object") {
+        return this.errors;
+      }
+
+      // Fallback to the old method for backward compatibility
+      if (this.data && typeof this.data === "object") {
+        return this.data.errors || this.data;
+      }
     }
     return null;
   }

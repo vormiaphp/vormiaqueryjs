@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { getGlobalVormiaClient } from "../client/createVormiaClient";
+import { transformFormData } from "../utils/formDataTransformer.js";
 
 /**
  * Hook for making API mutations with Vormia
@@ -8,7 +9,7 @@ import { getGlobalVormiaClient } from "../client/createVormiaClient";
  * @param {string} [options.method='POST'] - HTTP method
  * @param {Object} [options.headers] - Custom headers
  * @param {Function} [options.transform] - Transform function for response data
-
+ * @param {Object} [options.formdata] - Form data transformation configuration
  * @param {Function} [options.onSuccess] - Success callback
  * @param {Function} [options.onError] - Error callback
  * @returns {Object} Mutation result and utilities
@@ -22,7 +23,7 @@ export const useVrmMutation = (options) => {
     method = "POST",
     headers,
     transform,
-
+    formdata,
     onSuccess,
     onError,
     ...mutationOptions
@@ -31,15 +32,19 @@ export const useVrmMutation = (options) => {
   const mutation = useMutation({
     mutationFn: async (variables) => {
       try {
+        // Transform form data if configuration is provided
+        const transformedData = formdata
+          ? transformFormData(variables, formdata)
+          : variables;
+
         const config = {
           method,
           url: endpoint,
-          data: variables,
+          data: transformedData,
           headers: {
             "Content-Type": "application/json",
             ...headers,
           },
-
         };
 
         const response = await client.request(config);

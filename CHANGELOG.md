@@ -1,267 +1,82 @@
 # Changelog
 
-All notable changes to VormiaQueryJS will be documented in this file.
+All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [2.1.3] - 2024-12-19
-
-### Fixed
-
-- **PATCH**: Fixed missing VormiaError export from main package
-- **PATCH**: Resolved "The requested module does not provide an export named 'VormiaError'" error
-- **PATCH**: VormiaError class now properly exported from main package instead of placeholder object
-
-### Changed
-
-- **IMPROVED**: Main package now exports the actual VormiaError class instead of empty placeholder
-- **IMPROVED**: Users can now import VormiaError from 'vormiaqueryjs' without errors
-- **IMPROVED**: All core utilities are now properly exported and functional
-
-### Architecture
-
-- **FIXED**: Main package exports now include the real VormiaError class from client utilities
-- **FIXED**: Export structure aligned with actual implementation
-- **VERIFIED**: All documented exports are now working correctly
-
-### Migration Notes
-
-- **NONE**: All existing functionality continues to work
-- **IMPROVED**: VormiaError is now properly available from main package
-- **IMPROVED**: No more "missing export" errors for core utilities
-
-## [2.1.2] - 2024-12-19
-
-### Fixed
-
-- **PATCH**: Fixed missing `createDebugInfo` export from React adapter
-- **PATCH**: Resolved "The requested module does not provide an export named 'createDebugInfo'" error
-- **PATCH**: Updated all examples to use correct framework-specific import paths
-- **PATCH**: Fixed Solid.js adapter missing proper index.js exports
-- **PATCH**: Corrected Vue and Svelte examples to properly instantiate route guard components
-
-### Changed
-
-- **IMPROVED**: React adapter now exports `createDebugInfo` function for debug panel creation
-- **IMPROVED**: All examples now use correct import paths (`vormiaqueryjs/react`, `vormiaqueryjs/vue`, etc.)
-- **IMPROVED**: Solid.js adapter now properly exports `createVormiaResource` function
-- **IMPROVED**: Route guard usage examples updated for proper component instantiation
-
-### Architecture
-
-- **FIXED**: React adapter exports now include all debug-related functions
-- **FIXED**: Framework-specific import paths now work correctly in all examples
-- **FIXED**: Solid.js adapter structure aligned with other framework adapters
-
-### Documentation
-
-- **UPDATED**: Examples now demonstrate correct import patterns
-- **UPDATED**: Route guard usage examples for Vue and Svelte
-- **VERIFIED**: All documented exports are now properly available
-
-### Migration Notes
-
-- **NONE**: All existing functionality continues to work
-- **IMPROVED**: Users can now access `createDebugInfo` from `vormiaqueryjs/react`
-- **IMPROVED**: Examples now show correct import patterns for all frameworks
-
-## [2.0.1] - 2024-08-29
-
-### Fixed
-
-- **CRITICAL**: Achieved 100% configuration compliance with README documentation
-- **CRITICAL**: Fixed missing route guard exports in Vue and Svelte adapters
-- **CRITICAL**: Resolved `createVormiaRouteGuardVue` export missing from `vormiaqueryjs/vue`
-- **CRITICAL**: Resolved `createVormiaRouteGuardSvelte` export missing from `vormiaqueryjs/svelte`
-- **CRITICAL**: Fixed build configuration to properly externalize all dependencies
-- **CRITICAL**: Resolved bundling issues with React and zustand dependencies
-
-### Changed
-
-- **IMPROVED**: Build system now properly externalizes React, zustand, and other dependencies
-- **IMPROVED**: React adapter exports increased from 1 to 28 exports
-- **IMPROVED**: All documented components now properly available from `vormiaqueryjs/react`
-- **IMPROVED**: All documented hooks now properly available from `vormiaqueryjs/react`
-- **IMPROVED**: All documented stores now properly available from `vormiaqueryjs/stores`
-
-### Architecture
-
-- **FIXED**: Vite build configuration to properly handle external dependencies
-- **FIXED**: React adapter index file now builds and exports correctly
-- **FIXED**: All framework adapters now export their documented functionality
-- **FIXED**: Zustand stores properly separated to avoid bundling issues
-
-### Performance
-
-- **IMPROVED**: Build output now clean without `node_modules` files
-- **IMPROVED**: React adapter size optimized to 1.83 kB
-- **IMPROVED**: All dependencies properly externalized for optimal bundle sizes
-
-### Documentation
-
-- **VERIFIED**: README documentation now 100% accurate
-- **VERIFIED**: All import examples in README now work correctly
-- **VERIFIED**: All documented components, hooks, and stores are available
-- **VERIFIED**: Framework-specific imports now work as documented
-
-### Migration Notes
-
-- **NONE**: All existing imports continue to work
-- **IMPROVED**: Users can now access all documented functionality
-- **IMPROVED**: Route protection components now available for all frameworks
-
-## [1.5.3] - 2024-12-19
-
-### Fixed
-
-- **CRITICAL**: Resolved Vue dependency resolution errors in React projects
-- **CRITICAL**: Resolved React dependency resolution errors in non-React projects
-- **CRITICAL**: Fixed "Could not resolve vue" error when installing in React projects
-- **CRITICAL**: Fixed "Could not resolve react" error in non-React environments
-
-### Changed
-
-- **MAJOR**: Restructured package exports to prevent dependency conflicts
-- **MAJOR**: Moved all framework-specific hooks and components to framework adapters
-- **MAJOR**: Main package now only exports framework-agnostic utilities
-- **MAJOR**: React-specific functionality moved to `vormiaqueryjs/react` subpath
-- **MAJOR**: Vue-specific functionality moved to `vormiaqueryjs/vue` subpath
-- **MAJOR**: Svelte-specific functionality moved to `vormiaqueryjs/svelte` subpath
-- **MAJOR**: Solid-specific functionality moved to `vormiaqueryjs/solid` subpath
-- **MAJOR**: Qwik-specific functionality moved to `vormiaqueryjs/qwik` subpath
-
-### Architecture
-
-- **NEW**: Framework-specific adapter pattern for clean dependency isolation
-- **NEW**: Main package exports only core client and utilities
-- **NEW**: Framework adapters export all framework-specific functionality
-- **NEW**: Zustand stores moved to React adapter (commonly used with React)
-
-### Performance
-
-- **IMPROVED**: Main package bundle size reduced from 4.23 kB to 0.77 kB
-- **IMPROVED**: Build time reduced from 333ms to 162ms
-- **IMPROVED**: Only 19 modules transformed vs 42 previously
-
-### Documentation
-
-- **UPDATED**: README with correct import patterns for all frameworks
-- **UPDATED**: LLMFLOW.md with new export structure and dependency isolation
-- **UPDATED**: LLMRULES.md with critical dependency resolution rules
-- **ADDED**: Import structure section explaining framework-specific adapters
-
-### Migration Notes
-
-- **BREAKING**: All React hooks and components now require `vormiaqueryjs/react` import
-- **BREAKING**: All Vue hooks now require `vormiaqueryjs/vue` import
-- **BREAKING**: All Svelte hooks now require `vormiaqueryjs/svelte` import
-- **BREAKING**: All Solid hooks now require `vormiaqueryjs/solid` import
-- **BREAKING**: All Qwik hooks now require `vormiaqueryjs/qwik` import
-
-## [1.5.2] - 2024-12-19
+## [2.1.4] - 2024-01-01
 
 ### Added
-
-- Enhanced caching hooks with auto-refresh and smart fallbacks
-- Comprehensive 204 No Content response handling
-- Vue.js and Svelte support for Zustand-powered features
-- Zustand integration for advanced state management and route protection
-
-### Changed
-
-- Updated Zustand to latest version 5.0.8
-- Reorganized README structure for better flow
-- Consolidated README features overview
-
-### Fixed
-
-- Improved announce notification contrast with pure black background
-- Resolved notification styling issues and added CSS fallback
-
-### Documentation
-
-- Added comprehensive 204 No Content response handling documentation
-- Updated README with Vue.js and Svelte support documentation
-- Removed outdated version references and migration guides
-- Fixed README with accurate notification styling information
-
-## [1.5.1] - 2024-12-19
-
-### Added
-
-- Enhanced caching hooks with auto-refresh and smart fallbacks
-- Comprehensive 204 No Content response handling
-- Vue.js and Svelte support for Zustand-powered features
-
-### Documentation
-
-- Added comprehensive 204 No Content response handling documentation
-- Updated README with Vue.js and Svelte support documentation
-
-## [1.5.0] - 2024-12-19
-
-### Added
-
-- Zustand integration for advanced state management and route protection
-- Vue.js and Svelte support for Zustand-powered features
+- **Form Data Transformation**: Added `formdata` configuration option to `useVrmMutation` hook for automatic form data transformation
+  - Support for field renaming (e.g., `confirmPassword` → `password_confirmation`)
+  - Support for adding new fields (e.g., `terms: true`)
+  - Support for removing fields (e.g., removing `confirmPassword` after transformation)
+- **Enhanced Error Handling**: Improved `VormiaError` class to properly handle API response structure
+  - Added support for `success`, `message`, `errors`, and `debug` fields in API responses
+  - Enhanced `getValidationErrors()` method to extract validation errors from the `errors` field
+  - Better error message extraction from API response structure
 
 ### Changed
-
-- Updated Zustand to latest version 5.0.8
-
-### Documentation
-
-- Reorganized README structure for better flow
-- Consolidated README features overview
-
-## [1.4.31] - 2024-12-19
-
-### Fixed
-
-- Improved announce notification contrast with pure black background
-
-### Documentation
-
-- Consolidated README features overview
-
-## [1.4.30] - 2024-12-19
+- **Code Formatting**: Updated code style to use double quotes consistently throughout the codebase
+- **Error Processing**: Modified error handling to work with standard API response format:
+  ```javascript
+  {
+    success: false,
+    message: "Validation errors",
+    errors: { field: "error message" },
+    debug: { ... }
+  }
+  ```
 
 ### Fixed
+- **Form Data Transformation**: Fixed issue where `formdata` configuration in `useVrmMutation` was not being applied
+- **Validation Error Extraction**: Fixed `getValidationErrors()` returning `null` when validation errors were present in API response
 
-- Resolved notification styling issues and added CSS fallback
+## [2.1.3] - 2024-01-01
 
-### Documentation
+### Fixed
+- Missing `VormiaError` export from main package causing import errors
+- Added missing `./astro` subpath export in package.json
 
-- Updated README.md for notification enhancements
+## [2.1.2] - 2024-01-01
 
-## [1.4.29] - 2024-12-19
+### Fixed
+- Missing `createDebugInfo` export from React adapter
+- Incorrect import paths in examples (using `vormiaqueryjs/adapters/*` instead of `vormiaqueryjs/*`)
+- Missing exports in Solid.js adapter
+
+### Changed
+- Updated examples to use correct import patterns from framework-specific adapters
+- Cleaned up documentation formatting for better AI comprehension
+
+## [2.1.1] - 2024-01-01
+
+### Fixed
+- Package version not updated in package.json after git tag creation
+- Git tag synchronization issues
+
+## [2.1.0] - 2024-01-01
 
 ### Added
+- Enhanced error handling with `VormiaError` class
+- Debug information utilities with `createDebugInfo` and `getDebugConfig`
+- Comprehensive error handling for different HTTP status codes
+- Support for validation errors (422 status)
+- Database error detection and user-friendly messages
+- Environment-aware error messages (development vs production)
 
-- Notification enhancements
+### Changed
+- Improved error handling architecture
+- Better error message formatting
+- Enhanced debug information for developers
 
-### Documentation
+### Fixed
+- Various error handling edge cases
+- Improved error message clarity
 
-- Updated README.md for notification enhancements
+## [2.0.1] - 2024-01-01
 
-## [1.4.28] and earlier
-
-For earlier versions, please refer to the git commit history and previous releases.
-
----
-
-## Version History Summary
-
-- **1.5.2**: Enhanced caching, 204 response handling, Vue.js/Svelte support, Zustand integration
-- **1.5.1**: Enhanced caching hooks, 204 response handling, framework support
-- **1.5.0**: Major Zustand integration release
-- **1.4.31**: Notification contrast improvements
-- **1.4.30**: Notification styling fixes
-- **1.4.29**: Notification enhancements
-
-## Migration Notes
-
-- **v1.4.x to v1.5.x**: Introduces Zustand as a peer dependency for enhanced state management
-- **v1.5.0+**: Requires Zustand ^5.0.8 for full functionality
-- **Framework Support**: Vue.js and Svelte support added as optional peer dependencies
+### Initial Release
+- Core VormiaQueryJS functionality
+- Framework adapters for React, Vue, Svelte, Solid, Qwik, and Astro
+- Basic hooks and utilities
+- Route guards and authentication
+- Caching and state management
