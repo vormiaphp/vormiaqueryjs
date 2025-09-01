@@ -13,7 +13,7 @@ export const HttpMethod = {
 };
 
 // Export types as plain objects for documentation purposes
-export const VormiaError = {};
+export { VormiaError } from "./client/utils/VormiaError.js";
 export const VormiaConfig = {};
 export const VormiaQueryOptions = {};
 export const VormiaAuthOptions = {};
