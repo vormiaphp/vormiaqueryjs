@@ -5,6 +5,41 @@ All notable changes to VormiaQueryJS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.2] - 2024-12-19
+
+### Fixed
+
+- **PATCH**: Fixed missing `createDebugInfo` export from React adapter
+- **PATCH**: Resolved "The requested module does not provide an export named 'createDebugInfo'" error
+- **PATCH**: Updated all examples to use correct framework-specific import paths
+- **PATCH**: Fixed Solid.js adapter missing proper index.js exports
+- **PATCH**: Corrected Vue and Svelte examples to properly instantiate route guard components
+
+### Changed
+
+- **IMPROVED**: React adapter now exports `createDebugInfo` function for debug panel creation
+- **IMPROVED**: All examples now use correct import paths (`vormiaqueryjs/react`, `vormiaqueryjs/vue`, etc.)
+- **IMPROVED**: Solid.js adapter now properly exports `createVormiaResource` function
+- **IMPROVED**: Route guard usage examples updated for proper component instantiation
+
+### Architecture
+
+- **FIXED**: React adapter exports now include all debug-related functions
+- **FIXED**: Framework-specific import paths now work correctly in all examples
+- **FIXED**: Solid.js adapter structure aligned with other framework adapters
+
+### Documentation
+
+- **UPDATED**: Examples now demonstrate correct import patterns
+- **UPDATED**: Route guard usage examples for Vue and Svelte
+- **VERIFIED**: All documented exports are now properly available
+
+### Migration Notes
+
+- **NONE**: All existing functionality continues to work
+- **IMPROVED**: Users can now access `createDebugInfo` from `vormiaqueryjs/react`
+- **IMPROVED**: Examples now show correct import patterns for all frameworks
+
 ## [2.0.1] - 2024-08-29
 
 ### Fixed
