@@ -1,7 +1,10 @@
 <script>
   import { onMount } from 'svelte'
-  import { VormiaRouteGuard } from 'vormiaqueryjs'
-  import { useVrmAuthEnhancedSvelte } from 'vormiaqueryjs'
+  import { createVormiaRouteGuardSvelte } from 'vormiaqueryjs/svelte'
+  import { useVrmAuthEnhancedSvelte } from 'vormiaqueryjs/svelte'
+
+  // Create the route guard component
+  const VormiaRouteGuard = createVormiaRouteGuardSvelte()
 
   // Enhanced authentication hook
   const auth = useVrmAuthEnhancedSvelte()

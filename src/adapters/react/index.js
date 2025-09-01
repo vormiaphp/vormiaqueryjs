@@ -16,7 +16,7 @@ export { useVrmMutation } from "../../hooks/useVrmMutation.js";
 
 // React components
 export { VormiaProvider } from "../../providers/VormiaProvider.jsx";
-export { ErrorDebugPanel } from "../../components/ErrorDebugPanel.jsx";
+export { ErrorDebugPanel, createDebugInfo } from "../../components/ErrorDebugPanel.jsx";
 export {
   SimpleNotification,
   NotificationPanel,

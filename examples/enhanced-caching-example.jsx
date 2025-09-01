@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useVormiaCache, useVormiaCacheVue, useVormiaCacheSvelte } from 'vormiaqueryjs';
+import { useVormiaCache } from 'vormiaqueryjs/react';
+import { useVormiaCacheVue } from 'vormiaqueryjs/vue';
+import { useVormiaCacheSvelte } from 'vormiaqueryjs/svelte';
 
 /**
  * Enhanced Caching Example - React Version

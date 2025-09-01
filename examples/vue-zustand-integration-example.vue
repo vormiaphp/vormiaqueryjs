@@ -157,11 +157,14 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { VormiaRouteGuard } from 'vormiaqueryjs'
-import { useVrmAuthEnhanced } from 'vormiaqueryjs'
+import { createVormiaRouteGuardVue } from 'vormiaqueryjs/vue'
+import { useVrmAuthEnhancedVue } from 'vormiaqueryjs/vue'
+
+// Create the route guard component
+const VormiaRouteGuard = createVormiaRouteGuardVue()
 
 // Enhanced authentication hook
-const auth = useVrmAuthEnhanced()
+const auth = useVrmAuthEnhancedVue()
 
 // Reactive state
 const loginForm = reactive({

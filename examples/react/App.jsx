@@ -4,7 +4,8 @@ import {
   SimpleNotification,
   NotificationPanel,
   ErrorDebugPanel,
-} from "vormiaqueryjs";
+  createDebugInfo,
+} from "vormiaqueryjs/react";
 
 export default function App() {
   // State management
