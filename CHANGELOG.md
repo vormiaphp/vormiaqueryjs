@@ -5,6 +5,32 @@ All notable changes to VormiaQueryJS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.3] - 2024-12-19
+
+### Fixed
+
+- **PATCH**: Fixed missing VormiaError export from main package
+- **PATCH**: Resolved "The requested module does not provide an export named 'VormiaError'" error
+- **PATCH**: VormiaError class now properly exported from main package instead of placeholder object
+
+### Changed
+
+- **IMPROVED**: Main package now exports the actual VormiaError class instead of empty placeholder
+- **IMPROVED**: Users can now import VormiaError from 'vormiaqueryjs' without errors
+- **IMPROVED**: All core utilities are now properly exported and functional
+
+### Architecture
+
+- **FIXED**: Main package exports now include the real VormiaError class from client utilities
+- **FIXED**: Export structure aligned with actual implementation
+- **VERIFIED**: All documented exports are now working correctly
+
+### Migration Notes
+
+- **NONE**: All existing functionality continues to work
+- **IMPROVED**: VormiaError is now properly available from main package
+- **IMPROVED**: No more "missing export" errors for core utilities
+
 ## [2.1.2] - 2024-12-19
 
 ### Fixed
