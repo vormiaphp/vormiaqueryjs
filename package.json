@@ -1,6 +1,6 @@
 {
   "name": "vormiaqueryjs",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Vormia Query Js - A npm package for query management with VormiaPHP laravel Backend application, featuring comprehensive debug and notification system",
   "main": "dist/esm/index.mjs",
   "module": "dist/esm/index.mjs",
