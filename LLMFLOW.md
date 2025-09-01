@@ -174,7 +174,7 @@ if (error instanceof VormiaError) {
 import { useVormiaQuery } from "vormiaqueryjs/react";
 
 // Provider component
-import { VormiaProvider } from "vormiaqueryjs/react/VormiaProvider";
+import { VormiaProvider } from "vormiaqueryjs/react";
 ```
 
 ### **Vue**

@@ -21,7 +21,8 @@
     "./solid": "./dist/esm/adapters/solid.mjs",
     "./core": "./dist/esm/core.mjs",
     "./vue": "./dist/esm/adapters/vue.mjs",
-    "./qwik": "./dist/esm/adapters/qwik.mjs"
+    "./qwik": "./dist/esm/adapters/qwik.mjs",
+    "./astro": "./dist/esm/adapters/astro.mjs"
   },
   "files": [
     "dist"

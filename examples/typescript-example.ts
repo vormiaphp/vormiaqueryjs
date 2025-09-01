@@ -134,7 +134,7 @@ function handleApiError(error: unknown): string {
 
 // Example mutation usage
 /*
-import { useVrmMutation } from 'vormiaqueryjs';
+import { useVrmMutation } from 'vormiaqueryjs/react';
 
 const CreateUser: React.FC = () => {
   const mutation = useVrmMutation({

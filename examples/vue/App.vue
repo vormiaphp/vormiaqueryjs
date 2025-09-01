@@ -1,5 +1,5 @@
 <script setup>
-import { useVormiaQuery } from "vormiaqueryjs/adapters/vue";
+import { useVormiaQuery } from "vormiaqueryjs/vue";
 
 const { data, error, isLoading } = useVormiaQuery({
   endpoint: "/categories",

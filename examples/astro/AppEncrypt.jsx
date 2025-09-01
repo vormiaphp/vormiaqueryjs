@@ -1,4 +1,4 @@
-import { useVormiaQuery } from "vormiaqueryjs/adapters/astro";
+import { useVormiaQuery } from "vormiaqueryjs/astro";
 
 export default function AppEncrypt() {
   const { data, isLoading, error } = useVormiaQuery({
