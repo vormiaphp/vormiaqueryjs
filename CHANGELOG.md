@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.5] - 2024-01-01
+
+### Fixed
+- **Success Response Data Extraction**: Fixed issue where success responses were returning the entire API wrapper instead of just the data field
+- **API Response Structure**: Now properly handles standard API response format with automatic data extraction
+- **Cleaner Data Access**: Users can now access `response.data.id` instead of `response.data.data.id`
+
+### Changed
+- **Response Handling**: Modified client to automatically detect and extract data from `{ success, message, data, debug }` API responses
+- **Backward Compatibility**: Still works with non-standard API responses that don't follow the wrapper pattern
+
+### Technical Details
+- **Before**: `response.data` contained the entire API response wrapper
+- **After**: `response.data` contains just the actual data, with `response.message` and `response.debug` available separately
+- **Example**: API response `{ success: true, data: { id: 123 } }` now returns `response.data = { id: 123 }`
+
 ## [2.1.4] - 2024-01-01
 
 ### Added

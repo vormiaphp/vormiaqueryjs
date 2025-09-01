@@ -64,7 +64,7 @@ const createHttpClient = (baseConfig) => {
 
         // Handle different response types based on status code
         let responseData = {};
-        
+
         // 204 No Content and other status codes without content body
         if (response.status === 204 || response.status === 205) {
           responseData = { message: "Success - No content returned" };
@@ -76,7 +76,7 @@ const createHttpClient = (baseConfig) => {
             // If JSON parsing fails, create a basic response object
             responseData = {
               message: `Response received but could not parse content (Status: ${response.status})`,
-              status: response.status
+              status: response.status,
             };
           }
         }
@@ -100,8 +100,27 @@ const createHttpClient = (baseConfig) => {
           throw new VormiaError(errorData);
         }
 
+        // Handle successful responses
+        // If the API response has a standard structure with success, message, data, debug
+        // extract the actual data field for easier access
+        let finalData = responseData;
+        let responseMessage = responseData.message;
+        let responseDebug = responseData.debug;
+
+        if (
+          responseData.success !== undefined &&
+          responseData.data !== undefined
+        ) {
+          // Standard API response structure: { success, message, data, debug }
+          finalData = responseData.data;
+          responseMessage = responseData.message;
+          responseDebug = responseData.debug;
+        }
+
         return {
-          data: responseData,
+          data: finalData,
+          message: responseMessage,
+          debug: responseDebug,
           status: response.status,
           statusText: response.statusText,
           headers: response.headers,
