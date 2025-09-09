@@ -209,6 +209,8 @@ export const useVormiaQueryAuthMutation = (options) => {
         if (onLoginSuccess) {
           onLoginSuccess(data);
         }
+      } else {
+        console.log("🔐 Whole data:", data);
       }
     },
     onError: (error, variables, context) => {
