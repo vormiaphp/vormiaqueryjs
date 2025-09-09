@@ -194,7 +194,7 @@ export const useVormiaQueryAuthMutation = (options) => {
           roles: data.data.user_roles || [],
           permissions: data.data.user_permissions || [],
         };
-        
+
         // Debug: Log the user data being stored
         console.log("🔐 Storing user data:", userData);
 
