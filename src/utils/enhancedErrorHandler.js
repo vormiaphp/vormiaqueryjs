@@ -112,29 +112,46 @@ export function logErrorForDebug(error, label = "API Error") {
     return; // Exit early if debug is disabled
   }
 
+  // Handle case where error is null or undefined
+  if (!error) {
+    console.group(`🚨 ${label}`);
+    console.log("Error: No error object provided");
+    console.groupEnd();
+    return;
+  }
+
   const apiResponse = error.response;
 
   console.group(`🚨 ${label}`);
-  console.log("Status:", error.status);
-  console.log("Message:", error.message);
+  console.log("Status:", error?.status || error?.response?.status || "Unknown");
+  console.log("Message:", error?.message || error?.response?.message || error?.toString() || "Unknown error");
 
   // Format output to match API JSON structure
-  if (apiResponse?.response?.data) {
-    const apiData = apiResponse.response.data;
-    console.log("Success:", apiData.success);
-    if (apiData.errors) {
-      console.log("Errors:", apiData.errors);
+  try {
+    if (apiResponse?.response?.data) {
+      const apiData = apiResponse.response.data;
+      console.log("Success:", apiData?.success);
+      if (apiData?.errors) {
+        console.log("Errors:", apiData.errors);
+      }
+      if (apiData?.data) {
+        console.log("Data:", apiData.data);
+      }
+      if (apiData?.debug) {
+        console.log("Debug:", apiData.debug);
+      }
     }
-    if (apiData.data) {
-      console.log("Data:", apiData.data);
-    }
-    if (apiData.debug) {
-      console.log("Debug:", apiData.debug);
-    }
+  } catch (apiError) {
+    console.log("Error processing API response:", apiError?.message || apiError);
   }
 
   // Full API Response dump
-  console.log("Full API Response:", apiResponse);
+  try {
+    console.log("Full API Response:", apiResponse);
+  } catch (responseError) {
+    console.log("Error logging API response:", responseError?.message || responseError);
+  }
+  
   console.groupEnd();
 }
 
