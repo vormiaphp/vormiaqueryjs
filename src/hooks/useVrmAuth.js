@@ -348,10 +348,13 @@ export const useVormiaAuth = () => {
       console.log("🔐 setUser called with:", userData);
       localStorage.setItem("vormia_user_data", JSON.stringify(userData));
       console.log("🔐 User data stored successfully");
-      
+
       // Verify storage
       const stored = localStorage.getItem("vormia_user_data");
-      console.log("🔐 Verification - stored data:", stored ? JSON.parse(stored) : null);
+      console.log(
+        "🔐 Verification - stored data:",
+        stored ? JSON.parse(stored) : null
+      );
     } catch (error) {
       console.warn("Failed to store user data:", error);
     }
@@ -492,7 +495,10 @@ export const useVormiaAuth = () => {
   const testAuth = () => {
     console.log("🔐 === AUTH DEBUG TEST ===");
     console.log("🔐 Client token:", client.getAuthToken());
-    console.log("🔐 LocalStorage raw:", localStorage.getItem("vormia_user_data"));
+    console.log(
+      "🔐 LocalStorage raw:",
+      localStorage.getItem("vormia_user_data")
+    );
     console.log("🔐 getUser() result:", getUser());
     console.log("🔐 isAuthenticated():", !!client.getAuthToken());
     console.log("🔐 === END AUTH DEBUG ===");
