@@ -1,6 +1,6 @@
 {
   "name": "vormiaqueryjs",
-  "version": "2.1.9",
+  "version": "2.1.10",
   "description": "A powerful JavaScript library for building modern web applications with enhanced querying, caching, and state management capabilities.",
   "main": "dist/esm/index.mjs",
   "module": "dist/esm/index.mjs",
