@@ -185,9 +185,30 @@ export const useVormiaQueryAuthMutation = (options) => {
         onSuccess(data, variables, context);
       }
 
-      // Handle login success
-      if (onLoginSuccess && data.data?.access_token) {
-        onLoginSuccess(data);
+      // Handle login success - store user data automatically
+      if (data.data?.access_token) {
+        // Store user data in localStorage for useVormiaAuth
+        const userData = {
+          ...data.data,
+          token: data.data.access_token, // Store access_token as token for compatibility
+          roles: data.data.user_roles || [],
+          permissions: data.data.user_permissions || [],
+        };
+        
+        // Debug: Log the user data being stored
+        console.log("🔐 Storing user data:", userData);
+
+        // Store in localStorage
+        try {
+          localStorage.setItem("vormia_user_data", JSON.stringify(userData));
+        } catch (error) {
+          console.warn("Failed to store user data:", error);
+        }
+
+        // Call custom login success handler
+        if (onLoginSuccess) {
+          onLoginSuccess(data);
+        }
       }
     },
     onError: (error, variables, context) => {
@@ -219,6 +240,13 @@ export const useVormiaQueryAuthMutation = (options) => {
   const logout = () => {
     client.removeAuthToken();
     mutation.reset();
+
+    // Clear user data from localStorage
+    try {
+      localStorage.removeItem("vormia_user_data");
+    } catch (error) {
+      console.warn("Failed to clear user data:", error);
+    }
   };
 
   const isAuthenticated = () => {
@@ -292,15 +320,21 @@ export const useVormiaAuth = () => {
   const getUser = () => {
     try {
       const token = client.getAuthToken();
-      if (!token) return null;
+      if (!token) {
+        console.log("🔐 No auth token found");
+        return null;
+      }
 
       // Try to get user from localStorage
       const userData = localStorage.getItem("vormia_user_data");
       if (userData) {
-        return JSON.parse(userData);
+        const parsedUser = JSON.parse(userData);
+        console.log("🔐 Retrieved user data:", parsedUser);
+        return parsedUser;
       }
 
       // If no stored user data, return basic token info
+      console.log("🔐 No stored user data, returning basic token info");
       return { token: !!token };
     } catch (error) {
       console.warn("Failed to get user data:", error);
