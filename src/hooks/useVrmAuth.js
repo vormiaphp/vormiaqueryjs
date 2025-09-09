@@ -60,8 +60,8 @@ export const useVormiaQueryAuth = (options) => {
       const response = await client.request(config);
 
       // Store token if present in response
-      if (storeToken && response.data?.token) {
-        client.setAuthToken(response.data.token);
+      if (storeToken && response.data?.access_token) {
+        client.setAuthToken(response.data.access_token);
       }
 
       if (transform && typeof transform === "function") {
@@ -156,8 +156,8 @@ export const useVormiaQueryAuthMutation = (options) => {
       const response = await client.request(config);
 
       // Store token if present in response
-      if (storeToken && response.data?.token) {
-        client.setAuthToken(response.data.token);
+      if (storeToken && response.data?.access_token) {
+        client.setAuthToken(response.data.access_token);
       }
 
       if (transform && typeof transform === "function") {
@@ -176,8 +176,8 @@ export const useVormiaQueryAuthMutation = (options) => {
       }
 
       // Show success notification
-      if (data?.data?.message) {
-        showSuccessNotification(data.data.message, "Success");
+      if (data?.message) {
+        showSuccessNotification(data.message, "Success");
       }
 
       // Call custom success handler
@@ -186,7 +186,7 @@ export const useVormiaQueryAuthMutation = (options) => {
       }
 
       // Handle login success
-      if (onLoginSuccess && data.data?.token) {
+      if (onLoginSuccess && data.data?.access_token) {
         onLoginSuccess(data);
       }
     },

@@ -68,7 +68,7 @@ export function useVormiaQuerySimple({
 
       // Show success notification if enabled
       showSuccessNotification(
-        data?.data?.message || "Operation completed successfully",
+        data?.message || "Operation completed successfully",
         "Success"
       );
 

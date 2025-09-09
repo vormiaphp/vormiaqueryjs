@@ -154,7 +154,32 @@ export function logSuccessForDebug(response, label = "API Success") {
   console.group(`✅ ${label}`);
 
   // Format output to match API JSON structure
-  if (response?.data) {
+  // Check if this is a processed response (has message, status) or original API response
+  const isProcessedResponse = response.message !== undefined && response.status !== undefined;
+  const isOriginalApiResponse = response.success !== undefined;
+  
+  if (isProcessedResponse) {
+    // This is a processed response from the client
+    console.log("Success:", true); // If we got here, it was successful
+    console.log("Message:", response.message);
+    if (response.data) {
+      console.log("Data:", response.data);
+    }
+    if (response.debug) {
+      console.log("Debug:", response.debug);
+    }
+  } else if (isOriginalApiResponse) {
+    // This is an original API response
+    console.log("Success:", response.success);
+    console.log("Message:", response.message);
+    if (response.data) {
+      console.log("Data:", response.data);
+    }
+    if (response.debug) {
+      console.log("Debug:", response.debug);
+    }
+  } else if (response?.data) {
+    // Fallback for other response structures
     const apiData = response.data;
     console.log("Success:", apiData.success);
     console.log("Message:", apiData.message);
