@@ -124,7 +124,13 @@ export function logErrorForDebug(error, label = "API Error") {
 
   console.group(`🚨 ${label}`);
   console.log("Status:", error?.status || error?.response?.status || "Unknown");
-  console.log("Message:", error?.message || error?.response?.message || error?.toString() || "Unknown error");
+  console.log(
+    "Message:",
+    error?.message ||
+      error?.response?.message ||
+      error?.toString() ||
+      "Unknown error"
+  );
 
   // Format output to match API JSON structure
   try {
@@ -142,16 +148,22 @@ export function logErrorForDebug(error, label = "API Error") {
       }
     }
   } catch (apiError) {
-    console.log("Error processing API response:", apiError?.message || apiError);
+    console.log(
+      "Error processing API response:",
+      apiError?.message || apiError
+    );
   }
 
   // Full API Response dump
   try {
     console.log("Full API Response:", apiResponse);
   } catch (responseError) {
-    console.log("Error logging API response:", responseError?.message || responseError);
+    console.log(
+      "Error logging API response:",
+      responseError?.message || responseError
+    );
   }
-  
+
   console.groupEnd();
 }
 
@@ -172,9 +184,10 @@ export function logSuccessForDebug(response, label = "API Success") {
 
   // Format output to match API JSON structure
   // Check if this is a processed response (has message, status) or original API response
-  const isProcessedResponse = response.message !== undefined && response.status !== undefined;
+  const isProcessedResponse =
+    response.message !== undefined && response.status !== undefined;
   const isOriginalApiResponse = response.success !== undefined;
-  
+
   if (isProcessedResponse) {
     // This is a processed response from the client
     console.log("Success:", true); // If we got here, it was successful
