@@ -25,8 +25,9 @@ export function ErrorDebugPanel({
   const { status, message, response, errorType, timestamp } = debugInfo;
 
   // Determine if this is a success or error response
-  const isSuccess = response.response?.data?.success === true;
-  const isError = response.response?.data?.success === false;
+  // Check both original API response format and processed response format
+  const isSuccess = response.response?.data?.success === true || errorType === "success";
+  const isError = response.response?.data?.success === false || errorType === "api_error";
 
   return (
     <div className={`mt-6 p-4 bg-gray-50 border border-gray-200 rounded-md ${className}`}>
@@ -238,23 +239,43 @@ export function createDebugInfo(response) {
     };
   }
   
-  // Handle success responses (from onSuccess)
-  if (response?.data) {
-    const isSuccess = response.data.success === true;
+  // Handle API responses (both success and error)
+  if (response?.data || response?.success !== undefined) {
+    // Check if this is a processed response from the client (has message, debug, status)
+    // vs an original API response (has success, message, data/errors, debug)
+    const isProcessedResponse = response.message !== undefined && response.status !== undefined;
+    const isOriginalApiResponse = response.success !== undefined;
+    
+    let isSuccess = false;
+    let message = "Unknown response";
+    let responseData = response.data;
+    let responseErrors = response.errors;
+    
+    if (isProcessedResponse) {
+      // This is a processed response from the client
+      // The data field contains the extracted data from the API
+      isSuccess = true; // If we got here, it was successful
+      message = response.message || "Operation successful";
+    } else if (isOriginalApiResponse) {
+      // This is an original API response
+      isSuccess = response.success === true;
+      message = response.message || (isSuccess ? "Operation successful" : "Unknown response");
+      responseData = response.data;
+      responseErrors = response.errors;
+    }
     
     return {
       status: isSuccess ? 200 : response.status || 0,
-      message: isSuccess
-        ? "Operation successful"
-        : response.data.message || "Unknown response",
+      message: message,
       response: {
         response: {
-          data: response.data, // Use the ORIGINAL response.data directly - no copying needed!
+          data: responseData,
+          errors: responseErrors,
           debug: response.debug
         },
         debug: response.debug
       },
-      errorType: isSuccess ? "success" : "api_response",
+      errorType: isSuccess ? "success" : "api_error",
       timestamp: new Date().toISOString()
     };
   }
@@ -310,8 +331,9 @@ export function createErrorDebugHtml(
   const { status, message, response, errorType, timestamp } = debugInfo;
 
   // Determine if this is a success or error response
-  const isSuccess = response.response?.data?.success === true;
-  const isError = response.response?.data?.success === false;
+  // Check both original API response format and processed response format
+  const isSuccess = response.response?.data?.success === true || errorType === "success";
+  const isError = response.response?.data?.success === false || errorType === "api_error";
 
   const getStatusColor = () => {
     if (status >= 500) return "background-color: #fef2f2; color: #dc2626;";

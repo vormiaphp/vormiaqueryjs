@@ -100,19 +100,26 @@ const createHttpClient = (baseConfig) => {
           throw new VormiaError(errorData);
         }
 
-        // Handle successful responses
-        // If the API response has a standard structure with success, message, data, debug
-        // extract the actual data field for easier access
+        // Handle API responses
+        // If the API response has a standard structure with success, message, data/errors, debug
+        // extract the appropriate field for easier access
         let finalData = responseData;
         let responseMessage = responseData.message;
         let responseDebug = responseData.debug;
 
-        if (
-          responseData.success !== undefined &&
-          responseData.data !== undefined
-        ) {
-          // Standard API response structure: { success, message, data, debug }
-          finalData = responseData.data;
+        if (responseData.success !== undefined) {
+          // Standard API response structure: { success, message, data/errors, debug }
+          if (
+            responseData.success === true &&
+            responseData.data !== undefined
+          ) {
+            // Success response with data
+            finalData = responseData.data;
+          } else if (responseData.success === false) {
+            // Error response - keep the full response structure for error handling
+            finalData = responseData;
+            // Don't extract data, keep errors accessible
+          }
           responseMessage = responseData.message;
           responseDebug = responseData.debug;
         }
