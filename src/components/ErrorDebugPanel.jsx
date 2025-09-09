@@ -81,49 +81,12 @@ export function ErrorDebugPanel({
           </p>
         </div>
         
-        {/* Response Data - Only show the data key content for success responses */}
-        {/* Debug: Print full response structure */}
-        {isSuccess && (
-          <div>
-            <span className="font-medium text-gray-600">🔍 Debug - Full Response Structure:</span>
-            <pre className="ml-2 mt-1 p-2 rounded text-xs overflow-x-auto bg-blue-50 text-gray-700 border border-blue-200">
-              {JSON.stringify(response, null, 2)}
-            </pre>
-          </div>
-        )}
-
-        {/* Debug: Check different data locations */}
-        {isSuccess && (
-          <div>
-            <span className="font-medium text-gray-600">🔍 Debug - Data Locations:</span>
-            <div className="ml-2 mt-1 space-y-2 text-xs">
-              <div>
-                <span className="font-medium">response.response?.data?.data:</span>
-                <pre className="ml-2 p-1 bg-gray-100 rounded">
-                  {JSON.stringify(response.response?.data?.data, null, 2)}
-                </pre>
-              </div>
-              <div>
-                <span className="font-medium">response.response?.data:</span>
-                <pre className="ml-2 p-1 bg-gray-100 rounded">
-                  {JSON.stringify(response.response?.data, null, 2)}
-                </pre>
-              </div>
-              <div>
-                <span className="font-medium">response.data:</span>
-                <pre className="ml-2 p-1 bg-gray-100 rounded">
-                  {JSON.stringify(response.data, null, 2)}
-                </pre>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {isSuccess && response.response?.data?.data && (
+        {/* Data: Show the data */}
+        {isSuccess && response.response?.data && (
           <div>
             <span className="font-medium text-gray-600">📊 Response Data:</span>
             <pre className="ml-2 mt-1 p-2 rounded text-xs overflow-x-auto bg-gray-100 text-gray-700">
-              {JSON.stringify(response.response.data.data, null, 2)}
+              {JSON.stringify(response.response.data, null, 2)}
             </pre>
           </div>
         )}
@@ -239,18 +202,6 @@ export function shouldShowDebug() {
  * @returns {ErrorDebugInfo} Debug information object
  */
 export function createDebugInfo(response) {
-  // Debug: Log the incoming response structure
-  console.log("🔍 createDebugInfo - Incoming response:", response);
-  console.log("🔍 createDebugInfo - Response structure:", {
-    hasResponse: !!response?.response,
-    hasData: !!response?.data,
-    hasSuccess: response?.success !== undefined,
-    hasErrors: !!response?.errors,
-    responseKeys: response ? Object.keys(response) : [],
-    responseDataKeys: response?.data ? Object.keys(response.data) : [],
-    responseResponseKeys: response?.response ? Object.keys(response.response) : []
-  });
-
   // Handle error objects (from onError)
   if (response?.response) {
     // This is an error response
