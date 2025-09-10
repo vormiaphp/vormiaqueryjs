@@ -31,6 +31,7 @@ export const useVrmAuthEnhanced = () => {
   const {
     token,
     refreshToken,
+    tokenExpiry,
     user,
     isAuthenticated,
     isLoading,
@@ -146,7 +147,10 @@ export const useVrmAuthEnhanced = () => {
           }
         } catch (error) {
           // Log the error but don't fail the logout process
-          console.warn("Logout endpoint call failed, but continuing with local cleanup:", error.message);
+          console.warn(
+            "Logout endpoint call failed, but continuing with local cleanup:",
+            error.message
+          );
         }
       }
 
@@ -320,8 +324,6 @@ export const useVrmAuthEnhanced = () => {
 
     return result;
   };
-
-
 
   // Form data persistence
   const saveFormData = (formId, data) => {
