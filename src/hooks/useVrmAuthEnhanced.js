@@ -55,7 +55,7 @@ export const useVrmAuthEnhanced = () => {
   // Enhanced login function
   const login = async (credentials, options = {}) => {
     const {
-      endpoint = "/api/auth/login",
+      endpoint = "/login",
       storeUserData = true,
       cacheUserData = true,
       rememberMe = false,
@@ -129,7 +129,7 @@ export const useVrmAuthEnhanced = () => {
   // Enhanced logout function
   const logout = async (options = {}) => {
     const {
-      endpoint = "/api/auth/logout",
+      endpoint = "/logout",
       clearCache = true,
       clearStorage = true,
       onSuccess,
@@ -195,7 +195,7 @@ export const useVrmAuthEnhanced = () => {
     }
 
     try {
-      const response = await client.post("/api/auth/refresh", {
+      const response = await client.post("/refresh", {
         refresh_token: refreshToken,
       });
 
@@ -232,7 +232,7 @@ export const useVrmAuthEnhanced = () => {
   // Enhanced user data management
   const updateUser = async (userData, options = {}) => {
     const {
-      endpoint = "/api/auth/profile",
+      endpoint = "/profile",
       updateStore = true,
       updateCache = true,
       onSuccess,
