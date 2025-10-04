@@ -16,6 +16,33 @@ const toHeadersInit = (headers) => {
   return result;
 };
 
+// Helper function to convert params object to query string
+const buildQueryString = (params) => {
+  if (!params || typeof params !== "object") {
+    return "";
+  }
+
+  const searchParams = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      // Handle arrays by joining with commas or repeating the parameter
+      if (Array.isArray(value)) {
+        value.forEach((item) => {
+          if (item !== undefined && item !== null) {
+            searchParams.append(key, String(item));
+          }
+        });
+      } else {
+        searchParams.append(key, String(value));
+      }
+    }
+  });
+
+  const queryString = searchParams.toString();
+  return queryString ? `?${queryString}` : "";
+};
+
 // Create a simple HTTP client that matches our VormiaInstance interface
 const createHttpClient = (baseConfig) => {
   const client = {
@@ -42,6 +69,12 @@ const createHttpClient = (baseConfig) => {
         }
       } else {
         fullUrl = "";
+      }
+
+      // Add query parameters for GET requests
+      if (config.method === "GET" && config.params) {
+        const queryString = buildQueryString(config.params);
+        fullUrl += queryString;
       }
 
       const headers = toHeadersInit({
